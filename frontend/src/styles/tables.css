@@ -1,0 +1,7 @@
+.clickable-table tbody tr {
+  cursor: pointer;
+}
+
+.calypso-header thead th {
+  @apply !bg-calypso-900 !text-white hover:!bg-calypso-700;
+}

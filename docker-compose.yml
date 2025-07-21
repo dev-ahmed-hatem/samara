@@ -1,0 +1,81 @@
+#version: "3.7"
+
+services:
+  # react_frontend:
+  #   build:
+  #     context: .
+  #     dockerfile: ./docker/frontend/Dockerfile
+  #   ports:
+  #     - 3000:80
+  #   networks:
+  #     - shared_network
+  #   depends_on:
+  #     - admission
+
+  admission:
+    build:
+      context: .
+      dockerfile: ./docker/backend/Dockerfile
+    volumes:
+      - static_volume:/app/static
+      - media_volume:/app/media
+      - db_backup_volume:/app/db:rw
+    environment:
+      - DJANGO_SETTINGS_MODULE=admission.settings
+    expose:
+      - 8000
+    deploy:
+      replicas: 3
+    command: gunicorn --workers=3 --bind=0.0.0.0:8000 admission.wsgi:application
+    restart: unless-stopped
+    networks:  # nginx and backend should be on the same network
+      shared_network:
+
+  # unhash in dependant run
+  nginx:
+    container_name: nginx
+    build:
+      context: .
+      dockerfile: ./docker/nginx/Dockerfile
+    ports:
+      - 80:80  # Proxy port for the application
+      - 443:443
+    volumes:
+      - static_volume:/usr/share/nginx/html/static
+      - media_volume:/usr/share/nginx/html/media
+      - ./docker/nginx/certbot/conf:/etc/letsencrypt
+      - ./docker/nginx/certbot/www:/var/www/certbot
+      # - ./docker/nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - admission
+      - certbot
+    restart: unless-stopped
+    networks:
+      shared_network:
+
+  admission_backup:
+    container_name: db_backup
+    image: alpine
+    restart: unless-stopped
+    volumes:
+      - db_backup_volume:/app/db  # Access shared SQLite database volume
+    entrypoint: sh -c "apk add --no-cache sqlite && mkdir -p /app/db/db_backup/ && touch /app/db/db_backup/backup.sqlite3 && while true; do sqlite3 /app/db/db.sqlite3 '.backup /app/db/db_backup/backup.sqlite3'; sleep 3600; done"
+
+  # unhash in dependant run
+  certbot:
+    container_name: certbot
+    image: certbot/certbot
+    volumes:
+      - ./docker/nginx/certbot/conf:/etc/letsencrypt
+      - ./docker/nginx/certbot/www:/var/www/certbot
+    restart: unless-stopped
+    entrypoint: /bin/sh -c 'trap exit TERM; while :; do sleep 6h & wait $!; certbot renew; done;'
+
+volumes:
+  static_volume: {}
+  media_volume: {}
+  db_backup_volume: {}  # Persistent volume for SQLite database and backups
+
+networks:
+  shared_network:
+    external: true
