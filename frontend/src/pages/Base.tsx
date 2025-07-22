@@ -1,37 +1,49 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "../components/navbar/Navbar";
 import Menu from "../components/Menu";
-import { Navigate, Outlet, useMatch } from "react-router";
-import Home from "./Home";
+import { Navigate, Outlet, useLocation } from "react-router";
 import Footer from "../components/Footer";
-import Breadcrumbs from "../components/BreadCrumbs";
 import ScrollToTop from "../components/ScrollToTop";
 import Error from "./ErrorPage";
 import { useAppSelector } from "@/app/redux/hooks";
+import Loading from "@/components/Loading";
 
 const Base = ({ error }: { error?: any }) => {
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
-  const isHome = useMatch("/");
   const user = useAppSelector((state) => state.auth.user)!;
+  const [redirected, setRedirected] = useState(false);
+  const location = useLocation();
+
+  // Handle redirect only once when needed
+  useEffect(() => {
+    if (user && location.pathname === "/") {
+      setRedirected(true);
+    }
+  }, [user, location.pathname]);
+
+  // Show loading if user is not ready
+  if (!user) {
+    return <Loading />;
+  }
+
+  // Show error page if error prop is passed
+  if (error) {
+    return <Error notFound={true} />;
+  }
+
+  // Redirect based on role from root
+  if (redirected && location.pathname === "/") {
+    return <Navigate to={`/${user.role}`} replace />;
+  }
 
   return (
     <>
       <ScrollToTop />
       <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
       <Menu menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
-      {error ? (
-        // error display
-        <Error />
-      ) : isHome ? (
-        // home page
-        <Navigate to={user.role} />
-      ) : (
-        // nested routes
-        <div className="padding-container py-7">
-          <Breadcrumbs />
-          <Outlet />
-        </div>
-      )}
+      <main className="min-h-screen">
+        <Outlet />
+      </main>
       <Footer />
     </>
   );

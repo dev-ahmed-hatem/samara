@@ -3,24 +3,38 @@ import Logo from "./Logo";
 import "../styles/menu.css";
 import { NavLink, useLocation } from "react-router";
 import { useEffect, useMemo, useState } from "react";
-import appRoutes, { type AppRoute } from "../app/appRoutes";
+import { routesMap, type AppRoute } from "../app/appRoutes";
 import { ItemType } from "antd/es/menu/interface";
+import { useAppSelector } from "@/app/redux/hooks";
 
-const mapRoute = ({ path, label, icon, children }: AppRoute): ItemType => ({
-  key: path!,
+const mapRoute = ({
+  path,
+  label,
   icon,
-  label:
-    children && children?.length > 0 ? (
-      label
-    ) : (
-      <NavLink to={path!}>{label}</NavLink>
-    ),
-  children: children?.length
-    ? children.map((subRoute) =>
-        mapRoute({ ...subRoute, path: `${path}/${subRoute.path}` })
-      )
-    : undefined,
-});
+  children,
+  fullPath,
+}: AppRoute & { fullPath: string }): ItemType => {
+  const currentPath = fullPath ? `${fullPath}/${path}` : path;
+
+  return {
+    key: currentPath!,
+    icon,
+    label:
+      children && children?.length > 0 ? (
+        label
+      ) : (
+        <NavLink to={currentPath!}>{label}</NavLink>
+      ),
+    children: children?.length
+      ? children.map((subRoute) =>
+          mapRoute({
+            ...subRoute,
+            fullPath: currentPath!,
+          })
+        )
+      : undefined,
+  };
+};
 
 const Menu = ({
   menuOpen,
@@ -35,12 +49,16 @@ const Menu = ({
   const location = useLocation();
   const [openKeys, setOpenKeys] = useState<string[]>([]);
 
+  const user = useAppSelector((state) => state.auth.user);
+
   const items = useMemo(() => {
-    return appRoutes[0].children!.map(mapRoute);
+    return routesMap[user!.role].children!.map((route) =>
+      mapRoute({ ...route, fullPath: `/${user?.role}` })
+    );
   }, []);
 
   useEffect(() => {
-    const activeSubMenu = items.find((item: any) =>
+    const activeSubMenu = items!.find((item: any) =>
       item!.children?.some((child: any) => child.key === location.pathname)
     );
     setOpenKeys(activeSubMenu ? [activeSubMenu.key as string] : []);
@@ -64,7 +82,7 @@ const Menu = ({
         </NavLink>
 
         <AntdMenu
-          selectedKeys={[location.pathname.slice(1)]}
+          selectedKeys={[location.pathname]}
           defaultOpenKeys={openKeys}
           mode="inline"
           items={items}

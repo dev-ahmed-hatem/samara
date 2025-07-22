@@ -31,7 +31,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // check if user data has been saved in the store
   const user = useAppSelector((state) => state.auth.user);
 
-  if (isFetching || !user) return <Loading />;
+  if (isFetching || (isSuccess && !user)) return <Loading />;
   if (isError) {
     const err = error as axiosBaseQueryError & AxiosError;
     const next =

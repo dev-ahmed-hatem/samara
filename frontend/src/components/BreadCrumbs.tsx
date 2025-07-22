@@ -3,11 +3,13 @@ import { HomeOutlined } from "@ant-design/icons";
 import { Breadcrumb } from "antd";
 import { Link, useLocation } from "react-router";
 import { BreadcrumbItemType } from "antd/es/breadcrumb/Breadcrumb";
-import appRoutes, { AppRoute } from "../app/appRoutes";
+import { AppRoute, routesMap } from "../app/appRoutes";
+import { useAppSelector } from "@/app/redux/hooks";
 
 const Breadcrumbs: React.FC = () => {
   const location = useLocation();
   const [items, setItems] = useState<BreadcrumbItemType[]>([]);
+  const user = useAppSelector((state) => state.auth.user)!;
 
   const build = (
     appRoutes: AppRoute[],
@@ -40,7 +42,7 @@ const Breadcrumbs: React.FC = () => {
 
   useEffect(() => {
     setItems([]);
-    build(appRoutes, location.pathname.slice(1));
+    build(routesMap[user.role].children, location.pathname, "/supervisor");
   }, [location.pathname]);
 
   return (
@@ -63,7 +65,7 @@ const Breadcrumbs: React.FC = () => {
               </Link>
             );
         }}
-        items={items}
+        items={[{ href: "" }, ...items]}
       />
     </div>
   );

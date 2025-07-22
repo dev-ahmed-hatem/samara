@@ -36,13 +36,7 @@ const Navbar = ({
       </div>
       <div className="user">
         <Popover
-          content={
-            <UserMenu
-              role={
-                user?.is_root ? "مطور" : user?.is_superuser ? "مدير" : "مشرف"
-              }
-            />
-          }
+          content={<UserMenu role={user?.role_arabic!} />}
           title={user?.name || <span className="text-red-500">بلا اسم</span>}
           trigger="click"
           open={open}

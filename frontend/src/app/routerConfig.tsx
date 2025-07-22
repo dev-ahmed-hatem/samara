@@ -9,7 +9,7 @@ import TaskForm from "@/pages/tasks/TaskForm";
 import FinancialForm from "@/pages/financials/FinancialForm";
 import FinancialProfilePage from "@/pages/financials/FinancialProfilePage";
 import SalaryForm from "@/pages/financials/SalaryForm";
-import AddSchedule from "@/pages/schedules/AddSchedule";
+import AddSchedule from "@/pages/visits/AddSchedule";
 import NotePreview from "@/pages/notes/NotePreview";
 import AddNote from "@/pages/notes/AddNote";
 import EmployeeEdit from "@/pages/employees/EmployeeEdit";
