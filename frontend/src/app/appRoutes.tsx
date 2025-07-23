@@ -4,7 +4,9 @@ import { RouteObject } from "react-router";
 import LoginPage from "@/pages/LoginPage";
 import AuthProvider from "@/providers/AuthProvider";
 import PermissionProvider from "@/providers/PermissionProvider";
-import VisitsPage from "@/pages/visits/supervisor/Visits";
+import SectionView from "@/pages/SectionView";
+import VisitsList from "@/pages/visits/supervisor/visits/VisitsList";
+import { CalendarOutlined } from "@ant-design/icons";
 
 export type AppRoute = RouteObject & {
   key?: string;
@@ -41,7 +43,13 @@ export const routesMap = {
       {
         label: "الزيارات",
         path: "visits",
-        element: <VisitsPage />,
+        icon: <CalendarOutlined />,
+        element: (
+          <SectionView
+            parentComponent={<VisitsList />}
+            parentUrl="/supervisor/visits"
+          />
+        ),
       },
     ],
   },

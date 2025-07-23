@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Card, Input, Empty, Button } from "antd";
-import { CheckCircleOutlined, ClockCircleOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, CalendarOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router";
 import dayjs from "dayjs";
 
@@ -30,7 +30,7 @@ const completedSchedules = [
 
 const selectedDate = dayjs();
 
-const VisitsPage: React.FC = () => {
+const VisitsList: React.FC = () => {
   const navigate = useNavigate();
   const [searchText, setSearchText] = useState<string>("");
 
@@ -52,7 +52,7 @@ const VisitsPage: React.FC = () => {
 
     return (
       <div
-        className={`border p-4 rounded-2xl shadow-sm transition hover:shadow-md ${
+        className={`border p-4 rounded-lg shadow-sm transition hover:shadow-md ${
           isCompleted
             ? "border-green-500 bg-green-50"
             : "border-blue-500 bg-white"
@@ -68,13 +68,13 @@ const VisitsPage: React.FC = () => {
               <Button
                 type="primary"
                 className="bg-blue-600"
-                onClick={() => navigate(`/start-visit/${visit.id}`)}
+                onClick={() => navigate(`start-visit/${visit.id}`)}
               >
                 بدء الزيارة
               </Button>
               <Button
                 danger
-                onClick={() => navigate(`/report-violation/${visit.id}`)}
+                onClick={() => navigate(`report-violation/${visit.id}`)}
               >
                 إبلاغ عن مخالفة
               </Button>
@@ -106,7 +106,7 @@ const VisitsPage: React.FC = () => {
         className="shadow-md"
         title={
           <div className="flex items-center gap-2 text-blue-600">
-            <ClockCircleOutlined />
+            <CalendarOutlined />
             زيارات مجدولة ليوم {selectedDate.format("DD-MM-YYYY")}
           </div>
         }
@@ -146,4 +146,4 @@ const VisitsPage: React.FC = () => {
   );
 };
 
-export default VisitsPage;
+export default VisitsList;

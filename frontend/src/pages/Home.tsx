@@ -1,25 +1,7 @@
-import { useAppSelector } from "@/app/redux/hooks";
-import Calendar from "../components/home/calendar/Calendar";
-import EmployeesOverview from "../components/home/EmployeesOverview";
-import LatestNotes from "../components/home/LatestNotes";
-import NavigationGrid from "../components/home/NavigationGrid";
-import RecentActions from "../components/home/RecentActions";
-
 const Home = () => {
-  const user = useAppSelector(state => state.auth.user)!
   return (
     <div className="font-bold text-xl">
-      <div className="flex max-md:flex-col gap-y-8 gap-x-6 justify-between md:max-g-[360px]">
-        <EmployeesOverview />
-        <RecentActions />
-      </div>
-      <div className="my-16"></div>
-      <Calendar />
-      <div className="my-16"></div>
-      <LatestNotes />
-      <div className="my-16"></div>
-      <NavigationGrid />
-      <div className="my-16"></div>
+      <h1 className="text-3xl text-center font-bold">قيد التنفيذ</h1>
     </div>
   );
 };
