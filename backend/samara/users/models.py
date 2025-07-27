@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib import auth
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, _user_has_perm, Group, \
     Permission
+from django.utils.translation import gettext_lazy as _
 
 
 class UserManager(BaseUserManager):
@@ -23,9 +24,9 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     class RoleChoices(models.TextChoices):
-        ADMIN = 'admin', "مدير"
-        SUPERVISOR = 'supervisor', "مشرف"
-        SYS_USER = "sys_user", "مستخدم نظام"
+        ADMIN = 'admin', _("مدير")
+        SUPERVISOR = 'supervisor', _("مشرف")
+        SYS_USER = "sys_user", _("مستخدم نظام")
 
     name = models.CharField(max_length=100, default="")
     username = models.CharField(max_length=20, unique=True)

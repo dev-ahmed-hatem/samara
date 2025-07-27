@@ -30,6 +30,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # "django.contrib.gis",
+
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
@@ -37,7 +39,7 @@ INSTALLED_APPS = [
     'authentication.apps.AuthenticationConfig',
     'users.apps.UsersConfig',
     'employees.apps.EmployeesConfig',
-    # 'visits.apps.VisitsConfig',
+    'visits.apps.VisitsConfig',
 ]
 
 MIDDLEWARE = [

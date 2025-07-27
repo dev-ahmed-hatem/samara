@@ -1,90 +1,51 @@
-import React, { useState } from "react";
-import { Card, Input, Empty, Button } from "antd";
+import React, { useEffect, useState } from "react";
+import { Card, Input, Empty } from "antd";
 import { CheckCircleOutlined, CalendarOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router";
 import dayjs from "dayjs";
-
-// Type for a single visit item
-interface Visit {
-  id: string;
-  title: string;
-  description: string;
-}
-
-const schedules = [
-  { id: "1", title: "زيارة مطعم", description: "تفتيش النظافة" },
-  {
-    id: "2",
-    title: "زيارة مستشفى",
-    description: "مراجعة الإجراءات",
-  },
-];
-
-const completedSchedules = [
-  {
-    id: "3",
-    title: "زيارة مدرسة",
-    description: "تمت بنجاح الساعة 10 صباحًا",
-  },
-];
+import VisitCard from "@/components/visits/VisitCard";
+import ErrorPage from "@/pages/ErrorPage";
+import Loading from "@/components/Loading";
+import { useGetVisitsQuery } from "@/app/api/endpoints/visits";
+import { useAppSelector } from "@/app/redux/hooks";
+import { Visit } from "@/types/visit";
 
 const selectedDate = dayjs();
 
+type FilteredVisitsType = {
+  scheduled: Visit[];
+  completed: Visit[];
+};
+
 const VisitsList: React.FC = () => {
-  const navigate = useNavigate();
   const [searchText, setSearchText] = useState<string>("");
+  const [filteredVisits, setFilteredVisits] = useState<FilteredVisitsType>({
+    scheduled: [],
+    completed: [],
+  });
 
-  const filterVisits = (visits: Visit[]) =>
-    visits.filter(
-      (v) =>
-        v.title.toLowerCase().includes(searchText.toLowerCase()) ||
-        v.description.toLowerCase().includes(searchText.toLowerCase())
-    );
+  const user = useAppSelector((state) => state.auth.user);
+  const {
+    data: visits,
+    isFetching,
+    isError,
+    isSuccess,
+  } = useGetVisitsQuery({
+    employee: user?.employee_profile.id,
+    date: selectedDate.format("YYYY-MM-DD"),
+    project: searchText,
+  });
 
-  const VisitCard = ({
-    visit,
-    type,
-  }: {
-    visit: Visit;
-    type: "scheduled" | "completed";
-  }) => {
-    const isCompleted = type === "completed";
+  useEffect(() => {
+    if (isSuccess) {
+      setFilteredVisits({
+        scheduled: visits.filter((visit) => visit.status === "مجدولة"),
+        completed: visits.filter((visit) => visit.status === "مكتملة"),
+      });
+    }
+  }, [isSuccess, visits]);
 
-    return (
-      <div
-        className={`border p-4 rounded-lg shadow-sm transition hover:shadow-md ${
-          isCompleted
-            ? "border-green-500 bg-green-50"
-            : "border-blue-500 bg-white"
-        }`}
-      >
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
-          <div>
-            <h3 className="text-lg font-semibold">{visit.title}</h3>
-            <p className="text-gray-600 text-sm">{visit.description}</p>
-          </div>
-          {!isCompleted && (
-            <div className="flex gap-2 mt-2 md:mt-0">
-              <Button
-                type="primary"
-                className="bg-blue-600 hover:bg-blue-500"
-                onClick={() => navigate(`start-visit/${visit.id}`)}
-              >
-                بدء الزيارة
-              </Button>
-              <Button
-                danger
-                onClick={() => navigate(`report-violation/${visit.id}`)}
-              >
-                إبلاغ عن مخالفة
-              </Button>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  };
-
+  if (isFetching) return <Loading />;
+  if (isError) return <ErrorPage />;
   return (
     <div className="space-y-6">
       <h1 className="mb-6 text-2xl font-bold">الزيارات</h1>
@@ -113,8 +74,8 @@ const VisitsList: React.FC = () => {
         }
       >
         <div className="grid gap-4">
-          {filterVisits(schedules).length > 0 ? (
-            filterVisits(schedules).map((visit) => (
+          {filteredVisits!.scheduled?.length > 0 ? (
+            filteredVisits?.scheduled.map((visit) => (
               <VisitCard key={visit.id} visit={visit} type="scheduled" />
             ))
           ) : (
@@ -134,8 +95,8 @@ const VisitsList: React.FC = () => {
         }
       >
         <div className="grid gap-4">
-          {filterVisits(completedSchedules).length > 0 ? (
-            filterVisits(completedSchedules).map((visit) => (
+          {filteredVisits!.completed?.length > 0 ? (
+            filteredVisits?.completed.map((visit) => (
               <VisitCard key={visit.id} visit={visit} type="completed" />
             ))
           ) : (
