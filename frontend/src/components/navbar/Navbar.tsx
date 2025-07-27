@@ -37,7 +37,7 @@ const Navbar = ({
       <div className="user">
         <Popover
           content={<UserMenu role={user?.role_arabic!} />}
-          title={user?.name || <span className="text-red-500">بلا اسم</span>}
+          title={user?.employee_profile.name || <span className="text-red-500">بلا اسم</span>}
           trigger="click"
           open={open}
           onOpenChange={handleOpenChange}

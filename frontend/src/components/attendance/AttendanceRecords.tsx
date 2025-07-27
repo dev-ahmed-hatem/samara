@@ -1,451 +1,210 @@
-import { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Card,
-  DatePicker,
-  Table,
-  Button,
   Select,
-  Popconfirm,
-  TimePicker,
-  Space,
   Form,
-  Spin,
+  Input,
+  Button,
+  Radio,
+  Typography,
+  Divider,
+  message,
+  Table,
 } from "antd";
+import type { RadioChangeEvent } from "antd";
 import dayjs from "dayjs";
-import {
-  DeleteOutlined,
-  EditOutlined,
-  LoadingOutlined,
-  PlusOutlined,
-  SaveOutlined,
-} from "@ant-design/icons";
-import {
-  useDeleteAttendanceRecordMutation,
-  useGetDayAttendanceQuery,
-  useUpdateDayAttendanceMutation,
-} from "@/app/api/endpoints/attendance";
-import Loading from "@/components/Loading";
-import ErrorPage from "@/pages/ErrorPage";
-import { useGetAllEmployeesQuery } from "@/app/api/endpoints/employees";
-import { AssignedEmployee } from "@/types/employee";
-import { useNotification } from "@/providers/NotificationProvider";
+import "dayjs/locale/ar";
+dayjs.locale("ar");
 
-type AttendanceRecord = {
-  key: string | number;
-  employee: AssignedEmployee | null;
-  check_in: string | null;
-  check_out?: string;
-  editing?: boolean;
-  saved: boolean;
+const { Title } = Typography;
+
+type AttendanceStatus = "حاضر" | "متأخر" | "غائب";
+
+interface Employee {
+  id: number;
+  name: string;
+}
+
+interface AttendanceRecord {
+  status: AttendanceStatus;
+  note?: string;
+}
+
+const dummyProjects = [
+  { id: 1, name: "مشروع الرياض" },
+  { id: 2, name: "مشروع جدة" },
+];
+
+const dummyLocations: Record<number, Array<string>> = {
+  1: ["موقع 1 - الرياض", "موقع 2 - الرياض"],
+  2: ["موقع 1 - جدة"],
 };
 
-const AttendanceRecords = () => {
-  const [attendanceRecords, setAttendanceRecords] = useState<
-    AttendanceRecord[]
-  >([]);
-  const notification = useNotification();
+const dummyEmployees: Employee[] = [
+  { id: 1, name: "أحمد محمد" },
+  { id: 2, name: "سعيد علي" },
+  { id: 3, name: "فهد عبد الله" },
+];
+
+const AttendanceRecords: React.FC = () => {
+  const [projectId, setProjectId] = useState<number | null>(null);
+  const [location, setLocation] = useState<string | null>(null);
+  const [attendance, setAttendance] = useState<
+    Record<number, AttendanceRecord>
+  >({});
   const [form] = Form.useForm();
-
-  const [date, setDate] = useState(dayjs()); // Default to today's date
-
-  const [currentDeletedRecord, setcurrentDeletedRecord] = useState<
-    number | null
-  >(null);
-
-  // queries
-
-  // fetch attendance data
-  const {
-    data: savedAttendanceRecords,
-    isLoading,
-    isFetching,
-    isError,
-    refetch,
-  } = useGetDayAttendanceQuery({
-    date: date.format("YYYY-MM-DD"),
-  });
-
-  // update attendnace data
-  const [
-    updateAttendnace,
-    { isLoading: updating, isError: updateError, isSuccess: updateSuccess },
-  ] = useUpdateDayAttendanceMutation();
-
-  // delete attendance record
-  const [
-    deleteSavedRecord,
-    {
-      isLoading: deletingRecord,
-      isSuccess: recordDeleted,
-      isError: recordDeletingError,
-    },
-  ] = useDeleteAttendanceRecordMutation();
-
-  // fetch employees
-  const {
-    data: employees,
-    isError: employeesError,
-    isFetching: employeesFetching,
-  } = useGetAllEmployeesQuery();
-
-  // Add New Attendance Row
-  const addAttendanceRow = () => {
-    setAttendanceRecords([
-      ...attendanceRecords,
-      {
-        key: Date.now(),
-        employee: null,
-        check_in: null,
-        editing: true,
-        saved: false,
-      },
-    ]);
-  };
-
-  // Handle Cell Editing
-  const handleEdit = (key: string, field: string, value: any) => {
-    setAttendanceRecords((prev) =>
-      prev.map((record) =>
-        record.key === key ? { ...record, [field]: value } : record
-      )
-    );
-    form.setFields([{ name: `${field}-${key}`, errors: undefined }]);
-  };
-
-  // Make a record editable
-  const editRecord = (key: string) => {
-    const record = attendanceRecords.find((record) => record.key === key);
-    setAttendanceRecords((prev) =>
-      prev.map((record) =>
-        record.key === key ? { ...record, editing: true } : record
-      )
-    );
-
-    // set initial values
-    form.setFields([
-      {
-        name: `employee-${key}`,
-        value: { label: record?.employee?.name, value: record?.employee?.id },
-      },
-      {
-        name: `check-in-${key}`,
-        value: record?.check_in ? dayjs(record.check_in, "HH:mm") : null,
-      },
-      {
-        name: `check-out-${key}`,
-        value: record?.check_out ? dayjs(record.check_out, "HH:mm") : null,
-      },
-    ]);
-  };
-
-  // save record changes
-  const handleSave = () => {
-    form
-      .validateFields({ recursive: false, validateOnly: false })
-      .then((values) => {
-        // normalizing attendance records for database
-        const records = attendanceRecords
-          .filter((record) => record.editing === true)
-          .map((record) => ({
-            id: record.key,
-            employee: record.employee?.id,
-            check_in: record.check_in,
-            check_out: record.check_out,
-            saved: record.saved,
-          }));
-
-        // perform update
-        updateAttendnace({ date: date.format("YYYY-MM-DD"), records });
-      });
-  };
-
-  // Delete a Row
-  const handleDelete = (key: number) => {
-    const record = attendanceRecords.find((record) => record.key === key);
-    if (record?.saved) {
-      setcurrentDeletedRecord(key);
-      deleteSavedRecord(key.toString());
-    } else {
-      setAttendanceRecords((prev) =>
-        prev.filter((record) => record.key !== key)
-      );
-    }
-  };
 
   // Table Columns
   const columns = [
     {
       title: "الموظف",
-      dataIndex: "employee",
-      render: (employee: AssignedEmployee, record: any) =>
-        record.editing && !record.saved ? (
-          <Form.Item
-            name={`employee-${record.key}`}
-            rules={[
-              { required: true, message: "اختر الموظف" },
-              {
-                validator: (rule, value) => {
-                  if (
-                    value &&
-                    attendanceRecords.find(
-                      (current) =>
-                        current.employee?.id === value &&
-                        current.key !== record.key
-                    )
-                  ) {
-                    return Promise.reject(new Error("يوجد تسجيل لهذا الموظف"));
-                  }
-
-                  return Promise.resolve();
-                },
-              },
-            ]}
-          >
-            <Select
-              style={{ width: "100%" }}
-              placeholder="اختر الموظف"
-              onChange={(value, option) =>
-                handleEdit(record.key, "employee", {
-                  id: value,
-                  name: (
-                    option as {
-                      value: number;
-                      label: string;
-                    }
-                  ).label,
-                })
-              }
-              allowClear={false}
-              showSearch={true}
-              options={employees?.map((emp) => ({
-                value: emp.id,
-                label: emp.name,
-              }))}
-              optionFilterProp="label"
-            />
-          </Form.Item>
-        ) : (
-          employee.name
-        ),
+      dataIndex: "name",
     },
     {
-      title: "وقت الحضور",
-      dataIndex: "check_in",
-      render: (text: string, record: any) =>
-        record.editing ? (
-          <Form.Item
-            name={`check-in-${record.key}`}
-            rules={[{ required: true, message: "حدد وقت الحضور" }]}
-          >
-            <TimePicker
-              placeholder="حدد وقت الحضور"
-              className="w-40"
-              format={"HH:mm"}
-              onChange={(value) =>
-                handleEdit(record.key, "check_in", value?.format("HH:mm"))
-              }
-              allowClear={false}
-            />
-          </Form.Item>
-        ) : (
-          text
-        ),
+      title: "الحالة",
+      dataIndex: "status",
+      render: (text: string, record: any) => (
+        <Radio.Group
+          value={attendance[record.id]?.status}
+          onChange={(e) => handleStatusChange(record.id, e)}
+          options={["حاضر", "متأخر", "غائب"]}
+          optionType="button"
+          buttonStyle="solid"
+        />
+      ),
     },
     {
-      title: "وقت الانصراف",
-      dataIndex: "check_out",
-      render: (text: string, record: any) =>
-        record.editing ? (
-          <Form.Item
-            name={`check-out-${record.key}`}
-            rules={[
-              {
-                validator: (_, value) => {
-                  const checkIn = form.getFieldValue(`check-in-${record.key}`);
-                  if (!value || !checkIn || value.isAfter(checkIn)) {
-                    return Promise.resolve();
-                  }
-                  return Promise.reject(
-                    new Error("وقت الانصراف يجب أن يكون بعد وقت الحضور")
-                  );
-                },
-              },
-            ]}
-          >
-            <TimePicker
-              placeholder="حدد وقت الانصراف"
-              className="w-40"
-              format={"HH:mm"}
-              onChange={(value) =>
-                handleEdit(record.key, "check_out", value?.format("HH:mm"))
-              }
-            />
-          </Form.Item>
-        ) : text ? (
-          text
-        ) : (
-          "-"
-        ),
-    },
-    {
-      title: "إجراءات",
-      dataIndex: "actions",
-      render: (_: any, record: any) => (
-        <div className="flex gap-4 justify-between">
-          <Space>
-            {!record.editing && (
-              <Button
-                type="primary"
-                icon={<EditOutlined />}
-                onClick={() => editRecord(record.key)}
-                disabled={record.key === currentDeletedRecord}
-              />
-            )}
-
-            <Popconfirm
-              title="هل أنت متأكد من حذف هذا السجل؟"
-              onConfirm={() => handleDelete(record.key)}
-              okText="نعم"
-              cancelText="لا"
-            >
-              <Button
-                danger
-                icon={<DeleteOutlined />}
-                disabled={record.key === currentDeletedRecord}
-              />
-            </Popconfirm>
-            {record.key === currentDeletedRecord && (
-              <Spin indicator={<LoadingOutlined spin />} />
-            )}
-          </Space>
-        </div>
+      title: "ملاحظات",
+      dataIndex: "notes",
+      render: (text: string, record: any) => (
+        <Input
+          className="mt-2"
+          placeholder="ملاحظات"
+          value={attendance[record.id]?.note}
+          onChange={(e) => handleNoteChange(record.id, e)}
+        />
       ),
     },
   ];
 
-  useEffect(() => {
-    refetch();
-  }, [date]);
+  const handleStatusChange = (id: number, e: RadioChangeEvent) => {
+    setAttendance((prev) => ({
+      ...prev,
+      [id]: { ...prev[id], status: e.target.value },
+    }));
+  };
 
-  useEffect(() => {
-    if (savedAttendanceRecords) {
-      setAttendanceRecords(
-        savedAttendanceRecords.map((attendance) => ({
-          key: attendance.id,
-          employee: attendance.employee,
-          check_in: attendance.check_in,
-          check_out: attendance.check_out,
-          editing: false,
-          saved: true,
-        }))
-      );
+  const handleNoteChange = (
+    id: number,
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setAttendance((prev) => ({
+      ...prev,
+      [id]: { ...prev[id], note: e.target.value },
+    }));
+  };
+
+  const handleSave = () => {
+    if (!projectId || !location) {
+      message.warning("يرجى اختيار المشروع والموقع أولاً");
+      return;
     }
-  }, [savedAttendanceRecords]);
 
-  // notification listeners
+    console.log("Saved Attendance:", {
+      projectId,
+      location,
+      records: attendance,
+    });
 
-  // update records
-  useEffect(() => {
-    if (updateSuccess) {
-      notification.success({
-        message: "تم حفظ تسجيلات الحضور",
-      });
-      setAttendanceRecords((prev) =>
-        prev.map((record) => ({ ...record, editing: false }))
-      );
-    }
-  }, [updateSuccess]);
+    message.success("تم حفظ الحضور بنجاح");
+  };
 
-  useEffect(() => {
-    if (updateError) {
-      notification.error({
-        message: "حدث خطأ أثناء حفظ تسجيلات الحضور ! برجاء إعادة المحاولة",
-      });
-    }
-  }, [updateError]);
-
-  // deleting record
-  useEffect(() => {
-    if (recordDeleted) {
-      notification.success({
-        message: "تم حذف تسجيل الحضور",
-      });
-    }
-    setAttendanceRecords((prev) =>
-      prev.filter((record) => record.key !== currentDeletedRecord)
-    );
-  }, [recordDeleted]);
-
-  useEffect(() => {
-    if (recordDeletingError) {
-      notification.error({
-        message: "حدث خطأ أثناء حذف تسجيل الحضور ! برجاء إعادة المحاولة",
-      });
-      setcurrentDeletedRecord(null);
-    }
-  }, [recordDeletingError]);
-
-  if (isLoading || employeesFetching) return <Loading />;
-  if (isError || employeesError) {
-    return (
-      <ErrorPage subtitle={"حدث خطأ أثناء تحميل بيانات الحضور"} reload={true} />
-    );
-  }
+  const currentDate = dayjs().format("YYYY-MM-DD");
 
   return (
-    <Card>
-      {/* Date Picker for Attendance Records */}
-      <div className="mb-4 flex gap-5 items-center flex-wrap">
-        <h2 className="text-lg font-bold">تاريخ اليوم:</h2>
-        <DatePicker
-          value={date}
-          onChange={(value) => setDate(value)}
-          format="YYYY-MM-DD"
-          allowClear={false}
-        />
-      </div>
-      {isLoading ? (
-        <Loading />
-      ) : (
-        <>
-          <Form form={form}>
-            {/* Attendance Table */}
+    <div className="space-y-6">
+      {/* Section 1 */}
+      <Card title="تفاصيل الحضور" className="shadow-md">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Form
+            layout="vertical"
+            form={form}
+            className="col-span-full md:col-span-3"
+          >
+            {/* Date */}
+            <Form.Item label="تاريخ اليوم">
+              <div className="font-semibold">{currentDate}</div>
+            </Form.Item>
+
+            {/* Project Select */}
+            <Form.Item label="اختر المشروع" required>
+              <Select
+                placeholder="اختر المشروع"
+                onChange={(value) => {
+                  setProjectId(value);
+                  setLocation(null); // reset location
+                }}
+                value={projectId ?? undefined}
+              >
+                {dummyProjects.map((project) => (
+                  <Select.Option key={project.id} value={project.id}>
+                    {project.name}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            {/* Location Select */}
+            <Form.Item label="اختر الموقع" required>
+              <Select
+                placeholder="اختر الموقع"
+                onChange={(value) => setLocation(value)}
+                value={location ?? undefined}
+                disabled={!projectId}
+              >
+                {projectId &&
+                  dummyLocations[projectId]?.map((loc) => (
+                    <Select.Option key={loc} value={loc}>
+                      {loc}
+                    </Select.Option>
+                  ))}
+              </Select>
+            </Form.Item>
+
+            {/* Shift Select */}
+            <Form.Item label="اختر الوردية" required name="shift">
+              <Radio.Group>
+                <Radio.Button value="الأولى">الأولى</Radio.Button>
+                <Radio.Button value="الثانية">الثانية</Radio.Button>
+                <Radio.Button value="الثالثة">الثالثة</Radio.Button>
+              </Radio.Group>
+            </Form.Item>
+          </Form>
+        </div>
+      </Card>
+
+      {/* Section 2 */}
+      {projectId && location && (
+        <Card title="حالة الموظفين" className="shadow-md">
+          <div className="space-y-6">
             <Table
               columns={columns}
-              dataSource={attendanceRecords}
+              dataSource={dummyEmployees}
               pagination={false}
               className="calypso-header"
               scroll={{ x: "max-content" }}
             />
-          </Form>
-
-          {/* Add Row Button */}
-
-          <div className="flex md:justify-between items-center mt-4 flex-wrap gap-4">
-            <Button
-              type="dashed"
-              onClick={addAttendanceRow}
-              icon={<PlusOutlined />}
-            >
-              إضافة صف
-            </Button>
-
-            {attendanceRecords.some((record) => record.editing) && (
-              <Space>
-                <Button
-                  type="primary"
-                  icon={<SaveOutlined />}
-                  onClick={handleSave}
-                  loading={isFetching || updating}
-                >
-                  حفظ
-                </Button>
-              </Space>
-            )}
           </div>
-        </>
+
+          {/* Save Button */}
+          <div className="mt-6 text-end">
+            <Button type="primary" onClick={handleSave} size="large">
+              حفظ
+            </Button>
+          </div>
+        </Card>
       )}
-    </Card>
+    </div>
   );
 };
 

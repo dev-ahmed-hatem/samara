@@ -15,8 +15,8 @@ import { RcFile } from "antd/es/upload";
 import { useState } from "react";
 
 const options = [
-  { label: "جيد", value: "good" },
-  { label: "يحتاج إلى معالجة", value: "needs_attention" },
+  { label: "جيد", value: "جيد" },
+  { label: "يحتاج إلى معالجة", value: "يحتاج إلى معالجة" },
 ];
 
 type VisitFormData = {
@@ -55,7 +55,7 @@ const VisitForm = () => {
         <Descriptions
           bordered
           column={{ xs: 1, sm: 1, md: 2 }}
-          labelStyle={{ fontWeight: 600, fontSize: 14 }}
+          styles={{ label: { fontWeight: 600, fontSize: 14 } }}
           size="default"
         >
           <Descriptions.Item label="رقم الزيارة">#12345</Descriptions.Item>
@@ -84,7 +84,7 @@ const VisitForm = () => {
       <Card title="معلومات المشروع" className="bg-orange-50 mb-6 shadow-md">
         <Descriptions
           column={{ xs: 1, sm: 1, md: 2 }}
-          labelStyle={{ fontWeight: 600, fontSize: 14 }}
+          styles={{ label: { fontWeight: 600, fontSize: 14 } }}
           bordered
         >
           <Descriptions.Item label="اسم المشروع">
@@ -136,7 +136,10 @@ const VisitForm = () => {
             ))}
 
             <Col span={24}>
-              <Form.Item label="صورة مرفقة (اختياري)" name="attachment">
+              <Form.Item
+                label={<span className="text-base">صورة مرفقة (اختياري)</span>}
+                name="attachment"
+              >
                 <Upload
                   beforeUpload={() => false}
                   onChange={handleUploadChange}
@@ -156,12 +159,15 @@ const VisitForm = () => {
             <Col span={24}>
               <Form.Item
                 name="notes"
-                label="توجيهات أو توصيات من العميل"
+                label={
+                  <span className="text-base">توجيهات أو توصيات من العميل</span>
+                }
                 rules={[{ max: 500, message: "الحد الأقصى 500 حرف" }]}
               >
                 <Input.TextArea
                   rows={4}
                   placeholder="أدخل التوصيات أو الملاحظات هنا..."
+                  className="text-base"
                 />
               </Form.Item>
             </Col>

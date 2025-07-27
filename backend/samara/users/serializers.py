@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from rest_framework.relations import HyperlinkedIdentityField
+
+from employees.serializers import EmployeeReadSerializer
 from .models import User
 
 
@@ -8,11 +10,12 @@ class UserSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(write_only=True)
     role_arabic = serializers.CharField(source='get_role_display', read_only=True)
     url = HyperlinkedIdentityField(view_name='user-detail', lookup_field='pk')
+    employee_profile = EmployeeReadSerializer()
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'name', 'phone', 'national_id', 'is_superuser', 'is_moderator', 'password',
-                  'password2', 'url', 'is_root', 'role', 'role_arabic']
+        fields = ['id', 'username', 'name', 'is_superuser', 'is_moderator', 'password',
+                  'password2', 'url', 'is_root', 'role', 'role_arabic', 'employee_profile']
 
     def validate(self, data):
         if 'password' in data and 'password2' in data:

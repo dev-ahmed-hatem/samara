@@ -47,7 +47,7 @@ const ViolationForm: React.FC = () => {
         <Descriptions
           bordered
           column={{ xs: 1, sm: 1, md: 2 }}
-          labelStyle={{ fontWeight: 600, fontSize: 14 }}
+          styles={{ label: { fontWeight: 600, fontSize: 14 } }}
           size="default"
         >
           <Descriptions.Item label="رقم الزيارة">#12345</Descriptions.Item>
@@ -76,7 +76,7 @@ const ViolationForm: React.FC = () => {
       <Card title="معلومات المشروع" className="bg-orange-50 mb-6 shadow-md">
         <Descriptions
           column={{ xs: 1, sm: 1, md: 2 }}
-          labelStyle={{ fontWeight: 600, fontSize: 14 }}
+          styles={{ label: { fontWeight: 600, fontSize: 14 } }}
           bordered
         >
           <Descriptions.Item label="اسم المشروع">

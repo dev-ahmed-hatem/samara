@@ -6,7 +6,9 @@ import AuthProvider from "@/providers/AuthProvider";
 import PermissionProvider from "@/providers/PermissionProvider";
 import SectionView from "@/pages/SectionView";
 import VisitsList from "@/pages/visits/supervisor/visits/VisitsList";
+import AttendancePage from "@/pages/attendance/AttendancePage";
 import { CalendarOutlined } from "@ant-design/icons";
+import { BsFillPersonCheckFill } from "react-icons/bs";
 
 export type AppRoute = RouteObject & {
   key?: string;
@@ -50,6 +52,12 @@ export const routesMap = {
             parentUrl="/supervisor/visits"
           />
         ),
+      },
+      {
+        label: "الحضور",
+        path: "attendance",
+        icon: <BsFillPersonCheckFill />,
+        element: <AttendancePage />,
       },
     ],
   },

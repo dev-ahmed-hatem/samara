@@ -1,15 +1,10 @@
 from rest_framework.response import Response
 from rest_framework import viewsets, status
-from .serializers import DepartmentSerializer, EmployeeReadSerializer, EmployeeWriteSerializer, EmployeeListSerializer
-from .models import Department, Employee
+from .serializers import EmployeeReadSerializer, EmployeeWriteSerializer, EmployeeListSerializer
+from .models import Employee
 from rest_framework.decorators import action, api_view
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
-
-
-class DepartmentViewSet(viewsets.ModelViewSet):
-    queryset = Department.objects.all()
-    serializer_class = DepartmentSerializer
 
 
 class EmployeeViewSet(viewsets.ModelViewSet):

@@ -1,13 +1,12 @@
 import { Tabs } from "antd";
 import AttendanceRecords from "../../components/attendance/AttendanceRecords";
 import AttendanceSummary from "../../components/attendance/AttendanceSummary";
-import AttendanceSettings from "../../components/attendance/settings/AttendanceSettings";
 
 const AttendancePage: React.FC = () => {
   const tabItems = [
     {
       key: "1",
-      label: "دفتر الحضور",
+      label: "تسجيل الحضور",
       children: <AttendanceRecords />,
     },
     {
@@ -15,16 +14,11 @@ const AttendancePage: React.FC = () => {
       label: "ملخص الحضور",
       children: <AttendanceSummary />,
     },
-    {
-      key: "3",
-      label: "إعدادات",
-      children: <AttendanceSettings />,
-    },
   ];
 
   return (
     <>
-      <h1 className="mb-6 text-2xl font-bold">الحضور والانصراف</h1>
+      <h1 className="mb-6 text-2xl font-bold">الحضور </h1>
       <Tabs defaultActiveKey="1" items={tabItems} direction="rtl" />
     </>
   );

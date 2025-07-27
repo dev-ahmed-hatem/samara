@@ -67,7 +67,7 @@ const VisitsList: React.FC = () => {
             <div className="flex gap-2 mt-2 md:mt-0">
               <Button
                 type="primary"
-                className="bg-blue-600"
+                className="bg-blue-600 hover:bg-blue-500"
                 onClick={() => navigate(`start-visit/${visit.id}`)}
               >
                 بدء الزيارة
@@ -87,8 +87,9 @@ const VisitsList: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Search Bar */}
+      <h1 className="mb-6 text-2xl font-bold">الزيارات</h1>
 
+      {/* Search Bar */}
       <div className="flex justify-between flex-wrap mb-4">
         <Input.Search
           placeholder="ابحث ضمن الزيارات..."

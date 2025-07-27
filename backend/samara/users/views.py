@@ -79,12 +79,9 @@ def set_user_permissions(request):
     try:
         permission_list = request.data.get("permissions", [])
         username = request.data.get("username", None)
-        print(permission_list)
-        print(username)
         user = User.objects.get(username=username)
         user.user_permissions.clear()
         for permission in permission_list:
-            print(permission)
             permission = permission.split(".")[-1]
             perm = Permission.objects.filter(codename=permission).first()
             if perm:
