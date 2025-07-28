@@ -20,12 +20,12 @@ const VisitCard = ({
           : "border-blue-500 bg-white"
       }`}
     >
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 flex-wrap ">
         <div>
           <h3 className="text-lg font-semibold">
             {visit.location.project_name} - {visit.location.name}
           </h3>
-          <p className="text-gray-600 text-sm truncate max-w-full">
+          <p className="text-gray-600 text-sm truncate max-w-64 md:max-w-lg">
             {visit.purpose}
           </p>
         </div>

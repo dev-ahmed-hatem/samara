@@ -1,4 +1,4 @@
-import { Visit } from "@/types/visit";
+import { Visit, VisitReportForm } from "@/types/visit";
 import api from "../apiSlice";
 import qs from "query-string";
 
@@ -23,7 +23,23 @@ export const visitsEndpoints = api.injectEndpoints({
             ]
           : [{ type: "Visit", id: "LIST" }],
     }),
+    visit: builder.query<Visit, string>({
+      query: (id) => ({
+        url: `/visits/visits/${id}/`,
+        method: "GET",
+      }),
+      providesTags: (response, error, id) => [{ type: "Visit", id }],
+    }),
+    visitReport: builder.mutation<void, VisitReportForm>({
+      query: (data) => ({
+        url: `/visits/visit-report/`,
+        method: "POST",
+        data,
+      }),
+      invalidatesTags: [],
+    }),
   }),
 });
 
-export const { useGetVisitsQuery } = visitsEndpoints;
+export const { useGetVisitsQuery, useVisitReportMutation, useVisitQuery } =
+  visitsEndpoints;

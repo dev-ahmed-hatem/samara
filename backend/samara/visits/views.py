@@ -1,7 +1,8 @@
 from rest_framework.viewsets import ModelViewSet
 
-from .models import Project, Location, Visit
-from .serializers import ProjectSerializer, LocationSerializer, VisitReadSerializer, VisitWriteSerializer
+from .models import Project, Location, Visit, VisitReport
+from .serializers import ProjectSerializer, LocationSerializer, VisitReadSerializer, VisitWriteSerializer, \
+    VisitReportSerializer
 
 
 class ProjectViewSet(ModelViewSet):
@@ -38,3 +39,8 @@ class VisitViewSet(ModelViewSet):
             return VisitWriteSerializer
         else:
             return VisitReadSerializer
+
+
+class VisitReportViewSet(ModelViewSet):
+    queryset = VisitReport.objects.all()
+    serializer_class = VisitReportSerializer

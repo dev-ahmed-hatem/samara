@@ -1,4 +1,4 @@
-from .models import Project, Location, Visit
+from .models import Project, Location, Visit, VisitReport
 from rest_framework import serializers
 
 
@@ -34,4 +34,12 @@ class VisitReadSerializer(serializers.ModelSerializer):
 class VisitWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Visit
+        fields = '__all__'
+
+
+class VisitReportSerializer(serializers.ModelSerializer):
+    url = serializers.HyperlinkedIdentityField(view_name='visit-report-detail')
+
+    class Meta:
+        model = VisitReport
         fields = '__all__'

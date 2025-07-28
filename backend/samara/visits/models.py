@@ -41,8 +41,8 @@ class Location(models.Model):
 
 class Visit(models.Model):
     class VisitStatus(models.TextChoices):
-        SCHEDULED = "scheduled", _("مجدولة")
-        COMPLETED = "completed", _("مكتملة")
+        SCHEDULED = "مجدولة", _("مجدولة")
+        COMPLETED = "مكتملة", _("مكتملة")
 
     location = models.ForeignKey(
         "Location",
@@ -60,11 +60,13 @@ class Visit(models.Model):
         related_name="visits",
         verbose_name=_("الموظف المسؤول"),
     )
+
     # gps_coordinates = gis_models.PointField(
     #     geography=True,
     #     verbose_name=_("إحداثيات GPS"),
     #     help_text=_("تحديد الموقع الجغرافي باستخدام إحداثيات GPS"),
     # )
+
     purpose = models.TextField(
         verbose_name=_("الهدف من الزيارة"),
         help_text=_("صف الهدف من الزيارة"),
@@ -76,6 +78,13 @@ class Visit(models.Model):
         verbose_name=_("حالة الزيارة"),
     )
 
+    completed_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_("تاريخ استكمال التقرير"),
+        help_text=_("تاريخ ووقت اكتمال تقرير الزيارة")
+    )
+
     class Meta:
         verbose_name = _("زيارة")
         verbose_name_plural = _("الزيارات")
@@ -83,3 +92,79 @@ class Visit(models.Model):
 
     def __str__(self):
         return f"{self.location} - {self.date}"
+
+
+class VisitReport(models.Model):
+    class EvaluationChoices(models.TextChoices):
+        GOOD = "جيد", _("جيد")
+        NEEDS_ATTENTION = "يحتاج إلى معالجة", _("يحتاج إلى معالجة")
+
+    visit = models.OneToOneField(
+        "Visit",
+        on_delete=models.CASCADE,
+        related_name="report",
+        verbose_name=_("الزيارة")
+    )
+
+    guard_presence = models.CharField(
+        max_length=20,
+        choices=EvaluationChoices.choices,
+        verbose_name=_("تواجد الحارس في موقعه")
+    )
+    uniform_cleanliness = models.CharField(
+        max_length=20,
+        choices=EvaluationChoices.choices,
+        verbose_name=_("نظافة الزي الرسمي")
+    )
+    attendance_records = models.CharField(
+        max_length=20,
+        choices=EvaluationChoices.choices,
+        verbose_name=_("سجلات الحضور والانصراف والسجلات الخاصة بالموقع")
+    )
+    shift_handover = models.CharField(
+        max_length=20,
+        choices=EvaluationChoices.choices,
+        verbose_name=_("الانضباط في تسليم واستلام الورديات")
+    )
+    lighting = models.CharField(
+        max_length=20,
+        choices=EvaluationChoices.choices,
+        verbose_name=_("الإضاءة حول محيط الموقع")
+    )
+    cameras = models.CharField(
+        max_length=20,
+        choices=EvaluationChoices.choices,
+        verbose_name=_("كاميرات المراقبة")
+    )
+    security_vehicles = models.CharField(
+        max_length=20,
+        choices=EvaluationChoices.choices,
+        verbose_name=_("السيارات الأمنية")
+    )
+    radio_devices = models.CharField(
+        max_length=20,
+        choices=EvaluationChoices.choices,
+        verbose_name=_("عمل أجهزة الاتصال اللاسلكي")
+    )
+
+    notes = models.TextField(
+        null=True,
+        blank=True,
+        verbose_name=_("توجيهات أو توصيات من العميل")
+    )
+    attachment = models.FileField(
+        upload_to="visit_reports/",
+        null=True,
+        blank=True,
+        verbose_name=_("مرفقات")
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("تاريخ الإنشاء"))
+    updated_at = models.DateTimeField(auto_now=True, verbose_name=_("آخر تحديث"))
+
+    class Meta:
+        verbose_name = _("تقرير الزيارة")
+        verbose_name_plural = _("تقارير الزيارات")
+
+    def __str__(self):
+        return f"تقرير زيارة {self.visit}"

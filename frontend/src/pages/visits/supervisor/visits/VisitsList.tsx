@@ -37,6 +37,8 @@ const VisitsList: React.FC = () => {
 
   useEffect(() => {
     if (isSuccess) {
+      console.log(visits);
+      
       setFilteredVisits({
         scheduled: visits.filter((visit) => visit.status === "مجدولة"),
         completed: visits.filter((visit) => visit.status === "مكتملة"),
@@ -57,9 +59,11 @@ const VisitsList: React.FC = () => {
           className="w-full max-w-md"
           allowClear={true}
           size="large"
-          // onSearch={onSearch}
-          // defaultValue={search}
-          // onClear={() => setSearch("")}
+          onSearch={(value) => {
+            setSearchText(value);
+          }}
+          defaultValue={searchText}
+          onClear={() => setSearchText("")}
         />
       </div>
 

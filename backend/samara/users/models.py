@@ -42,7 +42,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['phone', 'national_id']
 
     # groups and permissions
     groups = models.ManyToManyField(Group, blank=True, related_name='custom_users')

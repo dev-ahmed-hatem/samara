@@ -6,44 +6,58 @@ import {
   Button,
   Row,
   Col,
-  message,
   Card,
   Descriptions,
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
-import { RcFile } from "antd/es/upload";
 import { useState } from "react";
+import { visitReportFieldLabels, VisitReportForm } from "@/types/visit";
+import { UploadFile } from "antd/lib";
+import { RcFile } from "antd/lib/upload";
+import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
+import Loading from "@/components/Loading";
+import ErrorPage from "@/pages/ErrorPage";
+import { useVisitQuery } from "@/app/api/endpoints/visits";
+import { useParams } from "react-router";
+import { dayjs } from "@/utils/locale";
 
 const options = [
   { label: "جيد", value: "جيد" },
   { label: "يحتاج إلى معالجة", value: "يحتاج إلى معالجة" },
 ];
 
-type VisitFormData = {
-  guardPresence: string;
-  uniformCleanliness: string;
-  attendanceRecords: string;
-  shiftHandover: string;
-  lighting: string;
-  cameras: string;
-  securityVehicles: string;
-  radioDevices: string;
-  notes?: string;
-  attachment?: RcFile[];
-};
-
 const VisitForm = () => {
-  const [form] = Form.useForm<VisitFormData>();
+  const { visit_id } = useParams();
+
+  const [form] = Form.useForm<VisitReportForm>();
   const [fileList, setFileList] = useState<RcFile[]>([]);
 
-  const handleFinish = (values: VisitFormData) => {
-    console.log("Form Data:", values);
-    message.success("تم إرسال النموذج بنجاح");
+  const handleFinish = (values: VisitReportForm) => {
+    console.log(values.attachment);
   };
 
   const handleUploadChange = ({ fileList }: any) => {
-    setFileList(fileList.map((file: any) => file.originFileObj));
+    setFileList(fileList.map((file: UploadFile) => file.originFileObj));
   };
+
+  const {
+    data: visit,
+    isFetching,
+    isError,
+    error: visitError,
+  } = useVisitQuery(visit_id as string);
+
+  if (isFetching || !visit) return <Loading />;
+  if (isError) {
+    const error_title =
+      (visitError as axiosBaseQueryError).status === 404
+        ? "زيارة غير موجود! تأكد من كود الزيارة المدخل."
+        : undefined;
+
+    return (
+      <ErrorPage subtitle={error_title} reload={error_title === undefined} />
+    );
+  }
 
   return (
     <>
@@ -58,9 +72,14 @@ const VisitForm = () => {
           styles={{ label: { fontWeight: 600, fontSize: 14 } }}
           size="default"
         >
-          <Descriptions.Item label="رقم الزيارة">#12345</Descriptions.Item>
-          <Descriptions.Item label="التاريخ">22-07-2025</Descriptions.Item>
-          <Descriptions.Item label="الوقت">14:30</Descriptions.Item>
+          <Descriptions.Item label="رقم الزيارة">#{visit.id}</Descriptions.Item>
+          <Descriptions.Item label="التاريخ">
+            {dayjs(visit.date, "DD/MM/YYYY").format("YYYY-MM-DD")}
+          </Descriptions.Item>
+          <Descriptions.Item label="الوقت">{visit.time}</Descriptions.Item>
+          <Descriptions.Item label="الموقع" span={2}>
+            {visit.location.name}
+          </Descriptions.Item>
           <Descriptions.Item label="إحداثيات GPS">
             <div className="flex items-center gap-2">
               <Button
@@ -74,8 +93,10 @@ const VisitForm = () => {
               </Button>
             </div>
           </Descriptions.Item>
+
+          {/* Purpose on its own full row */}
           <Descriptions.Item label="الهدف من الزيارة" span={2}>
-            متابعة أداء الحراس والتأكد من الانضباط
+            {visit.purpose}
           </Descriptions.Item>
         </Descriptions>
       </Card>
@@ -88,7 +109,7 @@ const VisitForm = () => {
           bordered
         >
           <Descriptions.Item label="اسم المشروع">
-            مجمع العليا الإداري
+            {visit.location.project_name}
           </Descriptions.Item>
           <Descriptions.Item label="إجمالي رجال الأمن">12</Descriptions.Item>
           <Descriptions.Item label="إجمالي المشرفين">2</Descriptions.Item>
@@ -104,26 +125,11 @@ const VisitForm = () => {
           initialValues={{}}
         >
           <Row gutter={[16, 16]}>
-            {[
-              { name: "guardPresence", label: "تواجد الحارس في موقعه" },
-              { name: "uniformCleanliness", label: "نظافة الزي الرسمي" },
-              {
-                name: "attendanceRecords",
-                label: "سجلات الحضور والانصراف والسجلات الخاصة بالموقع",
-              },
-              {
-                name: "shiftHandover",
-                label: "الانضباط في تسليم واستلام الورديات",
-              },
-              { name: "lighting", label: "الإضاءة حول محيط الموقع" },
-              { name: "cameras", label: "كاميرات المراقبة" },
-              { name: "securityVehicles", label: "السيارات الأمنية" },
-              { name: "radioDevices", label: "عمل أجهزة الاتصال اللاسلكي" },
-            ].map((field) => (
-              <Col xs={24} sm={24} key={field.name}>
+            {Object.entries(visitReportFieldLabels).map(([name, label]) => (
+              <Col xs={24} sm={24} key={name}>
                 <Form.Item
-                  name={field.name as keyof VisitFormData}
-                  label={<span className="text-base">{field.label}</span>}
+                  name={name as keyof VisitReportForm}
+                  label={<span className="text-base">{label}</span>}
                   rules={[{ required: true, message: "الرجاء اختيار تقييم" }]}
                 >
                   <Radio.Group
@@ -150,6 +156,7 @@ const VisitForm = () => {
                     url: URL.createObjectURL(file),
                   }))}
                   accept="image/*"
+                  maxCount={1}
                 >
                   <Button icon={<UploadOutlined />}>تحميل صورة</Button>
                 </Upload>
