@@ -189,7 +189,7 @@ const ViolationForm: React.FC = () => {
         className="shadow-md"
       >
         {visit!.violation !== null ? (
-          <Tag className="text-lg" color="danger">
+          <Tag className="text-lg" color="red ">
             تم تسجيل مخالفة لهذة الزيارة
           </Tag>
         ) : (
