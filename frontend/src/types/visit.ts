@@ -16,6 +16,8 @@ export interface Visit {
   };
   purpose: string;
   status: VisitStatus;
+  completed_at: string | null;
+  violation: string | null;
   // gps_coordinates?: { lat: number; lng: number }; // if you enable GIS field later
 }
 
@@ -41,4 +43,40 @@ export type VisitReportForm = {
   radio_devices: "جيد" | "يحتاج إلى معالجة";
   notes?: string;
   attachment?: RcFile;
+};
+
+export type Severity = "منخفضة" | "متوسطة" | "عالية";
+
+export type ViolationType =
+  | "تأخير عن الدوام"
+  | "التدخين بالموقع أثناء العمل"
+  | "عدم الالتزام بالزي الرسمي"
+  | "غياب"
+  | "ترك الموقع (انسحاب)"
+  | "التجمع في منطقة العمل"
+  | "الشكوى من العميل"
+  | "عدم احترام الرئيس المباشر"
+  | "استخدام الجوال أثناء العمل"
+  | "أخرى";
+
+export type ViolationForm = {
+  violation_type: ViolationType;
+
+  severity: Severity;
+
+  details: string;
+
+  supervisor_explanation?: string;
+
+  violation_image?: File | null;
+
+  action?: string;
+
+  guidance?: string;
+
+  penalty?: string;
+
+  confirmed_by_ops?: boolean;
+
+  confirmed_by_monitoring?: boolean;
 };

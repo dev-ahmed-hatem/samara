@@ -1,4 +1,4 @@
-import { Visit, VisitReportForm } from "@/types/visit";
+import { ViolationForm, Visit, VisitReportForm } from "@/types/visit";
 import api from "../apiSlice";
 import qs from "query-string";
 
@@ -30,16 +30,38 @@ export const visitsEndpoints = api.injectEndpoints({
       }),
       providesTags: (response, error, id) => [{ type: "Visit", id }],
     }),
-    visitReport: builder.mutation<void, VisitReportForm>({
+    visitReport: builder.mutation<void, VisitReportForm & { visit: string }>({
       query: (data) => ({
         url: `/visits/visit-report/`,
         method: "POST",
         data,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       }),
-      invalidatesTags: [],
+      invalidatesTags: (result, error, arg) => [
+        { type: "Visit", id: arg.visit },
+      ],
+    }),
+    violation: builder.mutation<void, ViolationForm & { visit: string }>({
+      query: (data) => ({
+        url: `/visits/violations/`,
+        method: "POST",
+        data,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }),
+      invalidatesTags: (result, error, arg) => [
+        { type: "Visit", id: arg.visit },
+      ],
     }),
   }),
 });
 
-export const { useGetVisitsQuery, useVisitReportMutation, useVisitQuery } =
-  visitsEndpoints;
+export const {
+  useGetVisitsQuery,
+  useVisitReportMutation,
+  useViolationMutation,
+  useVisitQuery,
+} = visitsEndpoints;

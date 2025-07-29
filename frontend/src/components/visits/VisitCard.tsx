@@ -1,5 +1,5 @@
 import { Visit } from "@/types/visit";
-import { Button } from "antd";
+import { Button, Tag } from "antd";
 import { useNavigate } from "react-router";
 
 const VisitCard = ({
@@ -28,9 +28,21 @@ const VisitCard = ({
           <p className="text-gray-600 text-sm truncate max-w-64 md:max-w-lg">
             {visit.purpose}
           </p>
+          {isCompleted && (
+            <Tag color="green" className="text-sm my-2">
+              تمت الزيارة في: {visit.completed_at}
+            </Tag>
+          )}
+          {visit.violation && (
+            <Tag color="red" className="text-sm my-2">
+              تمت تسجيل مخالفة: {visit.violation}
+            </Tag>
+          )}
         </div>
+
+        {/* buttons */}
         {!isCompleted && (
-          <div className="flex gap-2 mt-2 md:mt-0">
+          <div className="flex gap-2 mt-2 md:mt-0 flex-wrap">
             <Button
               type="primary"
               className="bg-blue-600 hover:bg-blue-500"
@@ -38,12 +50,19 @@ const VisitCard = ({
             >
               بدء الزيارة
             </Button>
-            <Button
-              danger
-              onClick={() => navigate(`report-violation/${visit.id}`)}
-            >
-              إبلاغ عن مخالفة
-            </Button>
+
+            {visit.violation ? (
+              <Tag color="red" className="flex items-center">
+                تم تسجيل مخالفة
+              </Tag>
+            ) : (
+              <Button
+                danger
+                onClick={() => navigate(`report-violation/${visit.id}`)}
+              >
+                إبلاغ عن مخالفة
+              </Button>
+            )}
           </div>
         )}
       </div>

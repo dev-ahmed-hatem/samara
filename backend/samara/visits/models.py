@@ -160,7 +160,6 @@ class VisitReport(models.Model):
     )
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("تاريخ الإنشاء"))
-    updated_at = models.DateTimeField(auto_now=True, verbose_name=_("آخر تحديث"))
 
     class Meta:
         verbose_name = _("تقرير الزيارة")
@@ -168,3 +167,104 @@ class VisitReport(models.Model):
 
     def __str__(self):
         return f"تقرير زيارة {self.visit}"
+
+    def delete(self, using=None, keep_parents=False):
+        if self.attachment:
+            self.attachment.delete()
+
+        super().delete(using, keep_parents=keep_parents)
+
+
+class Violation(models.Model):
+    class ViolationType(models.TextChoices):
+        LATE = "تأخير عن الدوام", _("تأخير عن الدوام")
+        SMOKING = "التدخين بالموقع أثناء العمل", _("التدخين بالموقع أثناء العمل")
+        UNIFORM = "عدم الالتزام بالزي الرسمي", _("عدم الالتزام بالزي الرسمي")
+        ABSENT = "غياب", _("غياب")
+        LEFT_SITE = "ترك الموقع (انسحاب)", _("ترك الموقع (انسحاب)")
+        GATHERING = "التجمع في منطقة العمل", _("التجمع في منطقة العمل")
+        CLIENT_COMPLAINT = "الشكوى من العميل", _("الشكوى من العميل")
+        DISRESPECT = "عدم احترام الرئيس المباشر", _("عدم احترام الرئيس المباشر")
+        PHONE_USE = "استخدام الجوال أثناء العمل", _("استخدام الجوال أثناء العمل")
+        OTHER = "أخرى", _("أخرى")
+
+    class SeverityLevel(models.TextChoices):
+        LOW = "منخفضة", _("منخفضة")
+        MEDIUM = "متوسطة", _("متوسطة")
+        HIGH = "عالية", _("عالية")
+
+    visit = models.OneToOneField(
+        "Visit",
+        on_delete=models.CASCADE,
+        related_name="violation",
+        verbose_name=_("الزيارة")
+    )
+
+    violation_type = models.CharField(
+        max_length=50,
+        choices=ViolationType.choices,
+        verbose_name=_("نوع المخالفة"),
+    )
+
+    severity = models.CharField(
+        max_length=10,
+        choices=SeverityLevel.choices,
+        verbose_name=_("درجة الخطورة"),
+    )
+
+    details = models.TextField(
+        verbose_name=_("وصف تفصيلي للمخالفة"),
+        help_text=_("يرجى كتابة تفاصيل المخالفة"),
+    )
+
+    supervisor_explanation = models.TextField(
+        blank=True,
+        verbose_name=_("شرح البيان من المشرف"),
+    )
+
+    violation_image = models.ImageField(
+        upload_to="violations/",
+        blank=True,
+        null=True,
+        verbose_name=_("تصوير فوري للمخالفة"),
+    )
+
+    action = models.TextField(
+        blank=True,
+        verbose_name=_("الإجراء"),
+    )
+
+    guidance = models.TextField(
+        blank=True,
+        verbose_name=_("التوجيه"),
+    )
+
+    penalty = models.TextField(
+        blank=True,
+        verbose_name=_("الجزاء المطبق للائحة"),
+    )
+
+    confirmed_by_ops = models.BooleanField(
+        default=False,
+        verbose_name=_("التأكيد من مدير العمليات"),
+    )
+
+    confirmed_by_monitoring = models.BooleanField(
+        default=False,
+        verbose_name=_("التأكيد من قسم المتابعة والحفظ"),
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("تاريخ الإنشاء"))
+
+    class Meta:
+        verbose_name = _("مخالفة")
+        verbose_name_plural = _("المخالفات")
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.violation_type} - {self.created_at.strftime('%Y-%m-%d')} - visit: {self.visit.id}"
+
+    def delete(self, using=None, keep_parents=False):
+        if self.violation_image:
+            self.violation_image.delete()
+        super().delete(using, keep_parents=keep_parents)

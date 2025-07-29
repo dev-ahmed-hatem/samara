@@ -37,8 +37,6 @@ const VisitsList: React.FC = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      console.log(visits);
-      
       setFilteredVisits({
         scheduled: visits.filter((visit) => visit.status === "مجدولة"),
         completed: visits.filter((visit) => visit.status === "مكتملة"),
