@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import { Card, Select, Form, Input, Button, Radio, message, Table } from "antd";
 import type { RadioChangeEvent } from "antd";
 import dayjs from "dayjs";
-import { AttendanceStatus, EmployeeAttendance } from "@/types/attendance";
+import {
+  AttendanceStatus,
+  EmployeeAttendance,
+  ShiftType,
+} from "@/types/attendance";
 import { Employee } from "@/types/employee";
 
 const dummyProjects = [
@@ -27,7 +31,7 @@ const AttendanceRecords: React.FC = () => {
   const [attendance, setAttendance] = useState<
     Record<number, EmployeeAttendance>
   >({});
-  const [shift, setShift] = useState(null);
+  const [shift, setShift] = useState<ShiftType | null>(null);
   const [form] = Form.useForm();
 
   // Table Columns
@@ -56,7 +60,7 @@ const AttendanceRecords: React.FC = () => {
         <Input
           className="mt-2"
           placeholder="ملاحظات"
-          value={attendance[record.id]?.note}
+          value={attendance[record.id]?.notes}
           onChange={(e) => handleNoteChange(record.id, e)}
         />
       ),
@@ -81,8 +85,8 @@ const AttendanceRecords: React.FC = () => {
   };
 
   const handleSave = () => {
-    if (!projectId || !location) {
-      message.warning("يرجى اختيار المشروع والموقع أولاً");
+    if (!projectId || !location || !shift) {
+      message.warning("يرجى اختيار المشروع والموقع والوردية أولاً");
       return;
     }
 
@@ -149,10 +153,16 @@ const AttendanceRecords: React.FC = () => {
 
             {/* Shift Select */}
             <Form.Item label="اختر الوردية" required name="shift">
-              <Radio.Group onChange={(event) => console.log(event.target.value)}>
-                <Radio.Button value="الأولى">الأولى</Radio.Button>
-                <Radio.Button value="الثانية">الثانية</Radio.Button>
-                <Radio.Button value="الثالثة">الثالثة</Radio.Button>
+              <Radio.Group onChange={(event) => setShift(event.target.value)}>
+                <Radio.Button value="الوردية الأولى">
+                  الوردية الأولى
+                </Radio.Button>
+                <Radio.Button value="الوردية الثانية">
+                  الوردية الثانية
+                </Radio.Button>
+                <Radio.Button value="الوردية الثالثة">
+                  الوردية الثالثة
+                </Radio.Button>
               </Radio.Group>
             </Form.Item>
           </Form>
