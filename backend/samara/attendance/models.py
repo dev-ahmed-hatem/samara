@@ -1,90 +1,68 @@
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from employees.models import Shift, SecurityGuard
+from visits.models import Location
 
-class Attendance(models.Model):
-    employee = models.ForeignKey(
-        'employees.Employee',
+
+class ShiftAttendance(models.Model):
+    location = models.ForeignKey(
+        Location,
         on_delete=models.CASCADE,
-        verbose_name=_("الموظف")
+        related_name="shifts",
+        verbose_name=_("الموقع"),
     )
-
-    date = models.DateField(
-        verbose_name=_("تاريخ الحضور"),
-        error_messages={
-            'invalid': _("يرجى إدخال تاريخ صحيح."),
-            'null': _("يرجى تحديد التاريخ.")
-        }
+    shift = models.ForeignKey(
+        Shift,
+        on_delete=models.CASCADE,
+        related_name="attendances",
+        verbose_name=_("الوردية"),
     )
+    date = models.DateField(verbose_name=_("تاريخ الوردية"))
+    created_at = models.DateTimeField(auto_now_add=True)
 
-    check_in = models.TimeField(
-        verbose_name=_("وقت الحضور"),
-        error_messages={
-            'invalid': _("يرجى إدخال وقت صالح."),
-            'null': _("يرجى إدخال وقت الحضور.")
-        }
+    class Meta:
+        unique_together = ("location", "shift", "date")
+        verbose_name = _("حضور وردية")
+        verbose_name_plural = _("حضور الورديات")
+
+    def __str__(self):
+        return f"{self.location.name} - {self.shift.get_name_display()} - {self.date.strftime('%d/%m/%Y')}"
+
+
+class SecurityGuardAttendance(models.Model):
+    class AttendanceStatus(models.TextChoices):
+        PRESENT = "حاضر", _("حاضر")
+        LATE = "متأخر", _("متأخر")
+        ABSENT = "غائب", _("غائب")
+
+    security_guard = models.ForeignKey(
+        SecurityGuard,
+        on_delete=models.CASCADE,
+        related_name="attendances",
+        verbose_name=_("حارس الأمن"),
     )
-
-    check_out = models.TimeField(
-        null=True,
+    shift = models.ForeignKey(
+        ShiftAttendance,
+        on_delete=models.CASCADE,
+        related_name="employee_attendances",
+        verbose_name=_("الوردية"),
+    )
+    status = models.CharField(
+        max_length=10,
+        choices=AttendanceStatus.choices,
+        verbose_name=_("الحالة"),
+    )
+    notes = models.TextField(
         blank=True,
-        verbose_name=_("وقت الانصراف"),
-        error_messages={
-            'invalid': _("يرجى إدخال وقت صالح.")
-        }
+        null=True,
+        verbose_name=_("ملاحظات"),
     )
 
     class Meta:
+        unique_together = ("security_guard", "shift")
         verbose_name = _("تسجيل حضور")
         verbose_name_plural = _("تسجيلات الحضور")
-        ordering = ['id']
-        unique_together = ["date", "employee"]
 
     def __str__(self):
-        return f"{self.employee} - {self.date.strftime('%Y-%m-%d')} {self.check_in.strftime('%H:%M')}"
-
-    def clean(self):
-        # Ensure check_out is not earlier than check_in
-        if self.check_out and self.check_out < self.check_in:
-            raise ValidationError({
-                'check_out': _("وقت الانصراف لا يمكن أن يكون قبل وقت الحضور.")
-            })
-
-
-class Day(models.Model):
-    class DayEnum(models.TextChoices):
-        SATURDAY = "saturday", _("السبت")
-        SUNDAY = "sunday", _("الأحد")
-        MONDAY = "monday", _("الاثنين")
-        TUESDAY = "tuesday", _("الثلاثاء")
-        WEDNESDAY = "wednesday", _("الأربعاء")
-        THURSDAY = "thursday", _("الخميس")
-        FRIDAY = "friday", _("الجمعة")
-
-    name = models.CharField(max_length=10, choices=DayEnum.choices, unique=True)
-
-    def __str__(self):
-        return self.get_name_display()
-
-    class Meta:
-        verbose_name = _("اليوم")
-        verbose_name_plural = _("الأيام")
-        ordering = ['id']
-
-
-class AttendanceSettings(models.Model):
-    name = models.CharField(_("الاسم"), max_length=100, blank=True, null=True)
-
-    check_in = models.TimeField(_("وقت الحضور"))
-    check_out = models.TimeField(_("وقت الانصراف"))
-    grace_period = models.PositiveIntegerField(_("فترة السماحية"), default=15)
-
-    working_days = models.ManyToManyField("Day", verbose_name=_("أيام العمل"))
-
-    def __str__(self):
-        return self.name or _("إعدادات الحضور الافتراضية")
-
-    class Meta:
-        verbose_name = _("إعدادات الحضور")
-        verbose_name_plural = _("إعدادات الحضور")
+        return f"{self.security_guard.name} - {self.shift} - {self.get_status_display()}"

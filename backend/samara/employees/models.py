@@ -80,3 +80,32 @@ class Employee(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.employee_id})"
+
+
+class Shift(models.Model):
+    class ShiftChoices(models.TextChoices):
+        FIRST = "الوردية الأولى", _("الوردية الأولى")
+        SECOND = "الوردية الثانية", _("الوردية الثانية")
+        THIRD = "الوردية الثالثة", _("الوردية الثالثة")
+
+    name = models.CharField(max_length=20, choices=ShiftChoices.choices, unique=True)
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+
+    def __str__(self):
+        return self.get_name_display()
+
+
+class SecurityGuard(models.Model):
+    name = models.CharField(max_length=100, verbose_name=_("الاسم"))
+
+    # the remaining fields will be here
+
+    shift = models.ForeignKey(Shift, on_delete=models.CASCADE, verbose_name=_("الوردية"))
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = _("حارس أمن")
+        verbose_name_plural = _("حراس الأمن")

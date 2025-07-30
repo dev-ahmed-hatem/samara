@@ -1,34 +1,9 @@
 import React, { useState } from "react";
-import {
-  Card,
-  Select,
-  Form,
-  Input,
-  Button,
-  Radio,
-  Typography,
-  Divider,
-  message,
-  Table,
-} from "antd";
+import { Card, Select, Form, Input, Button, Radio, message, Table } from "antd";
 import type { RadioChangeEvent } from "antd";
 import dayjs from "dayjs";
-import "dayjs/locale/ar";
-dayjs.locale("ar");
-
-const { Title } = Typography;
-
-type AttendanceStatus = "حاضر" | "متأخر" | "غائب";
-
-interface Employee {
-  id: number;
-  name: string;
-}
-
-interface AttendanceRecord {
-  status: AttendanceStatus;
-  note?: string;
-}
+import { AttendanceStatus, EmployeeAttendance } from "@/types/attendance";
+import { Employee } from "@/types/employee";
 
 const dummyProjects = [
   { id: 1, name: "مشروع الرياض" },
@@ -41,17 +16,18 @@ const dummyLocations: Record<number, Array<string>> = {
 };
 
 const dummyEmployees: Employee[] = [
-  { id: 1, name: "أحمد محمد" },
-  { id: 2, name: "سعيد علي" },
-  { id: 3, name: "فهد عبد الله" },
+  // { id: "1", name: "أحمد محمد" },
+  // { id: "2", name: "سعيد علي" },
+  // { id: "3", name: "فهد عبد الله" },
 ];
 
 const AttendanceRecords: React.FC = () => {
   const [projectId, setProjectId] = useState<number | null>(null);
   const [location, setLocation] = useState<string | null>(null);
   const [attendance, setAttendance] = useState<
-    Record<number, AttendanceRecord>
+    Record<number, EmployeeAttendance>
   >({});
+  const [shift, setShift] = useState(null);
   const [form] = Form.useForm();
 
   // Table Columns
@@ -173,7 +149,7 @@ const AttendanceRecords: React.FC = () => {
 
             {/* Shift Select */}
             <Form.Item label="اختر الوردية" required name="shift">
-              <Radio.Group>
+              <Radio.Group onChange={(event) => console.log(event.target.value)}>
                 <Radio.Button value="الأولى">الأولى</Radio.Button>
                 <Radio.Button value="الثانية">الثانية</Radio.Button>
                 <Radio.Button value="الثالثة">الثالثة</Radio.Button>
@@ -184,7 +160,7 @@ const AttendanceRecords: React.FC = () => {
       </Card>
 
       {/* Section 2 */}
-      {projectId && location && (
+      {projectId && location && shift && (
         <Card title="حالة الموظفين" className="shadow-md">
           <div className="space-y-6">
             <Table

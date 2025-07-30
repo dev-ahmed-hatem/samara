@@ -1,7 +1,8 @@
 from rest_framework.response import Response
 from rest_framework import viewsets, status
-from .serializers import EmployeeReadSerializer, EmployeeWriteSerializer, EmployeeListSerializer
-from .models import Employee
+from .serializers import EmployeeReadSerializer, EmployeeWriteSerializer, EmployeeListSerializer, \
+    SecurityGuardSerializer
+from .models import Employee, SecurityGuard
 from rest_framework.decorators import action, api_view
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
@@ -51,6 +52,11 @@ class EmployeeViewSet(viewsets.ModelViewSet):
             return Response(serializer)
         except Exception:
             return Response({'detail': _('موظف غير موجود')}, status=status.HTTP_404_NOT_FOUND)
+
+
+class SecurityGuardViewSet(viewsets.ModelViewSet):
+    queryset = SecurityGuard.objects.all()
+    serializer_class = SecurityGuardSerializer
 
 
 @api_view(["DELETE"])

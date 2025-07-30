@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Employee
+from .models import Employee, SecurityGuard
 
 
 class EmployeeReadSerializer(serializers.ModelSerializer):
@@ -31,3 +31,11 @@ class EmployeeWriteSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         auth_user = self.context['request'].user
         return Employee.objects.create(**validated_data, created_by=auth_user)
+
+
+class SecurityGuardSerializer(serializers.ModelSerializer):
+    url = serializers.HyperlinkedIdentityField(view_name='security-guard-detail')
+
+    class Meta:
+        model = SecurityGuard
+        fields = '__all__'

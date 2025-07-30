@@ -1,24 +1,25 @@
-import { AssignedEmployee } from "./employee";
+export type ShiftType =
+  | "الوردية الأولى"
+  | "الوردية الثانية"
+  | "الوردية الثالثة";
 
-export type Attendance = {
+export type AttendanceStatus = "حاضر" | "متأخر" | "غائب";
+
+export interface ShiftAttendance {
   id: number;
-  employee: AssignedEmployee;
+  location: {
+    id: number;
+    name: string;
+  };
+  shift_type: ShiftType;
   date: string;
-  check_in: string;
-  check_out?: string;
-};
+  created_at: string;
+}
 
-export type AttendanceSummary = {
+export interface EmployeeAttendance {
   id: number;
-  employee: string;
-  check_in: string;
-  check_out: string | null;
-  deductions: number | null;
-  extra: number | null;
-};
-
-export type AttendanceSettings = {
-  check_in: string;
-  check_out: string;
-  grace_period: number;
-};
+  employee: string; // id
+  shift: string; // id
+  status: AttendanceStatus;
+  notes?: string;
+}

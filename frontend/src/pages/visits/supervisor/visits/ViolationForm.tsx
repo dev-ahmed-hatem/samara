@@ -22,7 +22,7 @@ import dayjs from "dayjs";
 import Loading from "@/components/Loading";
 import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 import ErrorPage from "@/pages/ErrorPage";
-import { useAppDispatch, useAppSelector } from "@/app/redux/hooks";
+import { useAppDispatch } from "@/app/redux/hooks";
 import { useNotification } from "@/providers/NotificationProvider";
 import { ViolationForm as ViolationFormType, Visit } from "@/types/visit";
 
