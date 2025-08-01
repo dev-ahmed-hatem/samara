@@ -60,7 +60,11 @@ const LoginPage = () => {
       <div className="bg-white shadow-xl rounded-md overflow-hidden flex flex-col md:flex-row w-full max-w-md md:max-w-4xl">
         {/* Left: Logo */}
         <div className="md:w-1/2 max-md:h-52 bg-calypso flex items-center justify-center">
-          <img src="/kaffo.jpeg" alt="Logo" className="h-full object-cover" />
+          <img
+            src="/samara.jpg"
+            alt="samara logo"
+            className="h-full md:w-full object-cover"
+          />
         </div>
 
         {/* Right: Form */}
