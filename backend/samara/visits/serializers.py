@@ -20,7 +20,9 @@ class VisitReadSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_completed_at(self, obj):
-        return obj.completed_at.astimezone(settings.CAIRO_TZ).strftime('%d/%m/%Y %I:%M %p')
+        if obj.completed_at:
+            return obj.completed_at.astimezone(settings.CAIRO_TZ).strftime('%d/%m/%Y %I:%M %p')
+        return None
 
     def get_violation(self, obj: Visit):
         if hasattr(obj, "violation"):
