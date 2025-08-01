@@ -1,9 +1,16 @@
 from rest_framework.response import Response
 from rest_framework import viewsets, status
+from datetime import datetime
+from django.conf import settings
+
+from attendance.models import ShiftAttendance
+from visits.models import Visit, Violation
 from .serializers import EmployeeReadSerializer, EmployeeWriteSerializer, EmployeeListSerializer, \
     SecurityGuardSerializer
 from .models import Employee, SecurityGuard
-from rest_framework.decorators import action, api_view
+from projects.models import Location
+from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
@@ -17,8 +24,8 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         return EmployeeListSerializer
 
     def get_queryset(self):
-        search = self.request.query_params.get('search', None)
         queryset = Employee.objects.all()
+        search = self.request.query_params.get('search', None)
 
         if search:
             queryset = queryset.filter(Q(name__icontains=search) | Q(employee_id__icontains=search))
@@ -58,6 +65,22 @@ class SecurityGuardViewSet(viewsets.ModelViewSet):
     queryset = SecurityGuard.objects.all()
     serializer_class = SecurityGuardSerializer
 
+    def get_queryset(self):
+        queryset = SecurityGuard.objects.all()
+
+        search = self.request.query_params.get('search', None)
+        location_id = self.request.query_params.get('location_id', None)
+        shift = self.request.query_params.get('shift', None)
+
+        if search:
+            queryset = queryset.filter(name__icontains=search)
+        if location_id:
+            queryset = queryset.filter(location_id=location_id)
+        if shift:
+            queryset = queryset.filter(shift__name=shift)
+
+        return queryset
+
 
 @api_view(["DELETE"])
 def multiple_delete(request):
@@ -66,3 +89,28 @@ def multiple_delete(request):
         if emp:
             emp.delete()
     return Response()
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_home_stats(request):
+    employee = request.user.employee_profile
+    date = datetime.today().astimezone(settings.CAIRO_TZ).date()
+
+    visits = Visit.objects.filter(employee=employee)
+    locations_ids = visits.values_list('location_id', flat=True).distinct()
+    project_ids = Location.objects.filter(id__in=locations_ids).values_list('project_id', flat=True).distinct()
+
+    locations_count = locations_ids.count()
+    project_ids_count = project_ids.count()
+
+    data = {
+        "project_count": project_ids_count,
+        "location_count": locations_count,
+        "scheduled_visits": visits.filter(status=Visit.VisitStatus.SCHEDULED, date=date).count(),
+        "completed_visits": visits.filter(status=Visit.VisitStatus.COMPLETED, date=date).count(),
+        "violations": Violation.objects.filter(visit__employee=employee, created_at=date).count(),
+        "attendance_records": ShiftAttendance.objects.filter(created_by=employee, date=date).count(),
+    }
+
+    return Response(data, status=status.HTTP_200_OK)

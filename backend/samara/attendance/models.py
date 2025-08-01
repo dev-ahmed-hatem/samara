@@ -1,8 +1,8 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from employees.models import Shift, SecurityGuard
-from visits.models import Location
+from employees.models import Shift, SecurityGuard, Employee
+from projects.models import Location
 
 
 class ShiftAttendance(models.Model):
@@ -20,6 +20,7 @@ class ShiftAttendance(models.Model):
     )
     date = models.DateField(verbose_name=_("تاريخ الوردية"))
     created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(Employee, on_delete=models.CASCADE)
 
     class Meta:
         unique_together = ("location", "shift", "date")
@@ -45,7 +46,7 @@ class SecurityGuardAttendance(models.Model):
     shift = models.ForeignKey(
         ShiftAttendance,
         on_delete=models.CASCADE,
-        related_name="employee_attendances",
+        related_name="guards",
         verbose_name=_("الوردية"),
     )
     status = models.CharField(
@@ -60,9 +61,8 @@ class SecurityGuardAttendance(models.Model):
     )
 
     class Meta:
-        unique_together = ("security_guard", "shift")
         verbose_name = _("تسجيل حضور")
         verbose_name_plural = _("تسجيلات الحضور")
 
     def __str__(self):
-        return f"{self.security_guard.name} - {self.shift} - {self.get_status_display()}"
+        return f"{self.security_guard.name} - {self.get_status_display()}"

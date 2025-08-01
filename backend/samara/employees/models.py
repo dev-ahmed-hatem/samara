@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from users.models import User
+from projects.models import Location
 
 
 class Employee(models.Model):
@@ -89,8 +90,6 @@ class Shift(models.Model):
         THIRD = "الوردية الثالثة", _("الوردية الثالثة")
 
     name = models.CharField(max_length=20, choices=ShiftChoices.choices, unique=True)
-    start_time = models.TimeField()
-    end_time = models.TimeField()
 
     def __str__(self):
         return self.get_name_display()
@@ -101,6 +100,7 @@ class SecurityGuard(models.Model):
 
     # the remaining fields will be here
 
+    location = models.ForeignKey(Location, on_delete=models.SET_NULL, verbose_name=_("الموقع"), null=True)
     shift = models.ForeignKey(Shift, on_delete=models.CASCADE, verbose_name=_("الوردية"))
 
     def __str__(self):

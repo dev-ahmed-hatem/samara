@@ -2,22 +2,12 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from .models import Project, Location, Visit, VisitReport, Violation
-from .serializers import ProjectSerializer, LocationSerializer, VisitReadSerializer, VisitWriteSerializer, \
+from .models import Visit, VisitReport, Violation
+from .serializers import VisitReadSerializer, VisitWriteSerializer, \
     VisitReportSerializer, ViolationSerializer
 
 from datetime import datetime
 from django.conf import settings
-
-
-class ProjectViewSet(ModelViewSet):
-    queryset = Project.objects.all()
-    serializer_class = ProjectSerializer
-
-
-class LocationViewSet(ModelViewSet):
-    queryset = Location.objects.all()
-    serializer_class = LocationSerializer
 
 
 class VisitViewSet(ModelViewSet):

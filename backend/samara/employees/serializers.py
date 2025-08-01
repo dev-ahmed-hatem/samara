@@ -1,4 +1,6 @@
 from rest_framework import serializers
+
+from projects.serializers import LocationSerializer
 from .models import Employee, SecurityGuard
 
 
@@ -35,6 +37,8 @@ class EmployeeWriteSerializer(serializers.ModelSerializer):
 
 class SecurityGuardSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(view_name='security-guard-detail')
+    shift = serializers.StringRelatedField(read_only=True, source='shift.get_name_display')
+    location = LocationSerializer(read_only=True)
 
     class Meta:
         model = SecurityGuard

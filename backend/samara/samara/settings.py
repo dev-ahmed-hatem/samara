@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'employees.apps.EmployeesConfig',
     'attendance.apps.AttendanceConfig',
+    'projects.apps.ProjectsConfig',
     'visits.apps.VisitsConfig',
 ]
 

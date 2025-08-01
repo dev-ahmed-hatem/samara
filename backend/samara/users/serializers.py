@@ -10,7 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(write_only=True)
     role_arabic = serializers.CharField(source='get_role_display', read_only=True)
     url = HyperlinkedIdentityField(view_name='user-detail', lookup_field='pk')
-    employee_profile = EmployeeReadSerializer()
+    employee_profile = EmployeeReadSerializer(read_only=True)
 
     class Meta:
         model = User

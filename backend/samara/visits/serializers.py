@@ -1,25 +1,9 @@
 from django.conf import settings
 from datetime import datetime
 
-from .models import Project, Location, Visit, VisitReport, Violation
+from .models import Visit, VisitReport, Violation
 from rest_framework import serializers
-
-
-class ProjectSerializer(serializers.ModelSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='project-detail')
-
-    class Meta:
-        model = Project
-        fields = '__all__'
-
-
-class LocationSerializer(serializers.ModelSerializer):
-    url = serializers.HyperlinkedIdentityField(read_only=True, view_name='location-detail')
-    project_name = serializers.StringRelatedField(source='project.name', read_only=True)
-
-    class Meta:
-        model = Location
-        fields = '__all__'
+from projects.serializers import LocationSerializer
 
 
 class VisitReadSerializer(serializers.ModelSerializer):
