@@ -99,17 +99,22 @@ const VisitForm = () => {
 
   if (isFetching) return <Loading />;
   if (isError) {
-    let error_title;
+    let title, subtitle;
     if ((visitError as axiosBaseQueryError).status === 404) {
-      error_title = "زيارة غير موجودة! تأكد من كود الزيارة المدخل.";
+      subtitle = "زيارة غير موجودة! تأكد من كود الزيارة المدخل.";
     } else if ((visitError as axiosBaseQueryError).status === 403) {
-      error_title = (visitError as axiosBaseQueryError).data.detail;
+      title = "زيارة محجوبة";
+      subtitle = (visitError as axiosBaseQueryError).data.detail;
     } else {
-      error_title = undefined;
+      subtitle = undefined;
     }
 
     return (
-      <ErrorPage subtitle={error_title} reload={error_title === undefined} />
+      <ErrorPage
+        title={title}
+        subtitle={subtitle}
+        reload={subtitle === undefined}
+      />
     );
   }
 

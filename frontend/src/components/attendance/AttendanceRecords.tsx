@@ -1,43 +1,69 @@
-import React, { useState } from "react";
-import { Card, Select, Form, Input, Button, Radio, message, Table } from "antd";
-import type { RadioChangeEvent } from "antd";
-import dayjs from "dayjs";
+import React, { useEffect, useState } from "react";
 import {
-  AttendanceStatus,
-  EmployeeAttendance,
-  ShiftType,
-} from "@/types/attendance";
-import { Employee } from "@/types/employee";
-
-const dummyProjects = [
-  { id: 1, name: "مشروع الرياض" },
-  { id: 2, name: "مشروع جدة" },
-];
-
-const dummyLocations: Record<number, Array<string>> = {
-  1: ["موقع 1 - الرياض", "موقع 2 - الرياض"],
-  2: ["موقع 1 - جدة"],
-};
-
-const dummyEmployees: Employee[] = [
-  // { id: "1", name: "أحمد محمد" },
-  // { id: "2", name: "سعيد علي" },
-  // { id: "3", name: "فهد عبد الله" },
-];
+  Card,
+  Select,
+  Form,
+  Input,
+  Button,
+  Radio,
+  Table,
+  Spin,
+} from "antd";
+import type { RadioChangeEvent } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
+import dayjs from "dayjs";
+import { EmployeeAttendance, ShiftType } from "@/types/attendance";
+import { useGetProjectsQuery } from "@/app/api/endpoints/projects";
+import { useLazyGetLocationsQuery } from "@/app/api/endpoints/locations";
+import Loading from "../Loading";
+import ErrorPage from "@/pages/ErrorPage";
+import { useLazyGetSecurityGuardsQuery } from "@/app/api/endpoints/security_guards";
+import { useShiftAttendanceMutation } from "@/app/api/endpoints/attendance";
+import { useNotification } from "@/providers/NotificationProvider";
+import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 
 const AttendanceRecords: React.FC = () => {
+  const currentDate = dayjs().format("YYYY-MM-DD");
   const [projectId, setProjectId] = useState<number | null>(null);
   const [location, setLocation] = useState<string | null>(null);
+  const [shift, setShift] = useState<ShiftType | null>(null);
   const [attendance, setAttendance] = useState<
     Record<number, EmployeeAttendance>
   >({});
-  const [shift, setShift] = useState<ShiftType | null>(null);
   const [form] = Form.useForm();
+  const notification = useNotification();
+
+  const {
+    data: projects,
+    isFetching: fetchingProjects,
+    isError: ProjectsError,
+  } = useGetProjectsQuery();
+  const [
+    getLocations,
+    { data: locations, isFetching: fetchingLocations, isError: locationsError },
+  ] = useLazyGetLocationsQuery();
+  const [
+    getSecurityGuards,
+    {
+      data: securityGuards,
+      isFetching: fetchingSecurityGuards,
+      isError: securityGuardsError,
+    },
+  ] = useLazyGetSecurityGuardsQuery();
+  const [
+    recordAttendance,
+    {
+      isLoading: savingAttendance,
+      isSuccess: attendanceSaved,
+      isError: attendanceIsError,
+      error: attendanceError,
+    },
+  ] = useShiftAttendanceMutation();
 
   // Table Columns
   const columns = [
     {
-      title: "الموظف",
+      title: "حارس الأمن",
       dataIndex: "name",
     },
     {
@@ -85,21 +111,45 @@ const AttendanceRecords: React.FC = () => {
   };
 
   const handleSave = () => {
-    if (!projectId || !location || !shift) {
-      message.warning("يرجى اختيار المشروع والموقع والوردية أولاً");
-      return;
-    }
-
-    console.log("Saved Attendance:", {
-      projectId,
+    const data = {
       location,
+      shift,
+      date: currentDate,
       records: attendance,
-    });
+    };
 
-    message.success("تم حفظ الحضور بنجاح");
+    recordAttendance(data);
   };
 
-  const currentDate = dayjs().format("YYYY-MM-DD");
+  useEffect(() => {
+    if (projectId) getLocations({ project_id: projectId });
+  }, [projectId]);
+
+  useEffect(() => {
+    if (location && shift) {
+      getSecurityGuards({ location_id: location, shift: shift });
+    }
+  }, [location, shift]);
+
+  useEffect(() => {
+    if (attendanceSaved) notification.success({ message: "تم تسجيل الحضور" });
+  }, [attendanceSaved]);
+
+  useEffect(() => {
+    if (attendanceIsError) {
+      const error = attendanceError as axiosBaseQueryError;
+      notification.error({
+        message:
+          error.status === 409
+            ? error.data.detail || "حدث خطأ أثناء تسجيل الحضور !"
+            : "حدث خطأ أثناء تسجيل الحضور ! برجاء إعادة المحاولة",
+      });
+    }
+  }, [attendanceIsError]);
+
+  if (fetchingProjects) return <Loading />;
+  if (ProjectsError || locationsError || securityGuardsError)
+    return <ErrorPage />;
 
   return (
     <div className="space-y-6">
@@ -122,11 +172,11 @@ const AttendanceRecords: React.FC = () => {
                 placeholder="اختر المشروع"
                 onChange={(value) => {
                   setProjectId(value);
-                  setLocation(null); // reset location
+                  setLocation(null);
                 }}
                 value={projectId ?? undefined}
               >
-                {dummyProjects.map((project) => (
+                {projects!.map((project) => (
                   <Select.Option key={project.id} value={project.id}>
                     {project.name}
                   </Select.Option>
@@ -135,7 +185,17 @@ const AttendanceRecords: React.FC = () => {
             </Form.Item>
 
             {/* Location Select */}
-            <Form.Item label="اختر الموقع" required>
+            <Form.Item
+              label={
+                <div className="flex gap-2 items-center">
+                  <span>اختر الموقع</span>
+                  {fetchingLocations && (
+                    <Spin size="small" indicator={<LoadingOutlined spin />} />
+                  )}
+                </div>
+              }
+              required
+            >
               <Select
                 placeholder="اختر الموقع"
                 onChange={(value) => setLocation(value)}
@@ -143,9 +203,9 @@ const AttendanceRecords: React.FC = () => {
                 disabled={!projectId}
               >
                 {projectId &&
-                  dummyLocations[projectId]?.map((loc) => (
-                    <Select.Option key={loc} value={loc}>
-                      {loc}
+                  locations?.map((loc) => (
+                    <Select.Option key={loc.id} value={loc.id}>
+                      {loc.name}
                     </Select.Option>
                   ))}
               </Select>
@@ -170,12 +230,15 @@ const AttendanceRecords: React.FC = () => {
       </Card>
 
       {/* Section 2 */}
-      {projectId && location && shift && (
-        <Card title="حالة الموظفين" className="shadow-md">
+      {fetchingSecurityGuards ? (
+        <Loading />
+      ) : securityGuards ? (
+        <Card title="حالة حراس الأمن" className="shadow-md">
           <div className="space-y-6">
             <Table
               columns={columns}
-              dataSource={dummyEmployees}
+              dataSource={securityGuards}
+              rowKey={"id"}
               pagination={false}
               className="calypso-header"
               scroll={{ x: "max-content" }}
@@ -184,12 +247,17 @@ const AttendanceRecords: React.FC = () => {
 
           {/* Save Button */}
           <div className="mt-6 text-end">
-            <Button type="primary" onClick={handleSave} size="large">
+            <Button
+              type="primary"
+              onClick={handleSave}
+              size="large"
+              loading={savingAttendance}
+            >
               حفظ
             </Button>
           </div>
         </Card>
-      )}
+      ) : null}
     </div>
   );
 };

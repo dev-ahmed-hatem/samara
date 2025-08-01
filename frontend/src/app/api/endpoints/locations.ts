@@ -1,13 +1,13 @@
 import { PaginatedResponse } from "@/types/paginatedResponse";
+import { Location } from "@/types/location";
 import api from "../apiSlice";
-import { Project } from "@/types/project";
 import qs from "query-string";
 
-export const projectsEndpoints = api.injectEndpoints({
+export const locationsEndpoints = api.injectEndpoints({
   endpoints: (builder) => ({
-    getProjects: builder.query<Project[], Record<string, any> | void>({
+    getLocations: builder.query<Location[], Record<string, any> | void>({
       query: (params) => ({
-        url: `/projects/projects/?${qs.stringify({
+        url: `/projects/locations/?${qs.stringify({
           no_pagination: true,
           ...params,
         })}`,
@@ -16,13 +16,13 @@ export const projectsEndpoints = api.injectEndpoints({
       providesTags: (result) =>
         result
           ? [
-              ...result.map((project) => ({
-                type: "Project" as const,
-                id: project.id,
+              ...result.map((location) => ({
+                type: "Location" as const,
+                id: location.id,
               })),
-              { type: "Project", id: "LIST" },
+              { type: "Location", id: "LIST" },
             ]
-          : [{ type: "Project", id: "LIST" }],
+          : [{ type: "Location", id: "LIST" }],
     }),
 
     // getProject: builder.query<
@@ -80,4 +80,5 @@ export const projectsEndpoints = api.injectEndpoints({
   }),
 });
 
-export const { useGetProjectsQuery } = projectsEndpoints;
+export const { useGetLocationsQuery, useLazyGetLocationsQuery } =
+  locationsEndpoints;

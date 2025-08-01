@@ -1,22 +1,26 @@
-import Logo from "./Logo";
-
 const Footer = () => {
   return (
-    <footer className="bg-calypso-950 text-white py-6 padding-container mt-10">
+    <footer className="bg-black text-white py-6 padding-container mt-10">
       <div
         className="max-w-7xl mx-auto flex flex-wrap
       justify-between items-center gap-4"
       >
         {/* Logo */}
         <a href="https://kaffo.co">
-          <Logo className="fill-orange hover:fill-orange-200 size-40" />
+          {/* <Logo className="fill-orange hover:fill-orange-200 size-40" /> */}
+
+          <img
+            src="/samara.jpg"
+            alt="samara logo"
+            className="rounded-lg h-36"
+          />
         </a>
 
         {/* Company Info */}
         <div>
           <h2 className="text-xl font-semibold">نظام إدارة الموارد البشرية</h2>
           <p className="text-sm text-gray-400 mt-2">
-            منصة متكاملة لإدارة الموظفين والموارد البشرية بكفاءة.
+            منصة متكاملة لإدارة الإشراف والمواقع بكفاءة.
           </p>
         </div>
       </div>

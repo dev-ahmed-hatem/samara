@@ -1,6 +1,5 @@
 import { RouteObject } from "react-router";
 import appRoutes, { AppRoute } from "./appRoutes";
-import EmployeeForm from "@/pages/employees/EmployeeForm";
 import VisitForm from "@/pages/visits/supervisor/visits/VisitForm";
 import ViolationForm from "@/pages/visits/supervisor/visits/ViolationForm";
 

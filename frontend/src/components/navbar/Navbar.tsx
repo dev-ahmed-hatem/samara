@@ -22,7 +22,7 @@ const Navbar = ({
   };
 
   return (
-    <div className="padding-container flex justify-between items-center bg-orange py-2">
+    <div className="padding-container flex justify-between items-center bg-gray-500 py-2 h-24">
       <IoMenu
         className="text-calypso-900 hover:text-calypso-950 text-4xl md:text-5xl cursor-pointer"
         onClick={() => {
@@ -31,7 +31,9 @@ const Navbar = ({
       />
       <div className="logo h-12 md:h-16">
         <NavLink to={"/"}>
-          <Logo className="fill-calypso-900 hover:fill-calypso-950" />
+          {/* <Logo className="fill-calypso-900 hover:fill-calypso-950" /> */}
+          
+          <img src="/samara.jpg" alt="samara logo" className="h-full rounded-lg" />
         </NavLink>
       </div>
       <div className="user">

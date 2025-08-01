@@ -8,7 +8,7 @@ export const visitsEndpoints = api.injectEndpoints({
       query: (params) => ({
         url: `/visits/visits?${qs.stringify({
           no_pagination: true,
-          ...(params as {}),
+          ...params,
         })}`,
         method: "GET",
       }),

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   Form,
@@ -8,74 +8,96 @@ import {
   DatePicker,
   Table,
   Typography,
+  Spin,
 } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
 import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
+import { useGetProjectsQuery } from "@/app/api/endpoints/projects";
+import { useLazyGetLocationsQuery } from "@/app/api/endpoints/locations";
+import ErrorPage from "@/pages/ErrorPage";
+import Loading from "../Loading";
+import { useLazyGetShiftAttendanceQuery } from "@/app/api/endpoints/attendance";
+import { useNotification } from "@/providers/NotificationProvider";
+import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 
 const { Title } = Typography;
 
-// Dummy Data
-const dummyProjects = [
-  { id: 1, name: "مشروع الرياض" },
-  { id: 2, name: "مشروع جدة" },
-];
-
-const dummyLocations: Record<string, Array<string>> = {
-  1: ["موقع 1", "موقع 2"],
-  2: ["موقع 3"],
-};
-
-const chartData = [
-  { name: "الحضور", value: 25 },
-  { name: "التأخير", value: 5 },
-  { name: "الغياب", value: 8 },
-];
-
-const COLORS = ["#4ade80", "#facc15", "#f87171"];
-
-const tableData = [
+const columns = [
   {
-    key: "1",
-    name: "أحمد علي",
-    status: "حاضر",
-    note: "",
+    title: "حارس الأمن",
+    dataIndex: "name",
+    key: "name",
   },
   {
-    key: "2",
-    name: "سعيد مرزوق",
-    status: "متأخر",
-    note: "تأخر 15 دقيقة",
+    title: "الحالة",
+    dataIndex: "status",
+    key: "status",
   },
   {
-    key: "3",
-    name: "خالد فهد",
-    status: "غائب",
-    note: "بدون إذن",
+    title: "ملاحظات",
+    dataIndex: "note",
+    key: "note",
+    render: (text: string) => text || "-",
   },
 ];
 
 const AttendanceSummary: React.FC = () => {
   const [form] = Form.useForm();
-  const [showReport, setShowReport] = useState(false);
   const [projectId, setProjectId] = useState<number | null>(null);
+  const [noAttendance, setNoAttendance] = useState(false);
 
-  const columns = [
+  const notification = useNotification();
+
+  const {
+    data: projects,
+    isFetching: fetchingProjects,
+    isError: ProjectsError,
+  } = useGetProjectsQuery();
+  const [
+    getLocations,
+    { data: locations, isFetching: fetchingLocations, isError: locationsError },
+  ] = useLazyGetLocationsQuery();
+  const [
+    getShiftAttendance,
     {
-      title: "الموظف",
-      dataIndex: "name",
-      key: "name",
+      data: shiftAttendance,
+      isFetching: fetchingAttendance,
+      isError: attendanceIsError,
+      error: attendanceError,
     },
-    {
-      title: "الحالة",
-      dataIndex: "status",
-      key: "status",
-    },
-    {
-      title: "ملاحظات",
-      dataIndex: "note",
-      key: "note",
-      render: (text: string) => text || "-",
-    },
-  ];
+  ] = useLazyGetShiftAttendanceQuery();
+
+  const handleSave = (values: any) => {
+    const data = {
+      date: values.date.format("YYYY-MM-DD"),
+      location: values.location,
+      shift: values.shift,
+    };
+    setNoAttendance(false);
+    getShiftAttendance(data);
+  };
+
+  useEffect(() => {
+    if (projectId) {
+      getLocations({ project_id: projectId });
+    }
+  }, [projectId]);
+
+  useEffect(() => {
+    if (attendanceIsError) {
+      const error = attendanceError as axiosBaseQueryError;
+      if (error.status === 404) {
+        setNoAttendance(true);
+      } else {
+        notification.error({
+          message: "حدث خطأ! برجاء إعادة المحاولة",
+        });
+      }
+    }
+  }, [attendanceIsError]);
+
+  if (fetchingProjects) return <Loading />;
+  if (ProjectsError || locationsError) return <ErrorPage />;
 
   return (
     <div className="space-y-6">
@@ -84,13 +106,24 @@ const AttendanceSummary: React.FC = () => {
         <Form
           layout="vertical"
           form={form}
-          className="grid grid-cols-1 md:grid-cols-4 gap-4"
+          onFinish={handleSave}
+          className="grid grid-cols-1 md:grid-cols-5 gap-4"
         >
-          <Form.Item label="اليوم" name="date" className="col-span-1">
+          <Form.Item
+            label="اليوم"
+            name="date"
+            className="col-span-1"
+            rules={[{ required: true, message: "الرجاء اختيار التاريخ" }]}
+          >
             <DatePicker className="w-full" format="DD-MM-YYYY" />
           </Form.Item>
 
-          <Form.Item label="المشروع" name="project" className="col-span-1">
+          <Form.Item
+            label="المشروع"
+            name="project"
+            className="col-span-1"
+            rules={[{ required: true, message: "الرجاء اختيار المشروع" }]}
+          >
             <Select
               placeholder="اختر المشروع"
               onChange={(value) => {
@@ -98,7 +131,7 @@ const AttendanceSummary: React.FC = () => {
                 form.setFieldValue("location", undefined);
               }}
             >
-              {dummyProjects.map((p) => (
+              {projects!.map((p) => (
                 <Select.Option key={p.id} value={p.id}>
                   {p.name}
                 </Select.Option>
@@ -106,35 +139,68 @@ const AttendanceSummary: React.FC = () => {
             </Select>
           </Form.Item>
 
-          <Form.Item label="الموقع" name="location" className="col-span-1">
-            <Select placeholder="اختر الموقع" disabled={!projectId}>
+          <Form.Item
+            label={
+              <div className="flex gap-2 items-center">
+                <span>اختر الموقع</span>
+                {fetchingLocations && (
+                  <Spin size="small" indicator={<LoadingOutlined spin />} />
+                )}
+              </div>
+            }
+            name="location"
+            className="col-span-1"
+            rules={[{ required: true, message: "الرجاء اختيار الموقع" }]}
+          >
+            <Select
+              placeholder="اختر الموقع"
+              value={location ?? undefined}
+              disabled={!projectId}
+            >
               {projectId &&
-                dummyLocations[projectId]?.map((loc) => (
-                  <Select.Option key={loc} value={loc}>
-                    {loc}
+                locations?.map((loc) => (
+                  <Select.Option key={loc.id} value={loc.id}>
+                    {loc.name}
                   </Select.Option>
                 ))}
             </Select>
           </Form.Item>
 
-          <Form.Item label="الوردية" name="shift" className="col-span-1">
-            <Radio.Group className="flex gap-2">
-              <Radio.Button value="الأولى">الأولى</Radio.Button>
-              <Radio.Button value="الثانية">الثانية</Radio.Button>
-              <Radio.Button value="الثالثة">الثالثة</Radio.Button>
+          <Form.Item
+            label="الوردية"
+            name="shift"
+            className="col-span-1"
+            rules={[{ required: true, message: "الرجاء اختيار الوردية" }]}
+          >
+            <Radio.Group className="flex">
+              <Radio.Button value="الوردية الأولى">الأولى</Radio.Button>
+              <Radio.Button value="الوردية الثانية">الثانية</Radio.Button>
+              <Radio.Button value="الوردية الثالثة">الثالثة</Radio.Button>
             </Radio.Group>
           </Form.Item>
-        </Form>
 
-        <div className="text-end mt-4">
-          <Button type="primary" onClick={() => setShowReport(true)}>
-            عرض
-          </Button>
-        </div>
+          <Form.Item className="flex justify-center md:justify-end items-end">
+            <Button
+              type="primary"
+              htmlType="submit"
+              className="md:w-auto mx-auto"
+              size="middle"
+              loading={fetchingAttendance}
+            >
+              عرض
+            </Button>
+          </Form.Item>
+        </Form>
       </Card>
 
+      {noAttendance && (
+        <Card title="ملخص الحضور" className="shadow-md text-red-600 text-base">
+          لا يوجد سجل حضور لهذه الوردية في هذا اليوم
+        </Card>
+      )}
+
       {/* Report Section */}
-      {showReport && (
+      {shiftAttendance && (
         <Card title="ملخص الحضور" className="shadow-md">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Pie Chart */}
@@ -142,15 +208,15 @@ const AttendanceSummary: React.FC = () => {
               <Title level={5}>نسبة الحضور</Title>
               <PieChart width={300} height={300}>
                 <Pie
-                  data={chartData}
+                  data={shiftAttendance?.stats || []}
                   cx="50%"
                   cy="50%"
                   outerRadius={100}
                   dataKey="value"
                   label
                 >
-                  {chartData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index]} />
+                  {shiftAttendance?.stats?.map((entry: any, index: number) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
                 <Tooltip />
@@ -163,7 +229,8 @@ const AttendanceSummary: React.FC = () => {
               <Title level={5}>تفاصيل الحضور</Title>
               <Table
                 columns={columns}
-                dataSource={tableData}
+                dataSource={shiftAttendance?.records}
+                rowKey={"id"}
                 pagination={false}
                 className="calypso-header"
                 scroll={{ x: "max-content" }}

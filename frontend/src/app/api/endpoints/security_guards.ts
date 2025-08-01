@@ -1,13 +1,16 @@
 import { PaginatedResponse } from "@/types/paginatedResponse";
 import api from "../apiSlice";
-import { Project } from "@/types/project";
 import qs from "query-string";
+import { SecurityGuard } from "@/types/scurityGuard";
 
-export const projectsEndpoints = api.injectEndpoints({
+export const securityGuardsEndpoints = api.injectEndpoints({
   endpoints: (builder) => ({
-    getProjects: builder.query<Project[], Record<string, any> | void>({
+    getSecurityGuards: builder.query<
+      SecurityGuard[],
+      Record<string, any> | void
+    >({
       query: (params) => ({
-        url: `/projects/projects/?${qs.stringify({
+        url: `/employees/security-guards/?${qs.stringify({
           no_pagination: true,
           ...params,
         })}`,
@@ -16,13 +19,13 @@ export const projectsEndpoints = api.injectEndpoints({
       providesTags: (result) =>
         result
           ? [
-              ...result.map((project) => ({
-                type: "Project" as const,
-                id: project.id,
+              ...result.map((guard) => ({
+                type: "SecurityGuard" as const,
+                id: guard.id,
               })),
-              { type: "Project", id: "LIST" },
+              { type: "SecurityGuard", id: "LIST" },
             ]
-          : [{ type: "Project", id: "LIST" }],
+          : [{ type: "SecurityGuard", id: "LIST" }],
     }),
 
     // getProject: builder.query<
@@ -80,4 +83,4 @@ export const projectsEndpoints = api.injectEndpoints({
   }),
 });
 
-export const { useGetProjectsQuery } = projectsEndpoints;
+export const { useLazyGetSecurityGuardsQuery } = securityGuardsEndpoints;
