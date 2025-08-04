@@ -1,14 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Card,
-  Select,
-  Form,
-  Input,
-  Button,
-  Radio,
-  Table,
-  Spin,
-} from "antd";
+import { Card, Select, Form, Input, Button, Radio, Table, Spin } from "antd";
 import type { RadioChangeEvent } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
@@ -21,6 +12,7 @@ import { useLazyGetSecurityGuardsQuery } from "@/app/api/endpoints/security_guar
 import { useShiftAttendanceMutation } from "@/app/api/endpoints/attendance";
 import { useNotification } from "@/providers/NotificationProvider";
 import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
+import { SecurityGuard } from "@/types/scurityGuard";
 
 const AttendanceRecords: React.FC = () => {
   const currentDate = dayjs().format("YYYY-MM-DD");
@@ -30,6 +22,8 @@ const AttendanceRecords: React.FC = () => {
   const [attendance, setAttendance] = useState<
     Record<number, EmployeeAttendance>
   >({});
+  const [guards, setGuards] = useState<SecurityGuard[] | null>(null);
+  const [previouslyRecorded, setPreviouslyRecorded] = useState<boolean>(false);
   const [form] = Form.useForm();
   const notification = useNotification();
 
@@ -47,7 +41,8 @@ const AttendanceRecords: React.FC = () => {
     {
       data: securityGuards,
       isFetching: fetchingSecurityGuards,
-      isError: securityGuardsError,
+      error: securityGuardsError,
+      isError: securityGuardsIsError,
     },
   ] = useLazyGetSecurityGuardsQuery();
   const [
@@ -106,11 +101,25 @@ const AttendanceRecords: React.FC = () => {
   ) => {
     setAttendance((prev) => ({
       ...prev,
-      [id]: { ...prev[id], note: e.target.value },
+      [id]: { ...prev[id], notes: e.target.value },
     }));
   };
 
   const handleSave = () => {
+    if (!securityGuards) return;
+
+    const incomplete = Object.entries(attendance).filter(
+      ([_, value]) => !value.status
+    );
+
+    if (
+      incomplete.length > 0 ||
+      Object.entries(attendance).length < securityGuards?.length
+    ) {
+      notification.error({ message: "يرجى تحديد حالة الحضور لجميع الحراس" });
+      return;
+    }
+
     const data = {
       location,
       shift,
@@ -122,17 +131,33 @@ const AttendanceRecords: React.FC = () => {
   };
 
   useEffect(() => {
+    if (securityGuards) {
+      setGuards(securityGuards);
+    }
+  }, [securityGuards]);
+
+  useEffect(() => {
     if (projectId) getLocations({ project_id: projectId });
   }, [projectId]);
 
   useEffect(() => {
     if (location && shift) {
-      getSecurityGuards({ location_id: location, shift: shift });
+      getSecurityGuards({
+        location_id: location,
+        shift: shift,
+        date: currentDate,
+      });
     }
   }, [location, shift]);
 
   useEffect(() => {
-    if (attendanceSaved) notification.success({ message: "تم تسجيل الحضور" });
+    if (attendanceSaved) {
+      notification.success({ message: "تم تسجيل الحضور" });
+      setGuards(null);
+      setProjectId(null);
+      setLocation(null);
+      setShift(null);
+    }
   }, [attendanceSaved]);
 
   useEffect(() => {
@@ -146,9 +171,27 @@ const AttendanceRecords: React.FC = () => {
       });
     }
   }, [attendanceIsError]);
+  
+  useEffect(() => {
+    setPreviouslyRecorded(false);
+  }, [fetchingSecurityGuards]);
+
+  useEffect(() => {
+    if (securityGuardsIsError) {
+      const error = securityGuardsError as axiosBaseQueryError;
+      if (error.status === 409) {
+        setPreviouslyRecorded(true);
+      }
+    }
+  }, [securityGuardsIsError]);
+
 
   if (fetchingProjects) return <Loading />;
-  if (ProjectsError || locationsError || securityGuardsError)
+  if (
+    ProjectsError ||
+    locationsError ||
+    (securityGuardsIsError && !previouslyRecorded)
+  )
     return <ErrorPage />;
 
   return (
@@ -213,7 +256,10 @@ const AttendanceRecords: React.FC = () => {
 
             {/* Shift Select */}
             <Form.Item label="اختر الوردية" required name="shift">
-              <Radio.Group onChange={(event) => setShift(event.target.value)}>
+              <Radio.Group
+                onChange={(event) => setShift(event.target.value)}
+                value={shift}
+              >
                 <Radio.Button value="الوردية الأولى">
                   الوردية الأولى
                 </Radio.Button>
@@ -232,7 +278,26 @@ const AttendanceRecords: React.FC = () => {
       {/* Section 2 */}
       {fetchingSecurityGuards ? (
         <Loading />
-      ) : securityGuards ? (
+      ) : previouslyRecorded ? (
+        <div className="bg-green-50 border border-green-200 text-green-800 px-6 py-4 rounded-xl shadow-sm flex items-center gap-3">
+          <svg
+            className="w-5 h-5 text-green-500"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+          <span className="text-sm md:text-base font-medium">
+            تم تسجيل حضور هذه الوردية لهذا اليوم
+          </span>
+        </div>
+      ) : guards ? (
         <Card title="حالة حراس الأمن" className="shadow-md">
           <div className="space-y-6">
             <Table

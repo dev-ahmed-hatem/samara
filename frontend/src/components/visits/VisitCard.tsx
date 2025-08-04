@@ -1,4 +1,5 @@
 import { Visit } from "@/types/visit";
+import { dayjs } from "@/utils/locale";
 import { Button, Tag } from "antd";
 import { useNavigate } from "react-router";
 
@@ -10,6 +11,8 @@ const VisitCard = ({
   type: "scheduled" | "completed";
 }) => {
   const isCompleted = type === "completed";
+  const isVisitDay = dayjs().isSame(dayjs(visit.date, "DD/MM/YYYY"), "day");
+
   const navigate = useNavigate();
 
   return (
@@ -20,6 +23,9 @@ const VisitCard = ({
           : "border-blue-500 bg-white"
       }`}
     >
+      <Tag color="blue" className="text-sm px-3 py-1 rounded-md mb-4">
+        تاريخ الزيارة: {dayjs(visit.date, "DD/MM/YYYY").format("YYYY-MM-DD")}
+      </Tag>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 flex-wrap ">
         <div>
           <h3 className="text-lg font-semibold">
@@ -35,13 +41,13 @@ const VisitCard = ({
           )}
           {visit.violation && (
             <Tag color="red" className="text-sm my-2">
-              تمت تسجيل مخالفة: {visit.violation}
+              تم تسجيل مخالفة: {visit.violation}
             </Tag>
           )}
         </div>
 
         {/* buttons */}
-        {!isCompleted && (
+        {!isCompleted && isVisitDay && (
           <div className="flex gap-2 mt-2 md:mt-0 flex-wrap">
             <Button
               type="primary"

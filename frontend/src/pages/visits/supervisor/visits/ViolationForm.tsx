@@ -148,7 +148,7 @@ const ViolationForm: React.FC = () => {
             {visit?.location.name}
           </Descriptions.Item>
           <Descriptions.Item label="إحداثيات GPS">
-            <div className="flex items-center gap-2">
+            {/* <div className="flex items-center gap-2">
               <Button
                 size="small"
                 type="link"
@@ -158,7 +158,8 @@ const ViolationForm: React.FC = () => {
               >
                 24.7136°N, 46.6753°E
               </Button>
-            </div>
+            </div> */}
+            -
           </Descriptions.Item>
 
           {/* Purpose on its own full row */}
@@ -176,7 +177,7 @@ const ViolationForm: React.FC = () => {
           bordered
         >
           <Descriptions.Item label="اسم المشروع">
-            مجمع العليا الإداري
+            {visit?.location.project_name}
           </Descriptions.Item>
           <Descriptions.Item label="إجمالي رجال الأمن">12</Descriptions.Item>
           <Descriptions.Item label="إجمالي المشرفين">2</Descriptions.Item>

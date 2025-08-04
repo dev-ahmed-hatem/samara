@@ -16,12 +16,13 @@ class VisitViewSet(ModelViewSet):
     def get_queryset(self):
         queryset = Visit.objects.all()
 
-        date = self.request.query_params.get('date', None)
+        from_date = self.request.query_params.get('from', None)
+        to_date = self.request.query_params.get('to', None)
         employee = self.request.query_params.get('employee', None)
         project = self.request.query_params.get('project', None)
 
-        if date:
-            queryset = queryset.filter(date=date)
+        if from_date and to_date:
+            queryset = queryset.filter(date__range=[from_date, to_date])
         if employee:
             queryset = queryset.filter(employee=employee)
         if project:
@@ -30,7 +31,7 @@ class VisitViewSet(ModelViewSet):
         return queryset
 
     def retrieve(self, request, pk=None):
-        today = datetime.today().astimezone(settings.CAIRO_TZ).date()
+        today = datetime.today().astimezone(settings.SAUDI_TZ).date()
         instance: Visit = self.get_object()
 
         if instance.date != today:

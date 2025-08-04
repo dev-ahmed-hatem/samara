@@ -81,6 +81,28 @@ class SecurityGuardViewSet(viewsets.ModelViewSet):
 
         return queryset
 
+    def list(self, request, *args, **kwargs):
+        location_id = request.query_params.get('location_id', None)
+        shift = request.query_params.get('shift', None)
+        date = request.query_params.get('date', None)
+
+        if location_id and shift:
+            # Optionally filter by date
+            attendance_filter = {
+                'location_id': location_id,
+                'shift__name': shift,
+            }
+            if date:
+                attendance_filter['date'] = date
+
+            if ShiftAttendance.objects.filter(**attendance_filter).exists():
+                return Response(
+                    {"detail": "تم تسجيل حضور هذه الوردية لهذا اليوم"},
+                    status=status.HTTP_409_CONFLICT,
+                )
+
+        return super().list(request, *args, **kwargs)
+
 
 @api_view(["DELETE"])
 def multiple_delete(request):
@@ -95,7 +117,7 @@ def multiple_delete(request):
 @permission_classes([IsAuthenticated])
 def get_home_stats(request):
     employee = request.user.employee_profile
-    date = datetime.today().astimezone(settings.CAIRO_TZ).date()
+    date = datetime.today().astimezone(settings.SAUDI_TZ).date()
 
     visits = Visit.objects.filter(employee=employee)
     locations_ids = visits.values_list('location_id', flat=True).distinct()

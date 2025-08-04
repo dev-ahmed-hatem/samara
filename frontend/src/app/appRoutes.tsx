@@ -43,7 +43,7 @@ export const routesMap = {
     element: <PermissionProvider role="supervisor" />,
     children: [
       {
-        label: "الزيارات",
+        label: "جدول الزيارات الميدانية",
         path: "visits",
         icon: <CalendarOutlined />,
         element: (
@@ -54,7 +54,7 @@ export const routesMap = {
         ),
       },
       {
-        label: "الحضور",
+        label: "التحضير اليومي لرجال الأمن",
         path: "attendance",
         icon: <BsFillPersonCheckFill />,
         element: <AttendancePage />,

@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db.utils import IntegrityError
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -69,6 +70,7 @@ def get_shift_attendance(request):
         for guard in guards
     ]
 
-    data = {"stats": stats, "records": records}
+    data = {"stats": stats, "records": records,
+            "created_at": shift_attendance.created_at.astimezone(settings.SAUDI_TZ).strftime("%Y-%m-%d   %I:%M%p")}
 
     return Response(data=data, status=status.HTTP_200_OK)

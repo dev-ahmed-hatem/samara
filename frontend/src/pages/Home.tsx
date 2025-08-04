@@ -124,7 +124,7 @@ const Home: React.FC = () => {
             <div className="flex items-center gap-4">
               <CalendarOutlined className="text-3xl text-blue-600" />
               <div className="text-lg font-semibold text-blue-600">
-                صفحة الزيارات
+                جدول الزيارات الميدانية
               </div>
             </div>
           </Card>
@@ -137,7 +137,7 @@ const Home: React.FC = () => {
             <div className="flex items-center gap-4">
               <ClockCircleOutlined className="text-3xl text-yellow-500" />
               <div className="text-lg font-semibold text-yellow-600">
-                صفحة الحضور
+                التحضير اليومي لرجال الأمن
               </div>
             </div>
           </Card>

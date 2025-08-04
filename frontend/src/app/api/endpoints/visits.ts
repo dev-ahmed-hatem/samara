@@ -61,6 +61,7 @@ export const visitsEndpoints = api.injectEndpoints({
 
 export const {
   useGetVisitsQuery,
+  useLazyGetVisitsQuery,
   useVisitReportMutation,
   useViolationMutation,
   useVisitQuery,

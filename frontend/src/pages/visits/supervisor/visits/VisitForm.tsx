@@ -142,7 +142,7 @@ const VisitForm = () => {
             {visit?.location.name}
           </Descriptions.Item>
           <Descriptions.Item label="إحداثيات GPS">
-            <div className="flex items-center gap-2">
+            {/* <div className="flex items-center gap-2">
               <Button
                 size="small"
                 type="link"
@@ -152,7 +152,8 @@ const VisitForm = () => {
               >
                 24.7136°N, 46.6753°E
               </Button>
-            </div>
+            </div> */}
+            -
           </Descriptions.Item>
 
           {/* Purpose on its own full row */}

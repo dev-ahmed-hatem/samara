@@ -21,12 +21,12 @@ class VisitReadSerializer(serializers.ModelSerializer):
 
     def get_completed_at(self, obj):
         if obj.completed_at:
-            return obj.completed_at.astimezone(settings.CAIRO_TZ).strftime('%d/%m/%Y %I:%M %p')
+            return obj.completed_at.astimezone(settings.SAUDI_TZ).strftime('%d/%m/%Y %I:%M %p')
         return None
 
     def get_violation(self, obj: Visit):
         if hasattr(obj, "violation"):
-            return obj.violation.created_at.astimezone(settings.CAIRO_TZ).strftime('%d/%m/%Y %I:%M %p')
+            return obj.violation.created_at.astimezone(settings.SAUDI_TZ).strftime('%d/%m/%Y %I:%M %p')
         return None
 
 
@@ -46,7 +46,7 @@ class VisitReportSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         instance = super().create(validated_data)
         instance.visit.status = Visit.VisitStatus.COMPLETED
-        instance.visit.completed_at = datetime.now().astimezone(settings.CAIRO_TZ)
+        instance.visit.completed_at = datetime.now().astimezone(settings.SAUDI_TZ)
         instance.visit.save()
         return instance
 

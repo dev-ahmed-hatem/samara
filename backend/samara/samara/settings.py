@@ -116,7 +116,7 @@ LANGUAGES = [
 LOCALE_PATHS = [BASE_DIR / 'locale']
 
 TIME_ZONE = 'UTC'
-CAIRO_TZ = pytz.timezone('Africa/Cairo')
+SAUDI_TZ = pytz.timezone('Asia/Riyadh')
 
 USE_I18N = True
 
