@@ -171,7 +171,7 @@ const AttendanceRecords: React.FC = () => {
       });
     }
   }, [attendanceIsError]);
-  
+
   useEffect(() => {
     setPreviouslyRecorded(false);
   }, [fetchingSecurityGuards]);
@@ -184,7 +184,6 @@ const AttendanceRecords: React.FC = () => {
       }
     }
   }, [securityGuardsIsError]);
-
 
   if (fetchingProjects) return <Loading />;
   if (
@@ -311,16 +310,18 @@ const AttendanceRecords: React.FC = () => {
           </div>
 
           {/* Save Button */}
-          <div className="mt-6 text-end">
-            <Button
-              type="primary"
-              onClick={handleSave}
-              size="large"
-              loading={savingAttendance}
-            >
-              حفظ
-            </Button>
-          </div>
+          {guards.length > 0 && (
+            <div className="mt-6 text-end">
+              <Button
+                type="primary"
+                onClick={handleSave}
+                size="large"
+                loading={savingAttendance}
+              >
+                حفظ
+              </Button>
+            </div>
+          )}
         </Card>
       ) : null}
     </div>

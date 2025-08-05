@@ -33,6 +33,7 @@ class Location(models.Model):
     class Meta:
         verbose_name = _("موقع")
         verbose_name_plural = _("المواقع")
+        unique_together = ("name", "project")
 
     def __str__(self):
         return f"{self.name} ({self.project.name})"

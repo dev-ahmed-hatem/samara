@@ -23,8 +23,11 @@ const VisitCard = ({
           : "border-blue-500 bg-white"
       }`}
     >
-      <Tag color="blue" className="text-sm px-3 py-1 rounded-md mb-4">
+      <Tag color="blue" className="text-sm px-3 py-1 rounded-md mb-2">
         تاريخ الزيارة: {dayjs(visit.date, "DD/MM/YYYY").format("YYYY-MM-DD")}
+      </Tag>
+      <Tag color="gold" className="text-sm px-3 py-1 rounded-md mb-4">
+        وقت الزيارة: {visit.time}
       </Tag>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 flex-wrap ">
         <div>

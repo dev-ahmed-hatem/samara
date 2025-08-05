@@ -8,7 +8,7 @@ class UserAdminForm(UserAdmin):
     list_display = ('username', 'name', 'is_superuser')
     list_filter = ('username', 'name')
     fieldsets = [
-        ("Personal Information", {'fields': ['name']}),
+        ("Personal Information", {'fields': ['name', 'role']}),
         ("Authentication", {'fields': ['username', 'password']}),
         ("Permissions", {'fields': ['is_active', 'is_moderator', 'is_superuser', 'is_root', 'user_permissions']}),
     ]

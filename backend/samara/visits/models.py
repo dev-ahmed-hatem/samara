@@ -53,13 +53,10 @@ class Visit(models.Model):
         verbose_name = _("زيارة")
         verbose_name_plural = _("الزيارات")
         unique_together = ("location", "employee", "date")
+        ordering = ['date', 'time']
 
     def __str__(self):
         return f"{self.location} - {self.date}"
-
-
-from django.db import models
-from django.utils.translation import gettext_lazy as _
 
 
 class VisitReport(models.Model):
