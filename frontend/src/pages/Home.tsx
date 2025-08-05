@@ -143,6 +143,21 @@ const Home: React.FC = () => {
           </Card>
         </Col>
       </Row>
+      <Row gutter={[16, 16]}>
+        <Col xs={24} sm={12}>
+          <Card
+            className="flex items-center justify-between p-4 hover:bg-red-50 transition-all duration-200 cursor-pointer shadow-md rounded-2xl"
+            onClick={() => navigate("violations")}
+          >
+            <div className="flex items-center gap-4">
+              <WarningOutlined className="text-3xl text-red-500" />
+              <div className="text-lg font-semibold text-red-600">
+                سجل المخالفات
+              </div>
+            </div>
+          </Card>
+        </Col>
+      </Row>
     </div>
   );
 };

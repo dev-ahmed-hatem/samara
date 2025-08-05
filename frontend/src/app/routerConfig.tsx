@@ -61,7 +61,9 @@ const addSubRoutes = (
 let routes: RouteObject[] = addSubRoutes(appRoutes, {
   "/supervisor/visits": [
     { path: "start-visit/:visit_id", element: <VisitForm /> },
-    { path: "report-violation/:visit_id", element: <ViolationForm /> },
+  ],
+  "/supervisor/violations": [
+    { path: "report-violation", element: <ViolationForm /> },
   ],
 });
 

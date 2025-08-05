@@ -131,7 +131,7 @@ def get_home_stats(request):
         "location_count": locations_count,
         "scheduled_visits": visits.filter(status=Visit.VisitStatus.SCHEDULED, date=date).count(),
         "completed_visits": visits.filter(status=Visit.VisitStatus.COMPLETED, date=date).count(),
-        "violations": Violation.objects.filter(visit__employee=employee, created_at=date).count(),
+        "violations": Violation.objects.filter(created_by=employee, created_at__date=date).count(),
         "attendance_records": ShiftAttendance.objects.filter(created_by=employee, date=date).count(),
     }
 

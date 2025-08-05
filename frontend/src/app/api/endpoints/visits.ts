@@ -1,9 +1,11 @@
 import { ViolationForm, Visit, VisitReportForm } from "@/types/visit";
 import api from "../apiSlice";
 import qs from "query-string";
+import { Violation } from "@/types/violation";
 
 export const visitsEndpoints = api.injectEndpoints({
   endpoints: (builder) => ({
+    // visits queries
     getVisits: builder.query<Visit[], Record<string, any>>({
       query: (params) => ({
         url: `/visits/visits?${qs.stringify({
@@ -43,6 +45,27 @@ export const visitsEndpoints = api.injectEndpoints({
         { type: "Visit", id: arg.visit },
       ],
     }),
+
+    // violations queries
+    getViolations: builder.query<Violation[], Record<string, any>>({
+      query: (params) => ({
+        url: `/visits/violations?${qs.stringify({
+          no_pagination: true,
+          ...params,
+        })}`,
+        method: "GET",
+      }),
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.map((violation) => ({
+                type: "Violation" as const,
+                id: violation.id,
+              })),
+              { type: "Violation", id: "LIST" },
+            ]
+          : [{ type: "Violation", id: "LIST" }],
+    }),
     violation: builder.mutation<void, ViolationForm & { visit: string }>({
       query: (data) => ({
         url: `/visits/violations/`,
@@ -62,6 +85,7 @@ export const visitsEndpoints = api.injectEndpoints({
 export const {
   useGetVisitsQuery,
   useLazyGetVisitsQuery,
+  useLazyGetViolationsQuery,
   useVisitReportMutation,
   useViolationMutation,
   useVisitQuery,

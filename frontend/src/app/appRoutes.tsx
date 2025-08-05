@@ -7,8 +7,9 @@ import PermissionProvider from "@/providers/PermissionProvider";
 import SectionView from "@/pages/SectionView";
 import VisitsList from "@/pages/visits/supervisor/visits/VisitsList";
 import AttendancePage from "@/pages/attendance/AttendancePage";
-import { CalendarOutlined } from "@ant-design/icons";
+import { CalendarOutlined, WarningOutlined } from "@ant-design/icons";
 import { BsFillPersonCheckFill } from "react-icons/bs";
+import ViolationsList from "@/pages/violations/supervisor/ViolationsList";
 
 export type AppRoute = RouteObject & {
   key?: string;
@@ -50,6 +51,17 @@ export const routesMap = {
           <SectionView
             parentComponent={<VisitsList />}
             parentUrl="/supervisor/visits"
+          />
+        ),
+      },
+      {
+        label: "سجل المخالفات",
+        path: "violations",
+        icon: <WarningOutlined />,
+        element: (
+          <SectionView
+            parentComponent={<ViolationsList />}
+            parentUrl="/supervisor/violations"
           />
         ),
       },

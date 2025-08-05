@@ -65,17 +65,17 @@ const ViolationForm: React.FC = () => {
   ] = useLazyGetLocationsQuery();
 
   const handleSubmit = (values: any) => {
-    console.log(values);
-    return
     
     const data = {
       ...values,
     };
-
+    
     if (fileList?.length) {
       data["violation_image"] = fileList[0];
     }
-
+    // console.log(data);
+    // return
+    
     submitForm(data);
   };
 
@@ -92,7 +92,7 @@ const ViolationForm: React.FC = () => {
         message: "تم تسجيل المخالفة",
       });
 
-      navigate("/supervisor/visits/");
+      navigate("/supervisor/violations/");
     }
   }, [isSuccess]);
 

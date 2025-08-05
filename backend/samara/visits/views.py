@@ -1,3 +1,4 @@
+from django.utils.timezone import make_aware
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -54,3 +55,22 @@ class VisitReportViewSet(ModelViewSet):
 class ViolationViewSet(ModelViewSet):
     queryset = Violation.objects.all()
     serializer_class = ViolationSerializer
+
+    def get_queryset(self):
+        queryset = Violation.objects.all()
+
+        from_date = self.request.query_params.get('from', None)
+        to_date = self.request.query_params.get('to', None)
+        employee = self.request.query_params.get('employee', None)
+
+        if from_date and to_date:
+            from_dt = make_aware(datetime.strptime(from_date, "%Y-%m-%d"))
+            to_dt = make_aware(datetime.strptime(to_date, "%Y-%m-%d"))
+            # Optionally extend to end of day
+            to_dt = to_dt.replace(hour=23, minute=59, second=59)
+
+            queryset = queryset.filter(created_at__range=[from_dt, to_dt])
+        if employee:
+            queryset = queryset.filter(created_by=employee)
+
+        return queryset
