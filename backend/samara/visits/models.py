@@ -58,6 +58,10 @@ class Visit(models.Model):
         return f"{self.location} - {self.date}"
 
 
+from django.db import models
+from django.utils.translation import gettext_lazy as _
+
+
 class VisitReport(models.Model):
     class EvaluationChoices(models.TextChoices):
         GOOD = "جيد", _("جيد")
@@ -70,60 +74,155 @@ class VisitReport(models.Model):
         verbose_name=_("الزيارة")
     )
 
+    # Evaluation fields with optional note + attachment
     guard_presence = models.CharField(
         max_length=20,
         choices=EvaluationChoices.choices,
         verbose_name=_("تواجد الحارس في موقعه")
     )
+    guard_presence_notes = models.TextField(
+        null=True, blank=True,
+        verbose_name=_("ملاحظة تواجد الحارس")
+    )
+    guard_presence_attachment = models.FileField(
+        upload_to="visit_reports/",
+        null=True, blank=True,
+        verbose_name=_("مرفق تواجد الحارس")
+    )
+
     uniform_cleanliness = models.CharField(
         max_length=20,
         choices=EvaluationChoices.choices,
         verbose_name=_("نظافة الزي الرسمي")
     )
+    uniform_cleanliness_notes = models.TextField(
+        null=True, blank=True,
+        verbose_name=_("ملاحظة نظافة الزي")
+    )
+    uniform_cleanliness_attachment = models.FileField(
+        upload_to="visit_reports/",
+        null=True, blank=True,
+        verbose_name=_("مرفق نظافة الزي")
+    )
+
     attendance_records = models.CharField(
         max_length=20,
         choices=EvaluationChoices.choices,
         verbose_name=_("سجلات الحضور والانصراف والسجلات الخاصة بالموقع")
     )
+    attendance_records_notes = models.TextField(
+        null=True, blank=True,
+        verbose_name=_("ملاحظة السجلات")
+    )
+    attendance_records_attachment = models.FileField(
+        upload_to="visit_reports/",
+        null=True, blank=True,
+        verbose_name=_("مرفق السجلات")
+    )
+
     shift_handover = models.CharField(
         max_length=20,
         choices=EvaluationChoices.choices,
         verbose_name=_("الانضباط في تسليم واستلام الورديات")
     )
+    shift_handover_notes = models.TextField(
+        null=True, blank=True,
+        verbose_name=_("ملاحظة الورديات")
+    )
+    shift_handover_attachment = models.FileField(
+        upload_to="visit_reports/",
+        null=True, blank=True,
+        verbose_name=_("مرفق الورديات")
+    )
+
     lighting = models.CharField(
         max_length=20,
         choices=EvaluationChoices.choices,
         verbose_name=_("الإضاءة حول محيط الموقع")
     )
+    lighting_notes = models.TextField(
+        null=True, blank=True,
+        verbose_name=_("ملاحظة الإضاءة")
+    )
+    lighting_attachment = models.FileField(
+        upload_to="visit_reports/",
+        null=True, blank=True,
+        verbose_name=_("مرفق الإضاءة")
+    )
+
     cameras = models.CharField(
         max_length=20,
         choices=EvaluationChoices.choices,
         verbose_name=_("كاميرات المراقبة")
     )
+    cameras_notes = models.TextField(
+        null=True, blank=True,
+        verbose_name=_("ملاحظة الكاميرات")
+    )
+    cameras_attachment = models.FileField(
+        upload_to="visit_reports/",
+        null=True, blank=True,
+        verbose_name=_("مرفق الكاميرات")
+    )
+
     security_vehicles = models.CharField(
         max_length=20,
         choices=EvaluationChoices.choices,
         verbose_name=_("السيارات الأمنية")
     )
+    security_vehicles_notes = models.TextField(
+        null=True, blank=True,
+        verbose_name=_("ملاحظة السيارات الأمنية")
+    )
+    security_vehicles_attachment = models.FileField(
+        upload_to="visit_reports/",
+        null=True, blank=True,
+        verbose_name=_("مرفق السيارات الأمنية")
+    )
+
     radio_devices = models.CharField(
         max_length=20,
         choices=EvaluationChoices.choices,
         verbose_name=_("عمل أجهزة الاتصال اللاسلكي")
     )
+    radio_devices_notes = models.TextField(
+        null=True, blank=True,
+        verbose_name=_("ملاحظة الأجهزة اللاسلكية")
+    )
+    radio_devices_attachment = models.FileField(
+        upload_to="visit_reports/",
+        null=True, blank=True,
+        verbose_name=_("مرفق الأجهزة اللاسلكية")
+    )
+    other = models.CharField(
+        max_length=20,
+        choices=EvaluationChoices.choices,
+        verbose_name=_("أخرى")
+    )
+    other_notes = models.TextField(
+        null=True, blank=True,
+        verbose_name=_("ملاحظة أخرى")
+    )
+    other_attachment = models.FileField(
+        upload_to="visit_reports/",
+        null=True, blank=True,
+        verbose_name=_("مرفق أخرى")
+    )
 
-    notes = models.TextField(
-        null=True,
-        blank=True,
+    # Global notes
+    client_notes = models.TextField(
+        null=True, blank=True,
         verbose_name=_("توجيهات أو توصيات من العميل")
     )
-    attachment = models.FileField(
-        upload_to="visit_reports/",
-        null=True,
-        blank=True,
-        verbose_name=_("مرفقات")
+    supervisor_notes = models.TextField(
+        null=True, blank=True,
+        verbose_name=_("ملاحظات المشرف")
     )
 
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("تاريخ الإنشاء"))
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_("تاريخ الإنشاء")
+    )
 
     class Meta:
         verbose_name = _("تقرير الزيارة")
@@ -133,10 +232,13 @@ class VisitReport(models.Model):
         return f"تقرير زيارة {self.visit}"
 
     def delete(self, using=None, keep_parents=False):
-        if self.attachment:
-            self.attachment.delete()
-
-        super().delete(using, keep_parents=keep_parents)
+        """Delete attachments as well."""
+        for field in self._meta.fields:
+            if isinstance(field, models.FileField):
+                file = getattr(self, field.name)
+                if file:
+                    file.delete(save=False)
+        super().delete(using=using, keep_parents=keep_parents)
 
 
 class Violation(models.Model):
@@ -157,11 +259,11 @@ class Violation(models.Model):
         MEDIUM = "متوسطة", _("متوسطة")
         HIGH = "عالية", _("عالية")
 
-    visit = models.OneToOneField(
-        "Visit",
+    location = models.OneToOneField(
+        "projects.Location",
         on_delete=models.CASCADE,
         related_name="violation",
-        verbose_name=_("الزيارة")
+        verbose_name=_("الموقع")
     )
 
     violation_type = models.CharField(
@@ -220,13 +322,15 @@ class Violation(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("تاريخ الإنشاء"))
 
+    created_by = models.ForeignKey(Employee, on_delete=models.CASCADE)
+
     class Meta:
         verbose_name = _("مخالفة")
         verbose_name_plural = _("المخالفات")
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"{self.violation_type} - {self.created_at.strftime('%Y-%m-%d')} - visit: {self.visit.id}"
+        return f"{self.violation_type} - {self.created_at.strftime('%Y-%m-%d')} - location: {self.location.id}"
 
     def delete(self, using=None, keep_parents=False):
         if self.violation_image:

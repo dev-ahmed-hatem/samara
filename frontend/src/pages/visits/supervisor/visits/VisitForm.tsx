@@ -14,7 +14,6 @@ import { UploadOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { Visit, visitReportFieldLabels, VisitReportForm } from "@/types/visit";
 import { UploadFile } from "antd/lib";
-import { RcFile } from "antd/lib/upload";
 import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 import Loading from "@/components/Loading";
 import ErrorPage from "@/pages/ErrorPage";
@@ -28,6 +27,10 @@ import { dayjs } from "@/utils/locale";
 import { useAppDispatch } from "@/app/redux/hooks";
 import { useNotification } from "@/providers/NotificationProvider";
 
+interface NormalizedAttachments {
+  [fieldWithAttachmentSuffix: string]: File;
+}
+
 const options = [
   { label: "جيد", value: "جيد" },
   { label: "يحتاج إلى معالجة", value: "يحتاج إلى معالجة" },
@@ -38,7 +41,21 @@ const VisitForm = () => {
   const navigate = useNavigate();
 
   const [form] = Form.useForm<VisitReportForm>();
-  const [fileList, setFileList] = useState<RcFile[]>([]);
+  const [fieldStatus, setFieldStatus] = useState<Record<string, string>>({});
+  const [attachments, setAttachments] = useState<Record<string, UploadFile[]>>(
+    {}
+  );
+
+  const handleStatusChange = (field: string, value: string) => {
+    setFieldStatus((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleUploadChange = (field: string, info: any) => {
+    setAttachments((prev) => ({
+      ...prev,
+      [field]: info.fileList,
+    }));
+  };
 
   const dispatch = useAppDispatch();
   const notification = useNotification();
@@ -53,21 +70,30 @@ const VisitForm = () => {
   const [submitForm, { isSuccess, isError: submitError, isLoading }] =
     useVisitReportMutation();
 
+  // normalize attachments
+  const normalizeAttachments = (
+    attachments: Record<string, UploadFile[]>
+  ): NormalizedAttachments => {
+    const result: NormalizedAttachments = {};
+
+    Object.entries(attachments).forEach(([key, fileList]) => {
+      const file = fileList?.[0];
+      if (file) {
+        result[`${key}_attachment`] = file.originFileObj as File;
+      }
+    });
+
+    return result;
+  };
+
   const handleFinish = (values: VisitReportForm) => {
     const data = {
       ...values,
       visit: visit_id!,
+      ...normalizeAttachments(attachments),
     };
 
-    if (fileList?.length) {
-      data["attachment"] = fileList[0];
-    }
-
     submitForm(data);
-  };
-
-  const handleUploadChange = ({ fileList }: any) => {
-    setFileList(fileList.map((file: UploadFile) => file.originFileObj));
   };
 
   useEffect(() => {
@@ -185,69 +211,106 @@ const VisitForm = () => {
             تم تسجيل الملاحظات لهذه الزيارة
           </Tag>
         ) : (
-          <Form
-            form={form}
-            layout="vertical"
-            onFinish={handleFinish}
-            initialValues={{}}
-          >
+          <Form form={form} layout="vertical" onFinish={handleFinish}>
             <Row gutter={[16, 16]}>
-              {Object.entries(visitReportFieldLabels).map(([name, label]) => (
-                <Col xs={24} sm={24} key={name}>
-                  <Form.Item
-                    name={name as keyof VisitReportForm}
-                    label={<span className="text-base">{label}</span>}
-                    rules={[{ required: true, message: "الرجاء اختيار تقييم" }]}
+              {Object.entries(visitReportFieldLabels).map(([field, label]) => (
+                <Col xs={24} key={field}>
+                  <Card
+                    title={
+                      <span className="text-lg font-semibold">{label}</span>
+                    }
+                    bordered
+                    className="shadow-sm"
                   >
-                    <Radio.Group
-                      options={options}
-                      optionType="button"
-                      buttonStyle="solid"
-                    />
-                  </Form.Item>
+                    <Form.Item
+                      name={field}
+                      rules={[
+                        { required: true, message: "الرجاء اختيار تقييم" },
+                      ]}
+                    >
+                      <Radio.Group
+                        optionType="button"
+                        buttonStyle="solid"
+                        options={options}
+                        onChange={(e) =>
+                          handleStatusChange(field, e.target.value)
+                        }
+                      />
+                    </Form.Item>
+
+                    {fieldStatus[field] === "يحتاج إلى معالجة" && (
+                      <div className="space-y-4 mt-4">
+                        <Form.Item
+                          name={`${field}_note`}
+                          label="ملاحظة إضافية"
+                          rules={[{ max: 300, message: "الحد الأقصى 300 حرف" }]}
+                        >
+                          <Input.TextArea
+                            rows={2}
+                            placeholder="أدخل الملاحظة..."
+                          />
+                        </Form.Item>
+
+                        <Form.Item
+                          name={`${field}_attachment`}
+                          label="إرفاق صورة"
+                        >
+                          <Upload
+                            beforeUpload={() => false}
+                            onChange={(info) => handleUploadChange(field, info)}
+                            fileList={attachments[field] || []}
+                            accept="image/*"
+                            maxCount={1}
+                          >
+                            <Button icon={<UploadOutlined />}>
+                              تحميل صورة
+                            </Button>
+                          </Upload>
+                        </Form.Item>
+                      </div>
+                    )}
+                  </Card>
                 </Col>
               ))}
 
               <Col span={24}>
-                <Form.Item
-                  label={
-                    <span className="text-base">صورة مرفقة (اختياري)</span>
-                  }
-                  name="attachment"
-                >
-                  <Upload
-                    beforeUpload={() => false}
-                    onChange={handleUploadChange}
-                    fileList={fileList.map((file) => ({
-                      uid: file.uid,
-                      name: file.name,
-                      status: "done",
-                      url: URL.createObjectURL(file),
-                    }))}
-                    accept="image/*"
-                    maxCount={1}
-                  >
-                    <Button icon={<UploadOutlined />}>تحميل صورة</Button>
-                  </Upload>
-                </Form.Item>
-              </Col>
-
-              <Col span={24}>
-                <Form.Item
-                  name="notes"
-                  label={
-                    <span className="text-base">
-                      توجيهات أو توصيات من العميل
+                <Card
+                  title={
+                    <span className="text-lg font-semibold">
+                      ملاحظات إضافية
                     </span>
                   }
-                  rules={[{ max: 500, message: "الحد الأقصى 500 حرف" }]}
+                  bordered
+                  className="shadow-sm"
                 >
-                  <Input.TextArea
-                    rows={4}
-                    placeholder="أدخل التوصيات أو الملاحظات هنا..."
-                    className="text-base"
-                  />
-                </Form.Item>
+                  <Form.Item
+                    name="client_notes"
+                    label={
+                      <span className="text-base">
+                        توجيهات أو توصيات من العميل
+                      </span>
+                    }
+                    rules={[{ max: 500, message: "الحد الأقصى 500 حرف" }]}
+                  >
+                    <Input.TextArea
+                      rows={4}
+                      placeholder="أدخل التوصيات أو الملاحظات هنا..."
+                      className="text-base"
+                    />
+                  </Form.Item>
+
+                  <Form.Item
+                    name="supervisor_notes"
+                    label={<span className="text-base">ملاحظات المشرف</span>}
+                    rules={[{ max: 500, message: "الحد الأقصى 500 حرف" }]}
+                  >
+                    <Input.TextArea
+                      rows={4}
+                      placeholder="أدخل ملاحظات المشرف..."
+                      className="text-base"
+                    />
+                  </Form.Item>
+                </Card>
               </Col>
 
               <Col span={24}>
@@ -255,9 +318,8 @@ const VisitForm = () => {
                   <Button
                     type="primary"
                     htmlType="submit"
-                    className="w-full md:w-auto mx-auto"
+                    className="w-full md:w-auto"
                     size="large"
-                    loading={isLoading}
                   >
                     إرسال النموذج
                   </Button>

@@ -30,6 +30,7 @@ export const visitReportFieldLabels: Record<string, string> = {
   cameras: "كاميرات المراقبة",
   security_vehicles: "السيارات الأمنية",
   radio_devices: "عمل أجهزة الاتصال اللاسلكي",
+  other: "اخرى",
 };
 
 export type VisitReportForm = {
@@ -60,6 +61,8 @@ export type ViolationType =
   | "أخرى";
 
 export type ViolationForm = {
+  location: string
+
   violation_type: ViolationType;
 
   severity: Severity;
