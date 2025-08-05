@@ -59,19 +59,6 @@ const VisitCard = ({
             >
               بدء الزيارة
             </Button>
-
-            {visit.violation ? (
-              <Tag color="red" className="flex items-center">
-                تم تسجيل مخالفة
-              </Tag>
-            ) : (
-              <Button
-                danger
-                onClick={() => navigate(`report-violation/${visit.id}`)}
-              >
-                إبلاغ عن مخالفة
-              </Button>
-            )}
           </div>
         )}
       </div>
