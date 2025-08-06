@@ -28,6 +28,7 @@ import { useNotification } from "@/providers/NotificationProvider";
 import { ViolationForm as ViolationFormType, Visit } from "@/types/visit";
 import { useGetProjectsQuery } from "@/app/api/endpoints/projects";
 import { useLazyGetLocationsQuery } from "@/app/api/endpoints/locations";
+import { useLazyGetSecurityGuardsQuery } from "@/app/api/endpoints/security_guards";
 
 const { TextArea } = Input;
 
@@ -53,6 +54,7 @@ const ViolationForm: React.FC = () => {
   const [form] = Form.useForm<ViolationFormType>();
   const [fileList, setFileList] = useState<RcFile[]>([]);
   const [projectId, setProjectId] = useState<number | null>(null);
+  const [location, setLocation] = useState<number | null>(null);
 
   const {
     data: projects,
@@ -63,19 +65,24 @@ const ViolationForm: React.FC = () => {
     getLocations,
     { data: locations, isFetching: fetchingLocations, isError: locationsError },
   ] = useLazyGetLocationsQuery();
+  const [
+    getSecurityGuards,
+    {
+      data: securityGuards,
+      isFetching: fetchingSecurityGuards,
+      isError: securityGuardsError,
+    },
+  ] = useLazyGetSecurityGuardsQuery();
 
   const handleSubmit = (values: any) => {
-    
     const data = {
       ...values,
     };
-    
+
     if (fileList?.length) {
       data["violation_image"] = fileList[0];
     }
-    // console.log(data);
-    // return
-    
+
     submitForm(data);
   };
 
@@ -110,8 +117,17 @@ const ViolationForm: React.FC = () => {
     }
   }, [projectId]);
 
+  useEffect(() => {
+    if (projectId && location) {
+      getSecurityGuards({
+        location_id: location,
+      });
+    }
+  }, [projectId, location]);
+
   if (fetchingProjects) return <Loading />;
-  if (ProjectsError || locationsError) return <ErrorPage />;
+  if (ProjectsError || locationsError || securityGuardsError)
+    return <ErrorPage />;
 
   return (
     <>
@@ -139,6 +155,7 @@ const ViolationForm: React.FC = () => {
               placeholder="اختر المشروع"
               onChange={(value) => {
                 setProjectId(value);
+                setLocation(null);
                 form.setFieldValue("location", undefined);
               }}
             >
@@ -165,6 +182,9 @@ const ViolationForm: React.FC = () => {
           >
             <Select
               placeholder="اختر الموقع"
+              onChange={(value) => {
+                setLocation(value);
+              }}
               value={location ?? undefined}
               disabled={!projectId}
             >
@@ -172,6 +192,31 @@ const ViolationForm: React.FC = () => {
                 locations?.map((loc) => (
                   <Select.Option key={loc.id} value={loc.id}>
                     {loc.name}
+                  </Select.Option>
+                ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            label={
+              <div className="flex gap-2 items-center">
+                <span>الموظف المخالف</span>
+                {fetchingSecurityGuards && (
+                  <Spin size="small" indicator={<LoadingOutlined spin />} />
+                )}
+              </div>
+            }
+            name="security_guard"
+            className="col-span-1"
+            rules={[
+              { required: true, message: "الرجاء اختيار الموظف المخالف" },
+            ]}
+          >
+            <Select placeholder="اختر الموظف المخالف" disabled={!location}>
+              {location &&
+                securityGuards?.map((sec) => (
+                  <Select.Option key={sec.id} value={sec.id}>
+                    {sec.name}
                   </Select.Option>
                 ))}
             </Select>

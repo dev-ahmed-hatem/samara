@@ -256,11 +256,18 @@ class Violation(models.Model):
         MEDIUM = "متوسطة", _("متوسطة")
         HIGH = "عالية", _("عالية")
 
-    location = models.OneToOneField(
+    location = models.ForeignKey(
         "projects.Location",
         on_delete=models.CASCADE,
         related_name="violation",
         verbose_name=_("الموقع")
+    )
+
+    security_guard = models.ForeignKey(
+        "employees.SecurityGuard",
+        on_delete=models.CASCADE,
+        related_name="violation",
+        verbose_name=_("الموظف المخالف")
     )
 
     violation_type = models.CharField(

@@ -55,7 +55,7 @@ class ViolationSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(view_name='violation-detail')
     project_name = serializers.StringRelatedField(source='location.project.name', read_only=True)
     location_name = serializers.StringRelatedField(source='location.name', read_only=True)
-    created_at = serializers.DateTimeField(format='%Y-%m-%d %I:%M%p', read_only=True)
+    created_at = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Violation
@@ -66,3 +66,6 @@ class ViolationSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         employee = request.user.employee_profile
         return super().create({**validated_data, "created_by": employee})
+
+    def get_created_at(self, obj):
+        return obj.created_at.astimezone(settings.SAUDI_TZ).strftime('%d/%m/%Y %I:%M %p')
