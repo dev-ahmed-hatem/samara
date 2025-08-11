@@ -8,6 +8,7 @@ import { useAppSelector } from "@/app/redux/hooks";
 import { useLazyGetViolationsQuery } from "@/app/api/endpoints/visits";
 import ErrorPage from "@/pages/ErrorPage";
 import Loading from "@/components/Loading";
+import { Violation } from "@/types/violation";
 
 const { Title } = Typography;
 
@@ -21,6 +22,11 @@ const columns = [
     title: "التاريخ",
     dataIndex: "created_at",
     key: "created_at",
+    render: (text: string, record: Violation) => (
+      <>
+        {record.date} {text}
+      </>
+    ),
   },
   {
     title: "المشروع",
@@ -32,16 +38,6 @@ const columns = [
     dataIndex: "location_name",
     key: "location",
   },
-];
-
-const dataSource = [
-  {
-    id: "V123",
-    date: "2025-08-01",
-    location: "بوابة شمالية",
-    project_name: "أحمد محمد",
-  },
-  // Add more dummy or real data
 ];
 
 const ViolationsList = () => {

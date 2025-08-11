@@ -93,6 +93,7 @@ class ViolationWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Violation
         fields = '__all__'
+        read_only_fields = ("created_by",)
 
     def create(self, validated_data):
         request = self.context.get('request')

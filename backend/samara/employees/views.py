@@ -195,7 +195,7 @@ class SupervisorMonthlyRecord(APIView):
                 created_at__date__range=(first_day, last_day),
                 created_by_id=supervisor
             ).annotate(
-                date=TruncDate("created_at")
+                date=TruncDate("created_at", tzinfo=settings.SAUDI_TZ)
             )
             .values("date")
             .annotate(violations_count=Count("id"))
@@ -225,9 +225,10 @@ class SupervisorDailyRecord(APIView):
             employee_id=supervisor
         )
 
-        violations = Violation.objects.filter(
-            created_at__date=selected_date,
-        )
+        violations = (
+            Violation.objects
+            .annotate(local_date=TruncDate("created_at", tzinfo=settings.SAUDI_TZ))
+            .filter(local_date=selected_date))
 
         visits_serialized = VisitReadSerializer(visits, many=True, context={"request": request}).data
         violations_serialized = ViolationReadSerializer(violations, many=True, context={"request": request}).data

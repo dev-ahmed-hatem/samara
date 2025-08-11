@@ -9,6 +9,7 @@ from .serializers import VisitReadSerializer, VisitWriteSerializer, \
 
 from datetime import datetime
 from django.conf import settings
+from django.db.models.functions import TruncDate
 
 
 class VisitViewSet(ModelViewSet):
@@ -77,7 +78,8 @@ class ViolationViewSet(ModelViewSet):
             # Optionally extend to end of day
             to_dt = to_dt.replace(hour=23, minute=59, second=59)
 
-            queryset = queryset.filter(created_at__range=[from_dt, to_dt])
+            queryset = queryset.annotate(local_date=TruncDate("created_at", tzinfo=settings.SAUDI_TZ)).filter(
+                local_date__range=[from_dt, to_dt])
         if employee:
             queryset = queryset.filter(created_by=employee)
 
