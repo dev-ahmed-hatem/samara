@@ -36,7 +36,7 @@ export const routesMap = {
     children: [
       {
         path: "visits",
-        label: "الزيارات الميدانية",
+        label: "سجل الزيارات والمخالفات",
         element: (
           <SectionView
             parentComponent={<VisitsController />}

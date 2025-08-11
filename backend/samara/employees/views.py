@@ -18,6 +18,7 @@ from projects.models import Location
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from django.utils.translation import gettext_lazy as _
+from users.models import User
 
 
 class EmployeeViewSet(viewsets.ModelViewSet):
@@ -125,10 +126,18 @@ def multiple_delete(request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_home_stats(request):
-    employee = request.user.employee_profile
+    user: User = request.user
     date = datetime.today().astimezone(settings.SAUDI_TZ).date()
 
-    visits = Visit.objects.filter(employee=employee)
+    visits = Visit.objects.filter()
+    violations = Violation.objects.filter(created_at__date=date)
+    attendance_records = ShiftAttendance.objects.filter(date=date)
+    if user.role == User.RoleChoices.SUPERVISOR:
+        employee = user.employee_profile
+        visits.filter(employee=employee)
+        violations.filter(created_by=employee)
+        attendance_records.filter(created_by=employee)
+
     locations_ids = visits.values_list('location_id', flat=True).distinct()
     project_ids = Location.objects.filter(id__in=locations_ids).values_list('project_id', flat=True).distinct()
 
@@ -140,8 +149,9 @@ def get_home_stats(request):
         "location_count": locations_count,
         "scheduled_visits": visits.filter(status=Visit.VisitStatus.SCHEDULED, date=date).count(),
         "completed_visits": visits.filter(status=Visit.VisitStatus.COMPLETED, date=date).count(),
-        "violations": Violation.objects.filter(created_by=employee, created_at__date=date).count(),
-        "attendance_records": ShiftAttendance.objects.filter(created_by=employee, date=date).count(),
+        "violations": violations.count(),
+        "attendance_records": attendance_records.count(),
+        "guards_count": SecurityGuard.objects.count()
     }
 
     return Response(data, status=status.HTTP_200_OK)

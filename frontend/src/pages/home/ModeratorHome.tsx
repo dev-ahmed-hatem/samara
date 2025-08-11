@@ -6,24 +6,16 @@ import {
   CheckCircleOutlined,
   WarningOutlined,
   ClockCircleOutlined,
+  UserSwitchOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router";
 import Loading from "@/components/Loading";
-import ErrorPage from "./ErrorPage";
+import ErrorPage from "../ErrorPage";
 import { useGetHomeStatsQuery } from "@/app/api/endpoints/employees";
 import { useAppSelector } from "@/app/redux/hooks";
 
-export type HomeStats = {
-  project_count: number;
-  location_count: number;
-  scheduled_visits: number;
-  completed_visits: number;
-  violations: number;
-  attendance_records: number;
-};
-
-const Home: React.FC = () => {
+const ModeratorHome: React.FC = () => {
   const navigate = useNavigate();
   const today = dayjs().format("DD-MM-YYYY");
   const user = useAppSelector((state) => state.auth.user);
@@ -110,6 +102,15 @@ const Home: React.FC = () => {
             />
           </Card>
         </Col>
+        <Col xs={24} sm={12} md={6}>
+          <Card className="shadow-sm rounded-2xl">
+            <Statistic
+              title="عدد رجال الأمن"
+              value={stats!.guards_count}
+              prefix={<UserSwitchOutlined className="text-green-500 text-xl" />}
+            />
+          </Card>
+        </Col>
       </Row>
 
       <Divider />
@@ -124,35 +125,7 @@ const Home: React.FC = () => {
             <div className="flex items-center gap-4">
               <CalendarOutlined className="text-3xl text-blue-600" />
               <div className="text-lg font-semibold text-blue-600">
-                جدول الزيارات الميدانية
-              </div>
-            </div>
-          </Card>
-        </Col>
-        <Col xs={24} sm={12}>
-          <Card
-            className="flex items-center justify-between p-4 hover:bg-yellow-50 transition-all duration-200 cursor-pointer shadow-md rounded-2xl"
-            onClick={() => navigate("attendance")}
-          >
-            <div className="flex items-center gap-4">
-              <ClockCircleOutlined className="text-3xl text-yellow-500" />
-              <div className="text-lg font-semibold text-yellow-600">
-                التحضير اليومي لرجال الأمن
-              </div>
-            </div>
-          </Card>
-        </Col>
-      </Row>
-      <Row gutter={[16, 16]}>
-        <Col xs={24} sm={12}>
-          <Card
-            className="flex items-center justify-between p-4 hover:bg-red-50 transition-all duration-200 cursor-pointer shadow-md rounded-2xl"
-            onClick={() => navigate("violations")}
-          >
-            <div className="flex items-center gap-4">
-              <WarningOutlined className="text-3xl text-red-500" />
-              <div className="text-lg font-semibold text-red-600">
-                سجل المخالفات
+                سجل الزيارات والمخالفات
               </div>
             </div>
           </Card>
@@ -162,4 +135,4 @@ const Home: React.FC = () => {
   );
 };
 
-export default Home;
+export default ModeratorHome;

@@ -2,7 +2,7 @@ import NotAllowed from "@/pages/NotAllowed";
 import { ENGLISH_ROLES } from "@/types/user";
 import { Outlet, useMatch } from "react-router";
 import { useAuth } from "./AuthProvider";
-import Home from "@/pages/Home";
+import Home from "@/pages/home/Home";
 import Breadcrumbs from "@/components/BreadCrumbs";
 
 const PermissionProvider = ({ role }: { role: ENGLISH_ROLES }) => {

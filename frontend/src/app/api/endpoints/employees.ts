@@ -1,4 +1,4 @@
-import { HomeStats } from "@/pages/Home";
+
 import api from "../apiSlice";
 import qs from "query-string";
 import { Employee } from "@/types/employee";
@@ -6,6 +6,7 @@ import { PaginatedResponse } from "@/types/paginatedResponse";
 import { QueryParams } from "@/types/query_param";
 import { MonthRecord, Visit } from "@/types/visit";
 import { Violation } from "@/types/violation";
+import { HomeStats } from "@/types/homeStat";
 
 export const employeesEndpoints = api.injectEndpoints({
   endpoints: (builder) => ({
