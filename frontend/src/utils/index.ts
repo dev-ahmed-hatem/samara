@@ -29,3 +29,10 @@ export const isOverdue = (date: string) => {
 
   return today > dueDate;
 };
+
+export const textify = (text: string | null | undefined) => {
+  if (typeof text === "string" && text.trim() !== "") {
+    return text;
+  }
+  return null;
+};

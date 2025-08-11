@@ -2,6 +2,7 @@ import { ViolationForm, Visit, VisitReportForm } from "@/types/visit";
 import api from "../apiSlice";
 import qs from "query-string";
 import { Violation } from "@/types/violation";
+import { VisitReport } from "@/types/visitReport";
 
 export const visitsEndpoints = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -25,16 +26,26 @@ export const visitsEndpoints = api.injectEndpoints({
             ]
           : [{ type: "Visit", id: "LIST" }],
     }),
-    visit: builder.query<Visit, string>({
+    getVisit: builder.query<Visit, string>({
       query: (id) => ({
         url: `/visits/visits/${id}/`,
         method: "GET",
       }),
       providesTags: (response, error, id) => [{ type: "Visit", id }],
     }),
+    visit: builder.mutation<
+      Visit,
+      { url?: string; method?: string; data?: Record<string, any> }
+    >({
+      query: ({ url, method, data }) => ({
+        url: url ?? `/visits/visits/`,
+        method: method ?? "POST",
+        data,
+      }),
+    }),
     visitReport: builder.mutation<void, VisitReportForm & { visit: string }>({
       query: (data) => ({
-        url: `/visits/visit-report/`,
+        url: `/visits/visit-reports/`,
         method: "POST",
         data,
         headers: {
@@ -66,6 +77,13 @@ export const visitsEndpoints = api.injectEndpoints({
             ]
           : [{ type: "Violation", id: "LIST" }],
     }),
+    getViolation: builder.query<Violation, string>({
+      query: (id) => ({
+        url: `/visits/violations/${id}/`,
+        method: "GET",
+      }),
+      providesTags: (response, error, id) => [{ type: "Violation", id }],
+    }),
     violation: builder.mutation<void, ViolationForm & { visit: string }>({
       query: (data) => ({
         url: `/visits/violations/`,
@@ -76,8 +94,17 @@ export const visitsEndpoints = api.injectEndpoints({
         },
       }),
       invalidatesTags: (result, error, arg) => [
-        { type: "Visit", id: arg.visit },
+        { type: "Violation", id: arg.visit },
       ],
+    }),
+    deleteViolation: builder.mutation<void, string>({
+      query: (id) => ({
+        url: `/visits/visits/${id}`,
+        method: "DELETE",
+      }),
+    }),
+    getVisitReport: builder.query<VisitReport, string>({
+      query: (id) => ({ url: `/visits/visit-reports/${id}/?`, method: "GET" }),
     }),
   }),
 });
@@ -88,5 +115,9 @@ export const {
   useLazyGetViolationsQuery,
   useVisitReportMutation,
   useViolationMutation,
-  useVisitQuery,
+  useGetVisitReportQuery,
+  useGetVisitQuery,
+  useVisitMutation,
+  useDeleteViolationMutation,
+  useGetViolationQuery,
 } = visitsEndpoints;

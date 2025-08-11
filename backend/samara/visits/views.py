@@ -5,7 +5,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from .models import Visit, VisitReport, Violation
 from .serializers import VisitReadSerializer, VisitWriteSerializer, \
-    VisitReportSerializer, ViolationSerializer
+    VisitReportReadSerializer, VisitReportWriteSerializer, ViolationReadSerializer, ViolationWriteSerializer
 
 from datetime import datetime
 from django.conf import settings
@@ -49,12 +49,20 @@ class VisitViewSet(ModelViewSet):
 
 class VisitReportViewSet(ModelViewSet):
     queryset = VisitReport.objects.all()
-    serializer_class = VisitReportSerializer
+
+    def get_serializer_class(self):
+        if self.action in ["create", "update", "partial_update"]:
+            return VisitReportWriteSerializer
+        return VisitReportReadSerializer
 
 
 class ViolationViewSet(ModelViewSet):
     queryset = Violation.objects.all()
-    serializer_class = ViolationSerializer
+
+    def get_serializer_class(self):
+        if self.action in ["create", "update", "partial_update"]:
+            return ViolationWriteSerializer
+        return ViolationReadSerializer
 
     def get_queryset(self):
         queryset = Violation.objects.all()

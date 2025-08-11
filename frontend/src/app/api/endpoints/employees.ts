@@ -66,6 +66,7 @@ export const employeesEndpoints = api.injectEndpoints({
         url: `/employees/supervisor-daily-records/?${qs.stringify(params)}`,
         method: "GET",
       }),
+      providesTags: [{ type: "DailyRecords", id: "LIST" }],
     }),
     // switchEmployeeActive: builder.mutation<{ is_active: boolean }, string>({
     //   query: (id) => ({

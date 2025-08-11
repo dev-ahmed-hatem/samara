@@ -37,7 +37,12 @@ export const routesMap = {
       {
         path: "visits",
         label: "الزيارات الميدانية",
-        element: <VisitsController />,
+        element: (
+          <SectionView
+            parentComponent={<VisitsController />}
+            parentUrl="/moderator/visits"
+          />
+        ),
       },
     ],
   },

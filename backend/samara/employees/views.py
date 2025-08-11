@@ -10,7 +10,7 @@ from django.db.models.functions import TruncDate
 
 from attendance.models import ShiftAttendance
 from visits.models import Visit, Violation
-from visits.serializers import VisitReadSerializer, ViolationSerializer
+from visits.serializers import VisitReadSerializer, ViolationReadSerializer
 from .serializers import EmployeeReadSerializer, EmployeeWriteSerializer, EmployeeListSerializer, \
     SecurityGuardSerializer
 from .models import Employee, SecurityGuard
@@ -220,5 +220,5 @@ class SupervisorDailyRecord(APIView):
         )
 
         visits_serialized = VisitReadSerializer(visits, many=True, context={"request": request}).data
-        violations_serialized = ViolationSerializer(violations, many=True, context={"request": request}).data
+        violations_serialized = ViolationReadSerializer(violations, many=True, context={"request": request}).data
         return JsonResponse({"visits": visits_serialized, "violations": violations_serialized})

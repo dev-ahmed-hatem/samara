@@ -18,7 +18,7 @@ import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 import Loading from "@/components/Loading";
 import ErrorPage from "@/pages/ErrorPage";
 import {
-  useVisitQuery,
+  useGetVisitQuery,
   useVisitReportMutation,
   visitsEndpoints,
 } from "@/app/api/endpoints/visits";
@@ -65,7 +65,7 @@ const VisitForm = () => {
     isFetching,
     isError,
     error: visitError,
-  } = useVisitQuery(visit_id as string);
+  } = useGetVisitQuery(visit_id as string);
 
   const [submitForm, { isSuccess, isError: submitError, isLoading }] =
     useVisitReportMutation();
@@ -100,7 +100,7 @@ const VisitForm = () => {
     if (isSuccess) {
       dispatch(
         visitsEndpoints.util.updateQueryData(
-          "visit",
+          "getVisit",
           visit_id!,
           (draft: Visit) => {
             draft.status = "مكتملة";
@@ -241,7 +241,7 @@ const VisitForm = () => {
                     {fieldStatus[field] === "يحتاج إلى معالجة" && (
                       <div className="space-y-4 mt-4">
                         <Form.Item
-                          name={`${field}_note`}
+                          name={`${field}_notes`}
                           label="ملاحظة إضافية"
                           rules={[{ max: 300, message: "الحد الأقصى 300 حرف" }]}
                         >
@@ -320,6 +320,7 @@ const VisitForm = () => {
                     htmlType="submit"
                     className="w-full md:w-auto"
                     size="large"
+                    loading={isLoading}
                   >
                     إرسال النموذج
                   </Button>

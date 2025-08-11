@@ -8,7 +8,6 @@ import {
   Row,
   Col,
   Typography,
-  Space,
   Popconfirm,
   Badge,
   Empty,
@@ -24,8 +23,16 @@ import {
 import ErrorPage from "@/pages/ErrorPage";
 import Loading from "@/components/Loading";
 import { Employee } from "@/types/employee";
-import { BadgeProps, CalendarProps } from "antd/lib";
+import { CalendarProps } from "antd/lib";
 import { useNotification } from "@/providers/NotificationProvider";
+import { useNavigate } from "react-router";
+import {
+  useDeleteViolationMutation,
+  useVisitMutation,
+} from "@/app/api/endpoints/visits";
+import api from "@/app/api/apiSlice";
+import { useAppDispatch } from "@/app/redux/hooks";
+import CreateVisitForm from "@/components/visits/moderators/CreateVisitForm";
 
 const { Option } = Select;
 const { Title, Text } = Typography;
@@ -48,6 +55,10 @@ const titlesMap = {
 
 const VisitsController: React.FC = () => {
   const notification = useNotification();
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
+  const [message, setMessage] = useState<string>("");
 
   const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs());
   const [month, setMonth] = useState<number>(dayjs().month() + 1);
@@ -68,6 +79,32 @@ const VisitsController: React.FC = () => {
     getDaily,
     { data: daily, isFetching: fetchingDaily, isError: dailyError },
   ] = useLazyGetSupervisorDailyRecordQuery();
+  const [
+    handleVisit,
+    {
+      isLoading: loadingVisit,
+      isError: visitIsError,
+      isSuccess: visitDone,
+    },
+  ] = useVisitMutation();
+  const [
+    deleteViolation,
+    {
+      isLoading: deletingViolation,
+      isError: violationIsError,
+      isSuccess: violationIsDone,
+    },
+  ] = useDeleteViolationMutation();
+
+  const handleVisitDelete = (id: string) => {
+    setMessage("تم حذف الزيارة");
+    handleVisit({ url: `/visits/visits/${id}/`, method: "DELETE" });
+  };
+
+  const handleViolationDelete = (id: string) => {
+    setMessage("تم حذف المخالفة");
+    deleteViolation(id);
+  };
 
   const onDateSelect = (date: Dayjs) => {
     setSelectedDate(date);
@@ -127,6 +164,19 @@ const VisitsController: React.FC = () => {
       notification.error({ message: "حدث خطأ أثناء تحميل الزيارات" });
   }, [recordsError, dailyError]);
 
+  useEffect(() => {
+    if (visitDone || violationIsDone) {
+      dispatch(api.util.invalidateTags([{ type: "DailyRecords", id: "LIST" }]));
+      notification.success({ message: message });
+    }
+  }, [visitDone, violationIsDone]);
+
+  useEffect(() => {
+    if (visitIsError || violationIsError) {
+      notification.error({ message: "حدث خطأ أثناء التنفيذ" });
+    }
+  }, [visitIsError, violationIsError]);
+
   if (fetchingSupervisors) return <Loading />;
   if (supervisorsError) return <ErrorPage />;
   return (
@@ -168,6 +218,15 @@ const VisitsController: React.FC = () => {
                 />
               </div>
             </div>
+            <Divider />
+
+            <Title level={4} className="mb-4">
+              إضافة زيارة
+            </Title>
+            <CreateVisitForm
+              selectedSupervisor={selectedSupervisor!}
+              selectedDate={selectedDate.format("YYYY-MM-DD")}
+            />
           </Card>
         )
       )}
@@ -238,7 +297,14 @@ const VisitsController: React.FC = () => {
                     </Text>
                     <div className="flex justify-end items-center mt-5 gap-2">
                       {visit.status === "مكتملة" && (
-                        <Button type="primary" size="middle">
+                        <Button
+                          type="primary"
+                          size="middle"
+                          onClick={() =>
+                            navigate(`view-report/${visit.report_id}`)
+                          }
+                          disabled={loadingVisit}
+                        >
                           عرض التقرير
                         </Button>
                       )}
@@ -248,9 +314,9 @@ const VisitsController: React.FC = () => {
                         description="هل أنت متأكد من أنك تريد حذف هذه الزيارة؟"
                         okText="نعم"
                         cancelText="إلغاء"
-                        onConfirm={() => {}}
+                        onConfirm={() => handleVisitDelete(visit.id)}
                       >
-                        <Button danger size="middle">
+                        <Button danger size="middle" loading={loadingVisit}>
                           حذف الزيارة
                         </Button>
                       </Popconfirm>
@@ -297,7 +363,9 @@ const VisitsController: React.FC = () => {
                           </Text>
                         </div>
                         <div className="flex items-center justify-between">
-                          <Text className="text-xs">{violation.created_at}</Text>
+                          <Text className="text-xs">
+                            {violation.created_at}
+                          </Text>
                         </div>
                       </div>
                     }
@@ -306,7 +374,14 @@ const VisitsController: React.FC = () => {
                       {violation.violation_type}
                     </Text>
                     <div className="flex justify-end items-center mt-5 gap-2">
-                      <Button type="primary" size="middle">
+                      <Button
+                        type="primary"
+                        size="middle"
+                        disabled={deletingViolation}
+                        onClick={() =>
+                          navigate(`view-violation/${violation.id}`)
+                        }
+                      >
                         عرض التفاصيل
                       </Button>
 
@@ -315,9 +390,13 @@ const VisitsController: React.FC = () => {
                         description="هل أنت متأكد من أنك تريد حذف هذه المخالفة؟"
                         okText="نعم"
                         cancelText="إلغاء"
-                        onConfirm={() => {}}
+                        onConfirm={() => handleViolationDelete(violation.id)}
                       >
-                        <Button danger size="middle">
+                        <Button
+                          danger
+                          size="middle"
+                          loading={deletingViolation}
+                        >
                           حذف المخالفة
                         </Button>
                       </Popconfirm>

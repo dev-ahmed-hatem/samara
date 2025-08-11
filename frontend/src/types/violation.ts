@@ -1,5 +1,5 @@
 export type Violation = {
-  id: number;
+  id: string;
   location: number; // Assuming you're sending the `location.id`
   location_name: string;
   project_name: string;
@@ -15,6 +15,7 @@ export type Violation = {
     | "استخدام الجوال أثناء العمل"
     | "أخرى";
   severity: "منخفضة" | "متوسطة" | "عالية";
+  security_guard: string;
   details: string;
   supervisor_explanation?: string;
   violation_image?: string; // URL if returned in GET
@@ -23,6 +24,7 @@ export type Violation = {
   penalty?: string;
   confirmed_by_ops: boolean;
   confirmed_by_monitoring: boolean;
-  created_at: string; // ISO date string
-  created_by: number; // or { id: number; name: string; ... } if populated
+  created_by: string;
+  created_at: string;
+  date?: string;
 };

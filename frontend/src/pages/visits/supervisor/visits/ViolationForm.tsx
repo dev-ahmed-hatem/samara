@@ -15,15 +15,10 @@ import { useEffect, useState } from "react";
 import { RcFile, UploadFile } from "antd/lib/upload";
 import {
   useViolationMutation,
-  useVisitQuery,
-  visitsEndpoints,
 } from "@/app/api/endpoints/visits";
-import { useNavigate, useParams } from "react-router";
-import dayjs from "dayjs";
+import { useNavigate } from "react-router";
 import Loading from "@/components/Loading";
-import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 import ErrorPage from "@/pages/ErrorPage";
-import { useAppDispatch } from "@/app/redux/hooks";
 import { useNotification } from "@/providers/NotificationProvider";
 import { ViolationForm as ViolationFormType, Visit } from "@/types/visit";
 import { useGetProjectsQuery } from "@/app/api/endpoints/projects";
