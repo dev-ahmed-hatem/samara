@@ -42,7 +42,7 @@ const Breadcrumbs: React.FC = () => {
 
   useEffect(() => {
     setItems([]);
-    build(routesMap[user.role].children, location.pathname, "/supervisor");
+    build(routesMap[user.role].children, location.pathname, `/${user.role}`);
   }, [location.pathname]);
 
   return (

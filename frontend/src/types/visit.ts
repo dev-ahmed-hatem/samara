@@ -61,7 +61,7 @@ export type ViolationType =
   | "أخرى";
 
 export type ViolationForm = {
-  location: string
+  location: string;
 
   violation_type: ViolationType;
 
@@ -82,4 +82,10 @@ export type ViolationForm = {
   confirmed_by_ops?: boolean;
 
   confirmed_by_monitoring?: boolean;
+};
+
+export type MonthRecord = {
+  scheduled?: number;
+  completed?: number;
+  violations: number;
 };

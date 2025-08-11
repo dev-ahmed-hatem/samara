@@ -10,6 +10,7 @@ import AttendancePage from "@/pages/attendance/AttendancePage";
 import { CalendarOutlined, WarningOutlined } from "@ant-design/icons";
 import { BsFillPersonCheckFill } from "react-icons/bs";
 import ViolationsList from "@/pages/violations/supervisor/ViolationsList";
+import VisitsController from "@/pages/visits/moderators/visits/VisitsController";
 
 export type AppRoute = RouteObject & {
   key?: string;
@@ -29,13 +30,14 @@ export const routesMap = {
       },
     ],
   },
-  sys_user: {
-    path: "/sys_user",
-    element: <PermissionProvider role="sys_user" />,
+  moderator: {
+    path: "/moderator",
+    element: <PermissionProvider role="moderator" />,
     children: [
       {
-        path: "",
-        element: <>sys user</>,
+        path: "visits",
+        label: "الزيارات الميدانية",
+        element: <VisitsController />,
       },
     ],
   },

@@ -1,6 +1,6 @@
 import { Employee } from "./employee";
 
-export type ENGLISH_ROLES = "admin" | "sys_user" | "supervisor";
+export type ENGLISH_ROLES = "admin" | "moderator" | "supervisor";
 export type ARABBIC_ROLES = "مدير" | "مستخدم نظام" | "مشرف";
 
 export type User = {

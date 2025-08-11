@@ -68,4 +68,4 @@ class ViolationSerializer(serializers.ModelSerializer):
         return super().create({**validated_data, "created_by": employee})
 
     def get_created_at(self, obj):
-        return obj.created_at.astimezone(settings.SAUDI_TZ).strftime('%d/%m/%Y %I:%M %p')
+        return obj.created_at.astimezone(settings.SAUDI_TZ).strftime('%I:%M %p')

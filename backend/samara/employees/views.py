@@ -1,17 +1,22 @@
 from rest_framework.response import Response
 from rest_framework import viewsets, status
-from datetime import datetime
+from rest_framework.views import APIView
+from datetime import datetime, date, timedelta
 from django.conf import settings
+from django.utils.dateparse import parse_date
+from django.http import JsonResponse
+from django.db.models import Count, Q
+from django.db.models.functions import TruncDate
 
 from attendance.models import ShiftAttendance
 from visits.models import Visit, Violation
+from visits.serializers import VisitReadSerializer, ViolationSerializer
 from .serializers import EmployeeReadSerializer, EmployeeWriteSerializer, EmployeeListSerializer, \
     SecurityGuardSerializer
 from .models import Employee, SecurityGuard
 from projects.models import Location
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
-from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
 
@@ -26,6 +31,10 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Employee.objects.all()
         search = self.request.query_params.get('search', None)
+        role = self.request.query_params.get('role', None)
+
+        if role is not None:
+            queryset = queryset.filter(user__role=role)
 
         if search:
             queryset = queryset.filter(Q(name__icontains=search) | Q(employee_id__icontains=search))
@@ -136,3 +145,80 @@ def get_home_stats(request):
     }
 
     return Response(data, status=status.HTTP_200_OK)
+
+
+class SupervisorMonthlyRecord(APIView):
+    def get(self, request):
+        # Parse date from query params or default to today
+        date_str = request.GET.get("date")
+        supervisor = request.GET.get("supervisor")
+        if date_str:
+            selected_date = parse_date(date_str)
+        else:
+            selected_date = date.today()
+
+        if not selected_date or not supervisor:
+            return JsonResponse({"error": "Invalid date"}, status=400)
+
+        # Calculate month range
+        first_day = selected_date.replace(day=1)
+        if first_day.month == 12:
+            next_month = first_day.replace(year=first_day.year + 1, month=1, day=1)
+        else:
+            next_month = first_day.replace(month=first_day.month + 1, day=1)
+        last_day = next_month - timedelta(days=1)
+
+        # Get completed visits count per day
+        visits_data = (
+            Visit.objects.filter(
+                date__range=(first_day, last_day),
+                employee_id=supervisor
+            )
+            .values("date")
+            .annotate(scheduled=Count("id", filter=Q(status=Visit.VisitStatus.SCHEDULED)),
+                      completed=Count("id", filter=Q(status=Visit.VisitStatus.COMPLETED)))
+        )
+
+        # Get violations count per day
+        violations_data = (
+            Violation.objects.filter(
+                created_at__date__range=(first_day, last_day),
+                created_by_id=supervisor
+            ).annotate(
+                date=TruncDate("created_at")
+            )
+            .values("date")
+            .annotate(violations_count=Count("id"))
+        )
+
+        # Merge data by day
+        summary = {}
+        for v in visits_data:
+            summary[v["date"].day] = {"scheduled": v["scheduled"], "completed": v["completed"]}
+
+        for v in violations_data:
+            summary[v["date"].day]["violations"] = v["violations_count"]
+
+        return JsonResponse({"month": first_day.strftime("%Y-%m"), "data": summary})
+
+
+class SupervisorDailyRecord(APIView):
+    def get(self, request):
+        selected_date = parse_date(request.GET.get("date", None))
+        supervisor = request.GET.get("supervisor", None)
+
+        if not selected_date or not supervisor:
+            return JsonResponse({"error": "Invalid date"}, status=400)
+
+        visits = Visit.objects.filter(
+            date=selected_date,
+            employee_id=supervisor
+        )
+
+        violations = Violation.objects.filter(
+            created_at__date=selected_date,
+        )
+
+        visits_serialized = VisitReadSerializer(visits, many=True, context={"request": request}).data
+        violations_serialized = ViolationSerializer(violations, many=True, context={"request": request}).data
+        return JsonResponse({"visits": visits_serialized, "violations": violations_serialized})

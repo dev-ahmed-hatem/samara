@@ -1,37 +1,22 @@
 import { HomeStats } from "@/pages/Home";
 import api from "../apiSlice";
 import qs from "query-string";
+import { Employee } from "@/types/employee";
+import { PaginatedResponse } from "@/types/paginatedResponse";
+import { QueryParams } from "@/types/query_param";
+import { MonthRecord, Visit } from "@/types/visit";
+import { Violation } from "@/types/violation";
 
 export const employeesEndpoints = api.injectEndpoints({
   endpoints: (builder) => ({
     getHomeStats: builder.query<HomeStats, void>({
       query: () => ({ url: "/employees/get-home-stats", method: "GET" }),
     }),
-
     // getAllEmployees: builder.query<Employee[], void>({
     //   query: () => ({
     //     url: `/employees/employees?no_pagination=true`,
     //     method: "GET",
     //   }),
-    // }),
-    // getEmployees: builder.query<
-    //   PaginatedResponse<Employee>,
-    //   Record<string, any> | void
-    // >({
-    //   query: (params) => ({
-    //     url: `/employees/employees?${qs.stringify(params || {})}`,
-    //     method: "GET",
-    //   }),
-    //   providesTags: (result) =>
-    //     result?.data
-    //       ? [
-    //           ...result.data.map((employee) => ({
-    //             type: "Employee" as const,
-    //             id: employee.id,
-    //           })),
-    //           { type: "Employee", id: "LIST" },
-    //         ]
-    //       : [{ type: "Employee", id: "LIST" }],
     // }),
     // getEmployee: builder.query<
     //   Employee,
@@ -43,6 +28,45 @@ export const employeesEndpoints = api.injectEndpoints({
     //   }),
     //   providesTags: (res, error, arg) => [{ type: "Employee", id: arg.id }],
     // }),
+    getEmployees: builder.query<
+      PaginatedResponse<Employee> | Employee[],
+      QueryParams
+    >({
+      query: (params) => ({
+        url: `/employees/employees?${qs.stringify(params || {})}`,
+        method: "GET",
+      }),
+      providesTags: (result) => {
+        let array = Array.isArray(result) ? result : result?.data;
+        return array
+          ? [
+              ...array.map((employee) => ({
+                type: "Employee" as const,
+                id: employee.id,
+              })),
+              { type: "Employee", id: "LIST" },
+            ]
+          : [{ type: "Employee", id: "LIST" }];
+      },
+    }),
+    getSupervisorMonthlyRecord: builder.query<
+      { month: string; data: Record<string, MonthRecord> },
+      { date: string; supervisor: string }
+    >({
+      query: (params) => ({
+        url: `/employees/supervisor-monthly-records/?${qs.stringify(params)}`,
+        method: "GET",
+      }),
+    }),
+    getSupervisorDailyRecord: builder.query<
+      { visits: Visit[]; violations: Violation[] },
+      { date: string; supervisor: string }
+    >({
+      query: (params) => ({
+        url: `/employees/supervisor-daily-records/?${qs.stringify(params)}`,
+        method: "GET",
+      }),
+    }),
     // switchEmployeeActive: builder.mutation<{ is_active: boolean }, string>({
     //   query: (id) => ({
     //     url: `/employees/employees/${id}/switch_active/`,
@@ -111,4 +135,9 @@ export const employeesEndpoints = api.injectEndpoints({
   overrideExisting: false,
 });
 
-export const { useGetHomeStatsQuery } = employeesEndpoints;
+export const {
+  useGetHomeStatsQuery,
+  useGetEmployeesQuery,
+  useLazyGetSupervisorMonthlyRecordQuery,
+  useLazyGetSupervisorDailyRecordQuery,
+} = employeesEndpoints;

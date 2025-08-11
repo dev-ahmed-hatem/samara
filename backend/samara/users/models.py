@@ -26,7 +26,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     class RoleChoices(models.TextChoices):
         ADMIN = 'admin', _("مدير")
         SUPERVISOR = 'supervisor', _("مشرف")
-        SYS_USER = "sys_user", _("مستخدم نظام")
+        SYS_USER = "moderator", _("مستخدم نظام")
 
     name = models.CharField(max_length=100, default="")
     username = models.CharField(max_length=20, unique=True)
