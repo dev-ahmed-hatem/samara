@@ -65,7 +65,7 @@ def get_shift_attendance(request):
             "status": guard.status,
             "notes": guard.notes,
             "name": guard.security_guard.name,
-            "id": guard.security_guard.id,
+            "employee_id": guard.security_guard.employee_id,
         }
         for guard in guards
     ]

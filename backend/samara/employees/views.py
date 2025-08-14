@@ -85,9 +85,9 @@ class SecurityGuardViewSet(viewsets.ModelViewSet):
         if search:
             queryset = queryset.filter(name__icontains=search)
         if location_id:
-            queryset = queryset.filter(location_id=location_id)
+            queryset = queryset.filter(locations__id=location_id).distinct()
         if shift:
-            queryset = queryset.filter(shift__name=shift)
+            queryset = queryset.filter(shifts__name=shift)
 
         return queryset
 

@@ -58,6 +58,10 @@ const AttendanceRecords: React.FC = () => {
   // Table Columns
   const columns = [
     {
+      title: "الرقم الوظيفي",
+      dataIndex: "employee_id",
+    },
+    {
       title: "حارس الأمن",
       dataIndex: "name",
     },

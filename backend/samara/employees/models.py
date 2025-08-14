@@ -105,11 +105,11 @@ class SecurityGuard(models.Model):
 
     # the remaining fields will be here
 
-    location = models.ForeignKey(Location, on_delete=models.SET_NULL, verbose_name=_("الموقع"), null=True)
-    shift = models.ForeignKey(Shift, on_delete=models.CASCADE, verbose_name=_("الوردية"))
+    locations = models.ManyToManyField(Location, verbose_name=_("الموقع"), related_name="security_guards")
+    shifts = models.ManyToManyField(Shift, verbose_name=_("الورديات"), related_name="security_guards")
 
     def __str__(self):
-        return self.name
+        return f"{self.employee_id} - {self.name}"
 
     class Meta:
         verbose_name = _("حارس أمن")

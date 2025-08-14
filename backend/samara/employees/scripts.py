@@ -1,11 +1,11 @@
-from projects.models import Location
+from projects.models import Location, Project
 from employees.models import Shift, SecurityGuard
 from django.db.utils import IntegrityError
 
 import pandas as pd
 
 # Load the Excel file
-df = pd.read_excel('./employees/sheet.xlsx')  # Replace with your actual file path
+df = pd.read_excel('./employees/بيانات رجال الامن 13.8.2025.xlsx')  # Replace with your actual file path
 
 # Rename columns for consistency (optional)
 df.columns = ['index', 'name', 'employee_id', 'project_name', 'location', 'shift']
@@ -37,15 +37,27 @@ def match_shift(guard_shift: str) -> str | None:
     return None  # No match
 
 
+lis = []
 for guard in guards_data:
+    employee_id = guard["employee_id"]
+    sec = SecurityGuard.objects.get(employee_id=employee_id)
     location = Location.objects.get(name=guard["location"].strip(), project__name=guard["project_name"].strip())
-    shift = Shift.objects.get(name=match_shift(guard["shift"]))
+    sec.locations.add(location)
+    sec.save()
 
-    try:
-        SecurityGuard.objects.create(name=guard["name"], employee_id=guard["employee_id"], location=location,
-                                     shift=shift)
 
-    except IntegrityError:
-        print(guard["employee_id"])
+    # if not secs.exists():
+    #     print(employee_id)
+    #     SecurityGuard.objects.create(employee_id=employee_id, name=guard["name"])
+
+
+    # shift = Shift.objects.get(name=match_shift(guard["shift"]))
+    #
+    # try:
+    #     SecurityGuard.objects.create(name=guard["name"], employee_id=guard["employee_id"], location=location,
+    #                                  shift=shift)
+    #
+    # except IntegrityError:
+    #     print(guard["employee_id"])
 
     # print(guard["project_name"], guard["location"])

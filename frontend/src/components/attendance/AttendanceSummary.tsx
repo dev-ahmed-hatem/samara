@@ -29,6 +29,11 @@ const { Title } = Typography;
 
 const columns = [
   {
+    title: "الرقم الوظيفي",
+    dataIndex: "employee_id",
+    name: "employee_id",
+  },
+  {
     title: "حارس الأمن",
     dataIndex: "name",
     key: "name",
@@ -208,8 +213,10 @@ const AttendanceSummary: React.FC = () => {
       {!noAttendance && shiftAttendance && (
         <Card title="ملخص الحضور" className="shadow-md">
           {/* total scurity guards */}
-          <div className="bg-blue-50 border border-blue-200 rounded-md p-4 flex items-center 
-          gap-4 text-blue-800 shadow-sm w-full sm:max-w-xs mb-10 mx-auto">
+          <div
+            className="bg-blue-50 border border-blue-200 rounded-md p-4 flex items-center 
+          gap-4 text-blue-800 shadow-sm w-full sm:max-w-xs mb-10 mx-auto"
+          >
             <TeamOutlined className="text-2xl text-blue-600" />
             <Statistic
               title={
@@ -258,8 +265,10 @@ const AttendanceSummary: React.FC = () => {
           </div>
 
           {/* timestamp */}
-          <div className="bg-green-50 border border-green-200 rounded-md p-4 
-          flex items-center gap-3 text-green-800 shadow-sm mt-10">
+          <div
+            className="bg-green-50 border border-green-200 rounded-md p-4 
+          flex items-center gap-3 text-green-800 shadow-sm mt-10"
+          >
             <CheckCircleOutlined className="text-xl" />
             <span className="text-sm sm:text-base font-medium">
               تم تسجيل الحضور في
