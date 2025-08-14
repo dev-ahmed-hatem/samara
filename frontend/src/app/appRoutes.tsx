@@ -6,11 +6,12 @@ import AuthProvider from "@/providers/AuthProvider";
 import PermissionProvider from "@/providers/PermissionProvider";
 import SectionView from "@/pages/SectionView";
 import VisitsList from "@/pages/visits/supervisor/visits/VisitsList";
-import AttendancePage from "@/pages/attendance/AttendancePage";
+import AttendancePage from "@/pages/attendance/supervisors/AttendancePage";
 import { CalendarOutlined, WarningOutlined } from "@ant-design/icons";
 import { BsFillPersonCheckFill } from "react-icons/bs";
 import ViolationsList from "@/pages/violations/supervisor/ViolationsList";
 import VisitsController from "@/pages/visits/moderators/visits/VisitsController";
+import AttendanceReports from "@/pages/attendance/moderators/AttendanceReports";
 
 export type AppRoute = RouteObject & {
   key?: string;
@@ -43,6 +44,12 @@ export const routesMap = {
             parentUrl="/moderator/visits"
           />
         ),
+      },
+      {
+        label: "تسجيلات حضور رجال الأمن",
+        path: "attendance",
+        icon: <BsFillPersonCheckFill />,
+        element: <AttendanceReports />,
       },
     ],
   },

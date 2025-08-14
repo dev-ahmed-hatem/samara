@@ -7,6 +7,7 @@ import {
   WarningOutlined,
   ClockCircleOutlined,
   UserSwitchOutlined,
+  TeamOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router";
@@ -116,6 +117,7 @@ const ModeratorHome: React.FC = () => {
       <Divider />
 
       {/* Navigation Cards */}
+      {/* Navigation Cards */}
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={12}>
           <Card
@@ -126,6 +128,20 @@ const ModeratorHome: React.FC = () => {
               <CalendarOutlined className="text-3xl text-blue-600" />
               <div className="text-lg font-semibold text-blue-600">
                 سجل الزيارات والمخالفات
+              </div>
+            </div>
+          </Card>
+        </Col>
+
+        <Col xs={24} sm={12}>
+          <Card
+            className="flex items-center justify-between p-4 hover:bg-green-50 transition-all duration-200 cursor-pointer shadow-md rounded-2xl"
+            onClick={() => navigate("attendance")}
+          >
+            <div className="flex items-center gap-4">
+              <TeamOutlined className="text-3xl text-green-600" />
+              <div className="text-lg font-semibold text-green-600">
+                تسجيلات حضور رجال الأمن
               </div>
             </div>
           </Card>
