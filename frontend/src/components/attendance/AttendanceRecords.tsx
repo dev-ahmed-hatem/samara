@@ -155,8 +155,13 @@ const AttendanceRecords: React.FC = () => {
   }, [location, shift]);
 
   useEffect(() => {
+    setAttendance({});
+  }, [projectId, shift, location]);
+
+  useEffect(() => {
     if (attendanceSaved) {
       notification.success({ message: "تم تسجيل الحضور" });
+      setAttendance({});
       setGuards(null);
       setProjectId(null);
       setLocation(null);

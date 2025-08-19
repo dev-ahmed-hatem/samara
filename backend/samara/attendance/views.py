@@ -35,7 +35,7 @@ def record_shift_attendance(request):
         SecurityGuardAttendance.objects.create(security_guard=guard, shift=shift_attendance,
                                                status=records[record]["status"], notes=records[record].get("notes", ""))
 
-    return Response(data=data, status=status.HTTP_201_CREATED)
+    return Response(data={}, status=status.HTTP_201_CREATED)
 
 
 @api_view(['GET'])
@@ -49,7 +49,7 @@ def get_shift_attendance(request):
         ShiftAttendance, date=date, location=location, shift__name=shift
     )
 
-    guards = shift_attendance.guards.select_related("security_guard").all()
+    guards = shift_attendance.security_guards.all()
 
     # Count attendance statuses
     status_counts = Counter(guard.status for guard in guards)

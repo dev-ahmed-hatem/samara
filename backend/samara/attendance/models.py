@@ -30,6 +30,10 @@ class ShiftAttendance(models.Model):
     def __str__(self):
         return f"{self.location.name} - {self.shift.get_name_display()} - {self.date.strftime('%d/%m/%Y')}"
 
+    @property
+    def security_guards(self):
+        return SecurityGuardAttendance.objects.filter(shift=self,)
+
 
 class SecurityGuardAttendance(models.Model):
     class AttendanceStatus(models.TextChoices):
