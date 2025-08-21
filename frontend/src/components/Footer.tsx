@@ -6,15 +6,9 @@ const Footer = () => {
       justify-between items-center gap-4"
       >
         {/* Logo */}
-        <a href="https://kaffo.co">
-          {/* <Logo className="fill-orange hover:fill-orange-200 size-40" /> */}
+        {/* <Logo className="fill-orange hover:fill-orange-200 size-40" /> */}
 
-          <img
-            src="/samara.jpg"
-            alt="samara logo"
-            className="rounded-lg h-36"
-          />
-        </a>
+        <img src="/samara.jpg" alt="samara logo" className="rounded-lg h-36" />
 
         {/* Company Info */}
         <div>
