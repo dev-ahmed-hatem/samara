@@ -40,6 +40,7 @@ class SecurityGuardAttendance(models.Model):
         PRESENT = "حاضر", _("حاضر")
         LATE = "متأخر", _("متأخر")
         ABSENT = "غائب", _("غائب")
+        REST = "راحة", _("راحة")
 
     security_guard = models.ForeignKey(
         SecurityGuard,

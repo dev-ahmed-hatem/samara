@@ -55,9 +55,12 @@ def get_shift_attendance(request):
     status_counts = Counter(guard.status for guard in guards)
 
     # Build stats dict with default zeroes
-    stats = [{"name": "الحضور", "value": status_counts.get("حاضر", 0), "color": "#4ade80"},
-             {"name": "التأخير", "value": status_counts.get("متأخر", 0), "color": "#facc15"},
-             {"name": "الغياب", "value": status_counts.get("غائب", 0), "color": "#f87171"}, ]
+    stats = [
+        {"name": " الحضور", "value": status_counts.get("حاضر", 0), "color": "#4ade80"},  # green
+        {"name": " التأخير", "value": status_counts.get("متأخر", 0), "color": "#facc15"},  # yellow
+        {"name": " الغياب", "value": status_counts.get("غائب", 0), "color": "#f87171"},  # red
+        {"name": " الراحة", "value": status_counts.get("راحة", 0), "color": "#60a5fa"},  # blue
+    ]
 
     # Build record list
     records = [

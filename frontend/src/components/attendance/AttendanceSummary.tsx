@@ -246,6 +246,7 @@ const AttendanceSummary: React.FC = () => {
                     outerRadius={100}
                     dataKey="value"
                     label
+                    labelLine={false}
                   >
                     {shiftAttendance?.stats?.map(
                       (entry: any, index: number) => (

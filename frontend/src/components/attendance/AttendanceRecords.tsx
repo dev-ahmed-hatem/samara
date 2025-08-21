@@ -72,7 +72,7 @@ const AttendanceRecords: React.FC = () => {
         <Radio.Group
           value={attendance[record.id]?.status}
           onChange={(e) => handleStatusChange(record.id, e)}
-          options={["حاضر", "متأخر", "غائب"]}
+          options={["حاضر", "متأخر", "غائب", "راحة"]}
           optionType="button"
           buttonStyle="solid"
         />

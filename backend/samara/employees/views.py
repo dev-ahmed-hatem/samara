@@ -7,14 +7,15 @@ from django.utils.dateparse import parse_date
 from django.http import JsonResponse
 from django.db.models import Count, Q
 from django.db.models.functions import TruncDate
+from collections import Counter
 
-from attendance.models import ShiftAttendance
-from visits.models import Visit, Violation
+from attendance.models import ShiftAttendance, SecurityGuardAttendance
+from visits.models import Visit, Violation, filter_visits_by_period
 from visits.serializers import VisitReadSerializer, ViolationReadSerializer
 from .serializers import EmployeeReadSerializer, EmployeeWriteSerializer, EmployeeListSerializer, \
     SecurityGuardSerializer
 from .models import Employee, SecurityGuard
-from projects.models import Location
+from projects.models import Location, Project
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from django.utils.translation import gettext_lazy as _
@@ -121,6 +122,87 @@ def multiple_delete(request):
         if emp:
             emp.delete()
     return Response()
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_moderator_home_stats(request):
+    date = datetime.today().astimezone(settings.SAUDI_TZ).date()
+
+    projects_count = Project.objects.count()
+    locations_count = Location.objects.count()
+    security_guards_count = SecurityGuard.objects.count()
+    supervisors = Employee.objects.filter(user__role=User.RoleChoices.SUPERVISOR)
+    supervisors_count = supervisors.count()
+
+    visits = Visit.objects.all()
+    morning_visits = filter_visits_by_period(visits, date, "morning")
+    evening_visits = filter_visits_by_period(visits, date, "evening")
+
+    data = {
+        "general": {
+            "projects_count": projects_count,
+            "locations_count": locations_count,
+            "security_guards_count": security_guards_count,
+            "supervisors_count": supervisors_count,
+        },
+        "today_visits": {
+            "morning": {
+                "total": morning_visits.count(),
+                "completed": morning_visits.filter(status=Visit.VisitStatus.COMPLETED).count(),
+                "scheduled": morning_visits.filter(status=Visit.VisitStatus.SCHEDULED).count(),
+            },
+            "evening": {
+                "total": evening_visits.count(),
+                "completed": evening_visits.filter(status=Visit.VisitStatus.COMPLETED).count(),
+                "scheduled": evening_visits.filter(status=Visit.VisitStatus.SCHEDULED).count(),
+            }
+        },
+        "supervisors": [],
+        "attendance": None,
+        "shifts_count": None
+    }
+
+    for s in supervisors:
+        morning_visits = filter_visits_by_period(visits.filter(employee=s), date, "morning")
+        evening_visits = filter_visits_by_period(visits.filter(employee=s), date, "evening")
+        data["supervisors"].append(
+            {"name": s.name,
+             "id": s.id,
+             "morning": {
+                 "total": morning_visits.count(),
+                 "completed": morning_visits.filter(status=Visit.VisitStatus.COMPLETED).count(),
+                 "scheduled": morning_visits.filter(status=Visit.VisitStatus.SCHEDULED).count(),
+             },
+             "evening": {
+                 "total": evening_visits.count(),
+                 "completed": evening_visits.filter(status=Visit.VisitStatus.COMPLETED).count(),
+                 "scheduled": evening_visits.filter(status=Visit.VisitStatus.SCHEDULED).count(),
+             }
+             }
+        )
+
+    guards = SecurityGuardAttendance.objects.filter(shift__date=date)
+    status_counts = Counter(guard.status for guard in guards)
+
+    data["attendance"] = [
+        {"name": " الحضور", "value": status_counts.get("حاضر", 0), "color": "#4ade80"},  # green
+        {"name": " التأخير", "value": status_counts.get("متأخر", 0), "color": "#facc15"},  # yellow
+        {"name": " الغياب", "value": status_counts.get("غائب", 0), "color": "#f87171"},  # red
+        {"name": " الراحة", "value": status_counts.get("راحة", 0), "color": "#60a5fa"},  # blue
+    ]
+
+    shift_counts = Counter(guard.shift.shift.name for guard in guards)
+
+    data["shifts"] = [
+        {"name": " الأولى", "value": shift_counts.get("الوردية الأولى", 0), "color": "#3b82f6"},  # blue
+        {"name": " الثانية", "value": shift_counts.get("الوردية الثانية", 0), "color": "#06b6d4"},  # cyan
+        {"name": " الثالثة", "value": shift_counts.get("الوردية الثالثة", 0), "color": "#a855f7"},  # purple
+    ]
+
+    data["shifts_count"] = ShiftAttendance.objects.filter(date=date).count()
+
+    return Response(data, status=status.HTTP_200_OK)
 
 
 @api_view(["GET"])

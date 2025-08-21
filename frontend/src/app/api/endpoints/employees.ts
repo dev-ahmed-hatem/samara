@@ -6,12 +6,15 @@ import { PaginatedResponse } from "@/types/paginatedResponse";
 import { QueryParams } from "@/types/query_param";
 import { MonthRecord, Visit } from "@/types/visit";
 import { Violation } from "@/types/violation";
-import { HomeStats } from "@/types/homeStat";
+import { HomeStats, ModeratorHomeStats } from "@/types/homeStat";
 
 export const employeesEndpoints = api.injectEndpoints({
   endpoints: (builder) => ({
     getHomeStats: builder.query<HomeStats, void>({
-      query: () => ({ url: "/employees/get-home-stats", method: "GET" }),
+      query: () => ({ url: "/employees/get-home-stats/", method: "GET" }),
+    }),
+    getModeratorHomeStats: builder.query<ModeratorHomeStats, void>({
+      query: () => ({ url: "/employees/get-moderator-home-stats/", method: "GET" }),
     }),
     // getAllEmployees: builder.query<Employee[], void>({
     //   query: () => ({
@@ -139,6 +142,7 @@ export const employeesEndpoints = api.injectEndpoints({
 
 export const {
   useGetHomeStatsQuery,
+  useGetModeratorHomeStatsQuery,
   useGetEmployeesQuery,
   useLazyGetSupervisorMonthlyRecordQuery,
   useLazyGetSupervisorDailyRecordQuery,

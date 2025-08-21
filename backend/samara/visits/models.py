@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from employees.models import Employee
+from datetime import datetime, time, timedelta
+from django.db.models import Q, QuerySet
 
 
 class Visit(models.Model):
@@ -340,3 +342,31 @@ class Violation(models.Model):
         if self.violation_image:
             self.violation_image.delete()
         super().delete(using, keep_parents=keep_parents)
+
+
+def filter_visits_by_period(queryset, day: datetime.date, period: str) -> QuerySet[Visit]:
+    """
+    Filters visits for a given day and period (morning or evening).
+
+    Morning: 09:00 (day) → 20:59 (day)
+    Evening: 21:00 (day) → 08:59 (next day)
+    """
+    if period == "morning":
+        start_time = time(9, 0)  # 09:00 AM
+        end_time = time(20, 59)  # 08:59 PM
+        return queryset.filter(
+            date=day,
+            time__range=(start_time, end_time),
+        )
+
+    elif period == "evening":
+        start_time = time(21, 0)  # 09:00 PM (same day)
+        end_time = time(8, 59)  # 08:59 AM (next day)
+
+        next_day = day + timedelta(days=1)
+
+        return queryset.filter(
+            Q(date=day, time__gte=start_time) | Q(date=next_day, time__lte=end_time)
+        )
+
+    return queryset.none()
