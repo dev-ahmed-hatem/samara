@@ -14,7 +14,7 @@ from visits.models import Visit, Violation, filter_visits_by_period
 from visits.serializers import VisitReadSerializer, ViolationReadSerializer
 from .serializers import EmployeeReadSerializer, EmployeeWriteSerializer, EmployeeListSerializer, \
     SecurityGuardSerializer
-from .models import Employee, SecurityGuard
+from .models import Employee, SecurityGuard, SecurityGuardLocationShift
 from projects.models import Location, Project
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -85,10 +85,15 @@ class SecurityGuardViewSet(viewsets.ModelViewSet):
 
         if search:
             queryset = queryset.filter(name__icontains=search)
+        if shift and location_id:
+            location_shifts_ids = SecurityGuardLocationShift.objects.filter(shift__name=shift,
+                                                                            location_id=location_id).values_list(
+                "guard__employee_id", flat=True)
+            queryset = queryset.filter(employee_id__in=location_shifts_ids)
         if location_id:
-            queryset = queryset.filter(locations__id=location_id).distinct()
-        if shift:
-            queryset = queryset.filter(shifts__name=shift)
+            location_shifts_ids = SecurityGuardLocationShift.objects.filter(location_id=location_id).values_list(
+                "guard__employee_id", flat=True)
+            queryset = queryset.filter(employee_id__in=location_shifts_ids)
 
         return queryset
 
@@ -309,6 +314,7 @@ class SupervisorDailyRecord(APIView):
 
         violations = (
             Violation.objects
+            .filter(created_by_id=supervisor)
             .annotate(local_date=TruncDate("created_at", tzinfo=settings.SAUDI_TZ))
             .filter(local_date=selected_date))
 

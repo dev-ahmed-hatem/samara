@@ -103,10 +103,7 @@ class SecurityGuard(models.Model):
         verbose_name=_("الرقم الوظيفي")
     )
 
-    # the remaining fields will be here
-
-    locations = models.ManyToManyField(Location, verbose_name=_("الموقع"), related_name="security_guards")
-    shifts = models.ManyToManyField(Shift, verbose_name=_("الورديات"), related_name="security_guards")
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.employee_id} - {self.name}"
@@ -114,3 +111,22 @@ class SecurityGuard(models.Model):
     class Meta:
         verbose_name = _("حارس أمن")
         verbose_name_plural = _("حراس الأمن")
+
+
+class SecurityGuardLocationShift(models.Model):
+    guard = models.ForeignKey(
+        "SecurityGuard", on_delete=models.CASCADE, related_name="location_shifts"
+    )
+    location = models.ForeignKey(
+        "projects.Location", on_delete=models.CASCADE, related_name="guard_shifts"
+    )
+    shift = models.ForeignKey(
+        "Shift", on_delete=models.CASCADE, related_name="guard_locations"
+    )
+
+    class Meta:
+        verbose_name = _("وردية في موقع")
+        verbose_name_plural = _("ورديات المواقع")
+
+    def __str__(self):
+        return f"{self.guard.name} - {self.location.name} - {self.shift.name}"
