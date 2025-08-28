@@ -38,6 +38,7 @@ export const routesMap = {
       {
         path: "visits",
         label: "سجل الزيارات والمخالفات",
+        icon: <CalendarOutlined />,
         element: (
           <SectionView
             parentComponent={<VisitsController />}

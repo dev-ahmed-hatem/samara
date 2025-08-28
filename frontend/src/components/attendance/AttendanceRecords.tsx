@@ -14,8 +14,11 @@ import { useNotification } from "@/providers/NotificationProvider";
 import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 import { SecurityGuard } from "@/types/scurityGuard";
 
+const today = dayjs().format("YYYY-MM-DD");
+const yesterday = dayjs().subtract(1, "day").format("YYYY-MM-DD");
+
 const AttendanceRecords: React.FC = () => {
-  const currentDate = dayjs().format("YYYY-MM-DD");
+  const [currentDate, setCurrentDate] = useState(today);
   const [projectId, setProjectId] = useState<number | null>(null);
   const [location, setLocation] = useState<string | null>(null);
   const [shift, setShift] = useState<ShiftType | null>(null);
@@ -152,11 +155,11 @@ const AttendanceRecords: React.FC = () => {
         date: currentDate,
       });
     }
-  }, [location, shift]);
+  }, [currentDate, location, shift]);
 
   useEffect(() => {
     setAttendance({});
-  }, [projectId, shift, location]);
+  }, [currentDate, projectId, shift, location]);
 
   useEffect(() => {
     if (attendanceSaved) {
@@ -214,7 +217,14 @@ const AttendanceRecords: React.FC = () => {
           >
             {/* Date */}
             <Form.Item label="تاريخ اليوم">
-              <div className="font-semibold">{currentDate}</div>
+              <Radio.Group
+                value={currentDate}
+                onChange={(e) => setCurrentDate(e.target.value)}
+                className="font-semibold"
+              >
+                <Radio.Button value={yesterday}>{yesterday}</Radio.Button>
+                <Radio.Button value={today}>{today}</Radio.Button>
+              </Radio.Group>
             </Form.Item>
 
             {/* Project Select */}
