@@ -291,9 +291,11 @@ class SupervisorMonthlyRecord(APIView):
         # Merge data by day
         summary = {}
         for v in visits_data:
-            summary[v["date"].day] = {"scheduled": v["scheduled"], "completed": v["completed"]}
+            summary[v["date"].day] = {"completed": v["completed"], "scheduled": v["scheduled"]}
 
         for v in violations_data:
+            day = v["date"].day
+            summary.setdefault(day, {"completed": 0, "scheduled": 0, "violations": 0})
             summary[v["date"].day]["violations"] = v["violations_count"]
 
         return JsonResponse({"month": first_day.strftime("%Y-%m"), "data": summary})

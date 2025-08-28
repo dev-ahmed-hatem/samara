@@ -33,6 +33,7 @@ import {
 import api from "@/app/api/apiSlice";
 import { useAppDispatch } from "@/app/redux/hooks";
 import CreateVisitForm from "@/components/visits/moderators/CreateVisitForm";
+import { Visit } from "@/types/visit";
 
 const { Option } = Select;
 const { Title, Text } = Typography;
@@ -65,6 +66,8 @@ const VisitsController: React.FC = () => {
   const [selectedSupervisor, setSelectedSupervisor] = useState<string | null>(
     null
   );
+  const [completed, setCompleted] = useState<Visit[]>([]);
+  const [scheduled, setScheduled] = useState<Visit[]>([]);
 
   const {
     data: supervisors,
@@ -81,11 +84,7 @@ const VisitsController: React.FC = () => {
   ] = useLazyGetSupervisorDailyRecordQuery();
   const [
     handleVisit,
-    {
-      isLoading: loadingVisit,
-      isError: visitIsError,
-      isSuccess: visitDone,
-    },
+    { isLoading: loadingVisit, isError: visitIsError, isSuccess: visitDone },
   ] = useVisitMutation();
   const [
     deleteViolation,
@@ -177,6 +176,13 @@ const VisitsController: React.FC = () => {
     }
   }, [visitIsError, violationIsError]);
 
+  useEffect(() => {
+    if (daily) {
+      setCompleted(daily.visits.filter((v) => v.status === "مكتملة"));
+      setScheduled(daily.visits.filter((v) => v.status === "مجدولة"));
+    }
+  }, [daily]);
+
   if (fetchingSupervisors) return <Loading />;
   if (supervisorsError) return <ErrorPage />;
   return (
@@ -239,18 +245,18 @@ const VisitsController: React.FC = () => {
             {/* Visits Section */}
             <Col xs={24} md={24}>
               <Title level={4} className="mb-5">
-                الزيارات ليوم {selectedDate.format("DD-MM-YYYY")}
+                الزيارات المكتملة ليوم {selectedDate.format("DD-MM-YYYY")}
               </Title>
 
               <div className="flex flex-wrap gap-4 justify-between">
-                {daily.visits.length == 0 && (
+                {completed.length == 0 && (
                   <Empty
-                    description="لا توجد زيارات"
+                    description="لا توجد زيارات مكتملة"
                     image={Empty.PRESENTED_IMAGE_SIMPLE}
                     className="w-full py-10"
                   />
                 )}
-                {daily.visits.map((visit) => (
+                {completed.map((visit) => (
                   <Card
                     styles={{
                       header: {
@@ -258,18 +264,10 @@ const VisitsController: React.FC = () => {
                       },
                     }}
                     key={visit.id}
-                    className={`w-full sm:w-[49%] lg:w-[49%] h-52 flex flex-col justify-between shadow-sm border rounded-md ${
-                      visit.status == "مكتملة"
-                        ? "border-green-500"
-                        : "border-calypso-500"
-                    }`}
+                    className={`w-full sm:w-[49%] lg:w-[49%] h-52 flex flex-col justify-between shadow-sm border rounded-md border-green-500`}
                     title={
                       <div
-                        className={`py-2 px-3 rounded-t-md mx-0 ${
-                          visit.status == "مكتملة"
-                            ? "bg-green-100"
-                            : "bg-calypso-50"
-                        }`}
+                        className={`py-2 px-3 rounded-t-md mx-0 bg-green-100`}
                       >
                         <div className="flex items-center justify-between mb-1">
                           <Text
@@ -282,10 +280,7 @@ const VisitsController: React.FC = () => {
                         </div>
                         <div className="flex items-center justify-between">
                           <Text className="text-xs">{visit.time}</Text>
-                          <Tag
-                            color={visit.status === "مكتملة" ? "green" : "blue"}
-                            className="text-sm"
-                          >
+                          <Tag color="green" className="text-sm">
                             {visit.status}
                           </Tag>
                         </div>
@@ -296,19 +291,84 @@ const VisitsController: React.FC = () => {
                       {visit.purpose}
                     </Text>
                     <div className="flex justify-end items-center mt-5 gap-2">
-                      {visit.status === "مكتملة" && (
-                        <Button
-                          type="primary"
-                          size="middle"
-                          onClick={() =>
-                            navigate(`view-report/${visit.report_id}`)
-                          }
-                          disabled={loadingVisit}
-                        >
-                          عرض التقرير
-                        </Button>
-                      )}
+                      <Button
+                        type="primary"
+                        size="middle"
+                        onClick={() =>
+                          navigate(`view-report/${visit.report_id}`)
+                        }
+                        disabled={loadingVisit}
+                      >
+                        عرض التقرير
+                      </Button>
 
+                      <Popconfirm
+                        title="حذف الزيارة"
+                        description="هل أنت متأكد من أنك تريد حذف هذه الزيارة؟"
+                        okText="نعم"
+                        cancelText="إلغاء"
+                        onConfirm={() => handleVisitDelete(visit.id)}
+                      >
+                        <Button danger size="middle" loading={loadingVisit}>
+                          حذف الزيارة
+                        </Button>
+                      </Popconfirm>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </Col>
+
+            <Divider />
+
+            <Col xs={24} md={24}>
+              <Title level={4} className="mb-5">
+                الزيارات المجدولة ليوم {selectedDate.format("DD-MM-YYYY")}
+              </Title>
+
+              <div className="flex flex-wrap gap-4 justify-between">
+                {scheduled.length == 0 && (
+                  <Empty
+                    description="لا توجد زيارات متبقية"
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    className="w-full py-10"
+                  />
+                )}
+                {scheduled.map((visit) => (
+                  <Card
+                    styles={{
+                      header: {
+                        padding: 0,
+                      },
+                    }}
+                    key={visit.id}
+                    className={`w-full sm:w-[49%] lg:w-[49%] h-52 flex flex-col justify-between shadow-sm border rounded-md border-calypso-500`}
+                    title={
+                      <div
+                        className={`py-2 px-3 rounded-t-md mx-0 bg-calypso-50`}
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <Text
+                            strong
+                            className="truncate text-base line-clamp-1"
+                          >
+                            {visit.location.project_name} -{" "}
+                            {visit.location.name}
+                          </Text>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <Text className="text-xs">{visit.time}</Text>
+                          <Tag color="blue" className="text-sm">
+                            {visit.status}
+                          </Tag>
+                        </div>
+                      </div>
+                    }
+                  >
+                    <Text type="secondary" className="text-sm line-clamp-2">
+                      {visit.purpose}
+                    </Text>
+                    <div className="flex justify-end items-center mt-5 gap-2">
                       <Popconfirm
                         title="حذف الزيارة"
                         description="هل أنت متأكد من أنك تريد حذف هذه الزيارة؟"
