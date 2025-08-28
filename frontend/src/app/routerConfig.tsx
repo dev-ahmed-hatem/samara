@@ -1,9 +1,9 @@
 import { RouteObject } from "react-router";
 import appRoutes, { AppRoute } from "./appRoutes";
-import VisitForm from "@/pages/visits/supervisor/visits/VisitForm";
-import ViolationForm from "@/pages/visits/supervisor/visits/ViolationForm";
-import VisitReport from "@/pages/visits/moderators/visits/VisitReport";
-import ViolationReport from "@/pages/visits/moderators/visits/ViolationReport";
+import VisitForm from "@/pages/visits/supervisor/VisitForm";
+import ViolationForm from "@/pages/visits/supervisor/ViolationForm";
+import VisitReport from "@/pages/visits/moderators/VisitReport";
+import ViolationReport from "@/pages/visits/moderators/ViolationReport";
 
 const alterRoute = function (
   appRoutes: AppRoute[],

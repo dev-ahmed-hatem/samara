@@ -1,5 +1,5 @@
 from django.conf import settings
-from datetime import datetime
+from datetime import datetime, timedelta, time
 
 from .models import Visit, VisitReport, Violation
 from rest_framework import serializers
@@ -15,6 +15,7 @@ class VisitReadSerializer(serializers.ModelSerializer):
     completed_at = serializers.SerializerMethodField(read_only=True)
     report_id = serializers.PrimaryKeyRelatedField(read_only=True, source='report')
     violation = serializers.SerializerMethodField()
+    opened = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Visit
@@ -29,6 +30,12 @@ class VisitReadSerializer(serializers.ModelSerializer):
         if hasattr(obj, "violation"):
             return obj.violation.created_at.astimezone(settings.SAUDI_TZ).strftime('%d/%m/%Y %I:%M %p')
         return None
+
+    def get_opened(self, obj: Visit):
+        today = datetime.today().astimezone(settings.SAUDI_TZ).date()
+        yesterday = today - timedelta(days=1)
+        late_evening = time(21, 0)
+        return obj.date == today or (obj.date == yesterday and obj.time >= late_evening)
 
 
 class VisitWriteSerializer(serializers.ModelSerializer):

@@ -19,6 +19,8 @@ export interface Visit {
   completed_at: string | null;
   violation: string | null;
   report_id: string | null;
+
+  opened?: boolean;
   // gps_coordinates?: { lat: number; lng: number }; // if you enable GIS field later
 }
 

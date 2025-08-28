@@ -7,9 +7,11 @@ from .models import Visit, VisitReport, Violation
 from .serializers import VisitReadSerializer, VisitWriteSerializer, \
     VisitReportReadSerializer, VisitReportWriteSerializer, ViolationReadSerializer, ViolationWriteSerializer
 
-from datetime import datetime
+from datetime import datetime, time, timedelta
 from django.conf import settings
+from django.db.models import Q
 from django.db.models.functions import TruncDate
+from users.models import User
 
 
 class VisitViewSet(ModelViewSet):
@@ -22,9 +24,36 @@ class VisitViewSet(ModelViewSet):
         to_date = self.request.query_params.get('to', None)
         employee = self.request.query_params.get('employee', None)
         project = self.request.query_params.get('project', None)
+        period = self.request.query_params.get('period', None)
 
         if from_date and to_date:
-            queryset = queryset.filter(date__range=[from_date, to_date])
+            from_date = datetime.strptime(from_date, '%Y-%m-%d').date()
+            to_date = datetime.strptime(to_date, '%Y-%m-%d').date()
+
+            if period == "morning":
+                start_time = time(9, 0)
+                end_time = time(20, 59)
+                queryset = queryset.filter(
+                    date__range=[from_date, to_date],
+                    time__range=[start_time, end_time])
+
+            elif period == "evening":
+                evening_start = time(21, 0)
+                evening_end = time(8, 59)
+
+                late_evening = Q(
+                    date__range=(from_date, to_date),
+                    time__gte=evening_start,
+                )
+                early_morning = Q(
+                    date__range=[from_date + timedelta(days=1), to_date + timedelta(days=1)],
+                    time__lte=evening_end,
+                )
+                queryset = queryset.filter(late_evening | early_morning)
+
+            else:
+                queryset = queryset.filter(date__range=(from_date, to_date))
+
         if employee:
             queryset = queryset.filter(employee=employee)
         if project:
@@ -34,11 +63,21 @@ class VisitViewSet(ModelViewSet):
 
     def retrieve(self, request, pk=None):
         today = datetime.today().astimezone(settings.SAUDI_TZ).date()
+        yesterday = today - timedelta(days=1)
         instance: Visit = self.get_object()
+        employee = request.user.employee_profile
 
-        if instance.date != today:
-            return Response({'detail': "لا يمكن عرض الزيارة، هذا ليس يوم تنفيذ الزيارة."},
-                            status=status.HTTP_403_FORBIDDEN)
+        if employee.user.role == User.RoleChoices.SUPERVISOR and instance.employee != employee:
+            return Response(
+                {'detail': "لا يمكن عرض الزيارة، زيارة خاصة بمشرف اخر."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        if instance.date not in (today, yesterday):
+            return Response(
+                {"detail": "لا يمكن عرض الزيارة، هذا ليس يوم تنفيذ الزيارة."},
+                status=status.HTTP_403_FORBIDDEN
+            )
         return super().retrieve(request, pk)
 
     def get_serializer_class(self):

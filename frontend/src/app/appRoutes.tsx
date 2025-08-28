@@ -5,12 +5,12 @@ import LoginPage from "@/pages/LoginPage";
 import AuthProvider from "@/providers/AuthProvider";
 import PermissionProvider from "@/providers/PermissionProvider";
 import SectionView from "@/pages/SectionView";
-import VisitsList from "@/pages/visits/supervisor/visits/VisitsList";
+import VisitsList from "@/pages/visits/supervisor/VisitsList";
 import AttendancePage from "@/pages/attendance/supervisors/AttendancePage";
 import { CalendarOutlined, WarningOutlined } from "@ant-design/icons";
 import { BsFillPersonCheckFill } from "react-icons/bs";
 import ViolationsList from "@/pages/violations/supervisor/ViolationsList";
-import VisitsController from "@/pages/visits/moderators/visits/VisitsController";
+import VisitsController from "@/pages/visits/moderators/VisitsController";
 import AttendanceReports from "@/pages/attendance/moderators/AttendanceReports";
 
 export type AppRoute = RouteObject & {

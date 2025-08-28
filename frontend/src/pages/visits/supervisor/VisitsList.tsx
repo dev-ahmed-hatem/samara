@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, Empty, Button, DatePicker, Form, Typography } from "antd";
+import { Card, Empty, Button, DatePicker, Form, Typography, Radio } from "antd";
 import { CheckCircleOutlined, CalendarOutlined } from "@ant-design/icons";
 import dayjs, { Dayjs } from "dayjs";
 import VisitCard from "@/components/visits/VisitCard";
@@ -27,6 +27,7 @@ const VisitsList: React.FC = () => {
 
   const [fromDate, setFromDate] = useState<Dayjs>(dayjs());
   const [toDate, setToDate] = useState<Dayjs | null>(dayjs());
+  const [period, setPeriod] = useState<"morning" | "evening">();
 
   const user = useAppSelector((state) => state.auth.user);
   const [getVisits, { data: visits, isFetching, isError, isSuccess }] =
@@ -49,6 +50,7 @@ const VisitsList: React.FC = () => {
       employee: user?.employee_profile.id,
       from: fromDate?.format("YYYY-MM-DD"),
       to: toDate?.format("YYYY-MM-DD"),
+      period,
     });
   };
 
@@ -74,13 +76,13 @@ const VisitsList: React.FC = () => {
         <Form
           layout="vertical"
           form={form}
-          className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end"
+          className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end"
           onFinish={handleSubmit}
         >
           <Form.Item
             label="من"
             className="mb-0"
-            name={"from"}
+            name="from"
             rules={[{ required: true, message: "يرجى اختيار تاريخ البداية" }]}
           >
             <DatePicker
@@ -97,7 +99,7 @@ const VisitsList: React.FC = () => {
           </Form.Item>
 
           <Form.Item
-            name={"to"}
+            name="to"
             label="إلى"
             className="mb-0"
             rules={[{ required: true, message: "يرجى اختيار تاريخ النهاية" }]}
@@ -113,6 +115,23 @@ const VisitsList: React.FC = () => {
             />
           </Form.Item>
 
+          {/* Period field */}
+          <Form.Item
+            name="period"
+            label="الفترة"
+            className="mb-0"
+            rules={[{ required: true, message: "يرجى اختيار الفترة" }]}
+          >
+            <Radio.Group
+              className="flex"
+              onChange={(event) => setPeriod(event.target.value)}
+            >
+              <Radio.Button value="morning">صباحية</Radio.Button>
+              <Radio.Button value="evening">مسائية</Radio.Button>
+            </Radio.Group>
+          </Form.Item>
+
+          {/* Submit button with better alignment */}
           <Form.Item className="mb-0 md:flex md:justify-end">
             <Button
               type="primary"

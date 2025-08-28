@@ -50,7 +50,7 @@ const VisitCard = ({
         </div>
 
         {/* buttons */}
-        {!isCompleted && isVisitDay && (
+        {visit.opened && (
           <div className="flex gap-2 mt-2 md:mt-0 flex-wrap">
             <Button
               type="primary"
