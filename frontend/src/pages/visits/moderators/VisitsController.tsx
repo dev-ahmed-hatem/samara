@@ -34,6 +34,7 @@ import api from "@/app/api/apiSlice";
 import { useAppDispatch } from "@/app/redux/hooks";
 import CreateVisitForm from "@/components/visits/moderators/CreateVisitForm";
 import { Visit } from "@/types/visit";
+import VisitReportModal from "./VisitReportModal";
 
 const { Option } = Select;
 const { Title, Text } = Typography;
@@ -291,16 +292,10 @@ const VisitsController: React.FC = () => {
                       {visit.purpose}
                     </Text>
                     <div className="flex justify-end items-center mt-5 gap-2">
-                      <Button
-                        type="primary"
-                        size="middle"
-                        onClick={() =>
-                          navigate(`view-report/${visit.report_id}`)
-                        }
+                      <VisitReportModal
+                        report_id={visit.report_id!}
                         disabled={loadingVisit}
-                      >
-                        عرض التقرير
-                      </Button>
+                      />
 
                       <Popconfirm
                         title="حذف الزيارة"

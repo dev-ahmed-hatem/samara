@@ -9,8 +9,7 @@ import ErrorPage from "@/pages/ErrorPage";
 const { Text, Paragraph } = Typography;
 const { Panel } = Collapse;
 
-const VisitReport = () => {
-  const { report_id } = useParams();
+const VisitReport = ({report_id}: {report_id: string}) => {
 
   const {
     data: report,

@@ -35,7 +35,12 @@ class VisitReadSerializer(serializers.ModelSerializer):
         today = datetime.today().astimezone(settings.SAUDI_TZ).date()
         yesterday = today - timedelta(days=1)
         late_evening = time(21, 0)
-        return obj.date == today or (obj.date == yesterday and obj.time >= late_evening)
+
+        is_today = obj.date == today
+        is_last_night = obj.date == yesterday and obj.time and obj.time >= late_evening
+        is_scheduled = obj.status == Visit.VisitStatus.SCHEDULED
+
+        return (is_today or is_last_night) and is_scheduled
 
 
 class VisitWriteSerializer(serializers.ModelSerializer):
