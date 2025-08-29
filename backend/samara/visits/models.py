@@ -54,7 +54,7 @@ class Visit(models.Model):
     class Meta:
         verbose_name = _("زيارة")
         verbose_name_plural = _("الزيارات")
-        unique_together = ("location", "employee", "date")
+        unique_together = ("location", "employee", "date", "time")
         ordering = ['date', 'time']
 
     def __str__(self):
