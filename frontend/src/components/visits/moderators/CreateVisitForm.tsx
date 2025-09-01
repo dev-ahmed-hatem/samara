@@ -155,7 +155,14 @@ const CreateVisitForm = ({
           name="time"
           rules={[{ required: true, message: "يرجى اختيار الوقت" }]}
         >
-          <TimePicker use12Hours format="h:mm A" className="w-full" />
+          <TimePicker
+            use12Hours
+            showSecond={false}
+            format={(value) =>
+              value.format("hh:mm") + (value.hour() >= 12 ? " م" : " ص")
+            }
+            className="w-full"
+          />
         </Form.Item>
 
         {/* Purpose */}
