@@ -1,4 +1,4 @@
-import AttendanceSummary from "@/components/attendance/AttendanceSummary";
+import AttendanceSummary from "@/components/attendance/moderators/AttendanceSummary";
 import { Typography } from "antd";
 
 const { Title } = Typography;

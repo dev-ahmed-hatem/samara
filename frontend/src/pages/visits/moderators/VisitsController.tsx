@@ -34,7 +34,7 @@ import api from "@/app/api/apiSlice";
 import { useAppDispatch } from "@/app/redux/hooks";
 import CreateVisitForm from "@/components/visits/moderators/CreateVisitForm";
 import { Visit } from "@/types/visit";
-import VisitReportModal from "./VisitReportModal";
+import VisitReportModal from "../../../components/visits/moderators/VisitReportModal";
 
 const { Option } = Select;
 const { Title, Text } = Typography;

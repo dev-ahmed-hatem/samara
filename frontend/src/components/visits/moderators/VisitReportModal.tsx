@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Modal, Button } from "antd";
-import VisitReport from "./VisitReport";
+import VisitReport from "@/pages/visits/moderators/VisitReport";
 
 type VisitReportModalProps = {
   report_id: string;

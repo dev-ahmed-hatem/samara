@@ -6,7 +6,7 @@ import dayjs from "dayjs";
 import { EmployeeAttendance, ShiftType } from "@/types/attendance";
 import { useGetProjectsQuery } from "@/app/api/endpoints/projects";
 import { useLazyGetLocationsQuery } from "@/app/api/endpoints/locations";
-import Loading from "../Loading";
+import Loading from "../../Loading";
 import ErrorPage from "@/pages/ErrorPage";
 import { useLazyGetSecurityGuardsQuery } from "@/app/api/endpoints/security_guards";
 import { useShiftAttendanceMutation } from "@/app/api/endpoints/attendance";

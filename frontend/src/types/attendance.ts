@@ -23,3 +23,18 @@ export interface EmployeeAttendance {
   status: AttendanceStatus;
   notes?: string;
 }
+
+// for moderators attendance summary
+export type ShiftInfo = {
+  id: number | null;
+  has_attendance: boolean;
+};
+
+export type LocationAttendance = {
+  location: string;
+  shifts: {
+    "الوردية الأولى": ShiftInfo;
+    "الوردية الثانية": ShiftInfo;
+    "الوردية الثالثة": ShiftInfo;
+  };
+};

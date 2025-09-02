@@ -9,9 +9,33 @@ from django.utils.translation import gettext_lazy as _
 from collections import Counter
 from django.shortcuts import get_object_or_404
 
-from projects.models import Location
+from projects.models import Location, Project
 from employees.models import SecurityGuard, Shift
 from .models import ShiftAttendance, SecurityGuardAttendance
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_project_attendances(request):
+    project = request.query_params.get('project')
+    date = request.query_params.get('date')
+
+    project = get_object_or_404(Project, pk=project)
+
+    project_attendances = []
+    all_shifts = [*Shift.ShiftChoices]
+    for location in project.locations.all():
+        location_data = {"location": location.name, "shifts": {}}
+        for shift_name in all_shifts:
+            shift_attendance = ShiftAttendance.objects.filter(location=location, date=date,
+                                                              shift__name=shift_name).first()
+            location_data["shifts"][shift_name] = {"id": shift_attendance.id if shift_attendance else None,
+                                                   "has_attendance": True if shift_attendance else False}
+        project_attendances.append(location_data)
+
+    data = {"project": project.name, "date": date, "attendances": project_attendances}
+
+    return Response(data)
 
 
 @api_view(['POST'])
@@ -45,9 +69,14 @@ def get_shift_attendance(request):
     location = request.query_params.get('location')
     shift = request.query_params.get('shift')
 
-    shift_attendance = get_object_or_404(
-        ShiftAttendance, date=date, location=location, shift__name=shift
-    )
+    shift_id = request.query_params.get('shift_id')
+
+    if shift_id:
+        shift_attendance = get_object_or_404(ShiftAttendance, pk=shift_id)
+    else:
+        shift_attendance = get_object_or_404(
+            ShiftAttendance, date=date, location=location, shift__name=shift
+        )
 
     guards = shift_attendance.security_guards.all()
 
