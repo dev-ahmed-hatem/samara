@@ -214,11 +214,11 @@ def get_moderator_home_stats(request):
 @permission_classes([IsAuthenticated])
 def get_home_stats(request):
     user: User = request.user
-    date = datetime.today().astimezone(settings.SAUDI_TZ).date()
+    today = datetime.today().astimezone(settings.SAUDI_TZ).date()
 
     visits = Visit.objects.filter()
-    violations = Violation.objects.filter(created_at__date=date)
-    attendance_records = ShiftAttendance.objects.filter(date=date)
+    violations = Violation.objects.filter(date=today)
+    attendance_records = ShiftAttendance.objects.filter(date=today)
     if user.role == User.RoleChoices.SUPERVISOR:
         employee = user.employee_profile
         visits.filter(employee=employee)
@@ -234,8 +234,8 @@ def get_home_stats(request):
     data = {
         "project_count": project_ids_count,
         "location_count": locations_count,
-        "scheduled_visits": visits.filter(status=Visit.VisitStatus.SCHEDULED, date=date).count(),
-        "completed_visits": visits.filter(status=Visit.VisitStatus.COMPLETED, date=date).count(),
+        "scheduled_visits": visits.filter(status=Visit.VisitStatus.SCHEDULED, date=today).count(),
+        "completed_visits": visits.filter(status=Visit.VisitStatus.COMPLETED, date=today).count(),
         "violations": violations.count(),
         "attendance_records": attendance_records.count(),
         "guards_count": SecurityGuard.objects.count()
@@ -319,11 +319,12 @@ class SupervisorMonthlyRecord(APIView):
         # Get violations count per day
         violations_data = (
             Violation.objects.filter(
-                created_at__date__range=(first_day, last_day),
+                date__range=(first_day, last_day),
                 created_by_id=supervisor
-            ).annotate(
-                date=TruncDate("created_at", tzinfo=settings.SAUDI_TZ)
             )
+            # .annotate(
+            #     date=TruncDate("created_at", tzinfo=settings.SAUDI_TZ)
+            # )
             .values("date")
             .annotate(violations_count=Count("id"))
         )
@@ -354,8 +355,8 @@ class SupervisorDailyRecord(APIView):
         violations = (
             Violation.objects
             .filter(created_by_id=supervisor)
-            .annotate(local_date=TruncDate("created_at", tzinfo=settings.SAUDI_TZ))
-            .filter(local_date=selected_date))
+            # .annotate(local_date=TruncDate("created_at", tzinfo=settings.SAUDI_TZ))
+            .filter(date=selected_date))
 
         visits_serialized = VisitReadSerializer(visits, many=True, context={"request": request}).data
         violations_serialized = ViolationReadSerializer(violations, many=True, context={"request": request}).data

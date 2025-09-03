@@ -9,8 +9,7 @@ import Loading from "@/components/Loading";
 import { useGetViolationQuery } from "@/app/api/endpoints/visits";
 import { textify } from "@/utils";
 
-const ViolationReport = ({report_id}: {report_id: string}) => {
-
+const ViolationReport = ({ report_id }: { report_id: string }) => {
   const {
     data: violation,
     isFetching,
@@ -64,7 +63,7 @@ const ViolationReport = ({report_id}: {report_id: string}) => {
               {violation!.severity}
             </Tag>
           </Descriptions.Item>
-          <Descriptions.Item label="تاريخ الإنشاء">
+          <Descriptions.Item label="التاريخ">
             <span dir="rtl">{violation!.date}</span>
           </Descriptions.Item>
           <Descriptions.Item label="وقت الإنشاء">
@@ -72,6 +71,9 @@ const ViolationReport = ({report_id}: {report_id: string}) => {
           </Descriptions.Item>
           <Descriptions.Item label="أنشئ بواسطة">
             {violation!.created_by}
+          </Descriptions.Item>
+          <Descriptions.Item label="رقم المخالفة">
+            {violation!.id}
           </Descriptions.Item>
         </Descriptions>
 

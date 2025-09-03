@@ -85,7 +85,6 @@ class ViolationReadSerializer(serializers.ModelSerializer):
     project_name = serializers.StringRelatedField(source='location.project.name', read_only=True)
     location_name = serializers.StringRelatedField(source='location.name', read_only=True)
     created_at = serializers.SerializerMethodField(read_only=True)
-    date = serializers.SerializerMethodField(read_only=True)
     security_guard = serializers.StringRelatedField(source='security_guard.name', read_only=True)
     created_by = serializers.StringRelatedField(source='created_by.name', read_only=True)
 
@@ -94,11 +93,8 @@ class ViolationReadSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ("created_by",)
 
-    def get_date(self, obj):
-        return obj.created_at.astimezone(settings.SAUDI_TZ).strftime('%Y-%m-%d')
-
     def get_created_at(self, obj):
-        return obj.created_at.astimezone(settings.SAUDI_TZ).strftime('%I:%M %p')
+        return obj.created_at.astimezone(settings.SAUDI_TZ).strftime('%Y-%m-%d %I:%M %p')
 
 
 class ViolationWriteSerializer(serializers.ModelSerializer):

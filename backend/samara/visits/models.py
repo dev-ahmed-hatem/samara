@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from employees.models import Employee
 from datetime import datetime, time, timedelta
 from django.db.models import Q, QuerySet
+from django.utils.timezone import localdate
 
 
 class Visit(models.Model):
@@ -325,6 +326,8 @@ class Violation(models.Model):
         default=False,
         verbose_name=_("التأكيد من قسم المتابعة والحفظ"),
     )
+
+    date = models.DateField(verbose_name=_("تاريخ المخالفة"), blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("تاريخ الإنشاء"))
 
