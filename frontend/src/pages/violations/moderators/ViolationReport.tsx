@@ -5,13 +5,11 @@ import {
 } from "@ant-design/icons";
 import ErrorPage from "@/pages/ErrorPage";
 import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
-import { useParams } from "react-router";
 import Loading from "@/components/Loading";
 import { useGetViolationQuery } from "@/app/api/endpoints/visits";
 import { textify } from "@/utils";
 
-const ViolationReport = () => {
-  const { report_id } = useParams();
+const ViolationReport = ({report_id}: {report_id: string}) => {
 
   const {
     data: violation,
@@ -67,7 +65,7 @@ const ViolationReport = () => {
             </Tag>
           </Descriptions.Item>
           <Descriptions.Item label="تاريخ الإنشاء">
-            {violation!.date}
+            <span dir="rtl">{violation!.date}</span>
           </Descriptions.Item>
           <Descriptions.Item label="وقت الإنشاء">
             {violation!.created_at}

@@ -95,7 +95,7 @@ class ViolationReadSerializer(serializers.ModelSerializer):
         read_only_fields = ("created_by",)
 
     def get_date(self, obj):
-        return obj.created_at.astimezone(settings.SAUDI_TZ).strftime('%d-%m-%Y')
+        return obj.created_at.astimezone(settings.SAUDI_TZ).strftime('%Y-%m-%d')
 
     def get_created_at(self, obj):
         return obj.created_at.astimezone(settings.SAUDI_TZ).strftime('%I:%M %p')

@@ -1,8 +1,7 @@
 import { RouteObject } from "react-router";
 import appRoutes, { AppRoute } from "./appRoutes";
 import VisitForm from "@/pages/visits/supervisor/VisitForm";
-import ViolationForm from "@/pages/visits/supervisor/ViolationForm";
-import ViolationReport from "@/pages/visits/moderators/ViolationReport";
+import ViolationForm from "@/pages/violations/supervisor/ViolationForm";
 import VisitReportPage from "@/pages/visits/moderators/VisitReportPage";
 
 const alterRoute = function (
@@ -69,7 +68,6 @@ let routes: RouteObject[] = addSubRoutes(appRoutes, {
   ],
   "/moderator/visits": [
     { path: "view-report/:report_id", element: <VisitReportPage /> },
-    { path: "view-violation/:report_id", element: <ViolationReport /> },
   ],
 });
 
