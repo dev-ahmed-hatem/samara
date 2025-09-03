@@ -12,6 +12,7 @@ import {
   Badge,
   Empty,
   Divider,
+  Radio,
 } from "antd";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
@@ -67,6 +68,7 @@ const VisitsController: React.FC = () => {
   const [selectedSupervisor, setSelectedSupervisor] = useState<string | null>(
     null
   );
+  const [period, setPeriod] = useState<"morning" | "evening">("morning");
   const [completed, setCompleted] = useState<Visit[]>([]);
   const [scheduled, setScheduled] = useState<Visit[]>([]);
 
@@ -148,14 +150,16 @@ const VisitsController: React.FC = () => {
       getRecords({
         supervisor: selectedSupervisor,
         date: selectedDate.format("YYYY-MM-DD"),
+        period,
       });
-  }, [selectedSupervisor, month]);
+  }, [selectedSupervisor, month, period]);
 
   useEffect(() => {
     if (records && selectedDate && selectedSupervisor)
       getDaily({
         date: selectedDate.format("YYYY-MM-DD"),
         supervisor: selectedSupervisor,
+        period,
       });
   }, [records, selectedDate, selectedSupervisor]);
 
@@ -193,17 +197,38 @@ const VisitsController: React.FC = () => {
       </Title>
 
       <Col xs={24} md={8} className="mb-6">
-        <Select
-          placeholder="اختر المشرف"
-          className="w-full"
-          onChange={(value) => setSelectedSupervisor(value)}
-        >
-          {(supervisors as Employee[])?.map((sup) => (
-            <Option key={sup.id} value={sup.id}>
-              {sup.name}
-            </Option>
-          ))}
-        </Select>
+        <div className="flex flex-col">
+          <label className="mb-2 text-gray-600 font-medium text-lg">
+            المشرف
+          </label>
+          <Select
+            placeholder="اختر المشرف"
+            className="w-full"
+            onChange={(value) => setSelectedSupervisor(value)}
+          >
+            {(supervisors as Employee[])?.map((sup) => (
+              <Option key={sup.id} value={sup.id}>
+                {sup.name}
+              </Option>
+            ))}
+          </Select>
+        </div>
+      </Col>
+
+      <Col xs={24} md={8} className="mb-6">
+        <div className="flex flex-col">
+          <label className="mb-2 text-gray-600 font-medium text-lg">
+            الفترة
+          </label>
+          <Radio.Group
+            className="flex"
+            onChange={(event) => setPeriod(event.target.value)}
+            defaultValue={period}
+          >
+            <Radio.Button value="morning">صباحية</Radio.Button>
+            <Radio.Button value="evening">مسائية</Radio.Button>
+          </Radio.Group>
+        </div>
       </Col>
 
       {fetchingRecords ? (
@@ -267,9 +292,8 @@ const VisitsController: React.FC = () => {
                     key={visit.id}
                     className={`w-full sm:w-[49%] lg:w-[49%] h-52 flex flex-col justify-between shadow-sm border rounded-md border-green-500`}
                     title={
-                      <div
-                        className={`py-2 px-3 rounded-t-md mx-0 bg-green-100`}
-                      >
+                      <div className="py-2 px-3 rounded-t-md mx-0 bg-green-100">
+                        {/* Row 1: Project + Location */}
                         <div className="flex items-center justify-between mb-1">
                           <Text
                             strong
@@ -279,8 +303,13 @@ const VisitsController: React.FC = () => {
                             {visit.location.name}
                           </Text>
                         </div>
-                        <div className="flex items-center justify-between">
-                          <Text className="text-xs">{visit.time}</Text>
+
+                        {/* Row 2: Date + Time on left, Status on right */}
+                        <div className="flex items-center justify-between flex-wrap gap-1">
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2 text-xs text-gray-700">
+                            <span dir="rtl">{visit.date}</span>
+                            <span>{visit.time}</span>
+                          </div>
                           <Tag color="green" className="text-sm">
                             {visit.status}
                           </Tag>

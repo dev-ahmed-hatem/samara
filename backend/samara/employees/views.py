@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework import viewsets, status
 from rest_framework.views import APIView
-from datetime import datetime, date, timedelta
+from datetime import datetime, date, timedelta, time
 from django.conf import settings
 from django.utils.dateparse import parse_date
 from django.http import JsonResponse
@@ -249,6 +249,7 @@ class SupervisorMonthlyRecord(APIView):
         # Parse date from query params or default to today
         date_str = request.GET.get("date")
         supervisor = request.GET.get("supervisor")
+        period = request.GET.get("period")
         if date_str:
             selected_date = parse_date(date_str)
         else:
@@ -263,18 +264,57 @@ class SupervisorMonthlyRecord(APIView):
             next_month = first_day.replace(year=first_day.year + 1, month=1, day=1)
         else:
             next_month = first_day.replace(month=first_day.month + 1, day=1)
-        last_day = next_month - timedelta(days=1)
 
-        # Get completed visits count per day
-        visits_data = (
-            Visit.objects.filter(
-                date__range=(first_day, last_day),
-                employee_id=supervisor
-            )
-            .values("date")
-            .annotate(scheduled=Count("id", filter=Q(status=Visit.VisitStatus.SCHEDULED)),
-                      completed=Count("id", filter=Q(status=Visit.VisitStatus.COMPLETED)))
+        # set the last_day of the month in case of morning period,
+        # and include the first day in next month in case of evening
+
+        last_day = (next_month - timedelta(days=1)) if period == "morning" else next_month
+
+        queryset = Visit.objects.filter(
+            date__range=(first_day, last_day),
+            employee_id=supervisor,
         )
+
+        # check the period for filtering
+        if period == "morning":
+            start_time = time(9, 0)
+            end_time = time(20, 59)
+            queryset = queryset.filter(
+                time__range=(start_time, end_time),
+            )
+        elif period == "evening":
+            start_time = time(21, 0)
+            end_time = time(8, 59)
+            queryset = queryset.filter(
+                Q(time__gte=start_time) | Q(time__lte=end_time),
+            )
+
+        # Merge data by day
+        summary = {}
+
+        if period == "morning":
+            # Get completed visits count per day
+            visits_data = (
+                queryset
+                .values("date")
+                .annotate(scheduled=Count("id", filter=Q(status=Visit.VisitStatus.SCHEDULED)),
+                          completed=Count("id", filter=Q(status=Visit.VisitStatus.COMPLETED)))
+            )
+            for v in visits_data:
+                d = v["date"]
+                summary[d.day] = {"completed": v["completed"], "scheduled": v["scheduled"]}
+
+        else:
+            for v in queryset:
+                d = v.date
+                if v.time < time(9, 0):
+                    d = d - timedelta(days=1)
+
+                summary.setdefault(d.day, {"completed": 0, "scheduled": 0})
+                if v.status == Visit.VisitStatus.SCHEDULED:
+                    summary[d.day]["scheduled"] += 1
+                else:
+                    summary[d.day]["completed"] += 1
 
         # Get violations count per day
         violations_data = (
@@ -288,11 +328,6 @@ class SupervisorMonthlyRecord(APIView):
             .annotate(violations_count=Count("id"))
         )
 
-        # Merge data by day
-        summary = {}
-        for v in visits_data:
-            summary[v["date"].day] = {"completed": v["completed"], "scheduled": v["scheduled"]}
-
         for v in violations_data:
             day = v["date"].day
             summary.setdefault(day, {"completed": 0, "scheduled": 0, "violations": 0})
@@ -305,14 +340,16 @@ class SupervisorDailyRecord(APIView):
     def get(self, request):
         selected_date = parse_date(request.GET.get("date", None))
         supervisor = request.GET.get("supervisor", None)
+        period = request.GET.get("period", None)
 
         if not selected_date or not supervisor:
             return JsonResponse({"error": "Invalid date"}, status=400)
 
-        visits = Visit.objects.filter(
-            date=selected_date,
-            employee_id=supervisor
-        )
+        queryset = Visit.objects.filter(employee_id=supervisor)
+        if period is not None:
+            visits = filter_visits_by_period(queryset, selected_date, period)
+        else:
+            visits = queryset.filter(date=selected_date)
 
         violations = (
             Violation.objects

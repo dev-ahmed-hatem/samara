@@ -11,7 +11,6 @@ const VisitCard = ({
   type: "scheduled" | "completed";
 }) => {
   const isCompleted = type === "completed";
-  const isVisitDay = dayjs().isSame(dayjs(visit.date, "DD/MM/YYYY"), "day");
 
   const navigate = useNavigate();
 
@@ -24,7 +23,7 @@ const VisitCard = ({
       }`}
     >
       <Tag color="blue" className="text-sm px-3 py-1 rounded-md mb-2">
-        تاريخ الزيارة: {dayjs(visit.date, "DD/MM/YYYY").format("YYYY-MM-DD")}
+        تاريخ الزيارة: <span dir="rtl">{visit.date}</span>
       </Tag>
       <Tag color="gold" className="text-sm px-3 py-1 rounded-md mb-4">
         وقت الزيارة: {visit.time}

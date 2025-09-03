@@ -161,7 +161,7 @@ const VisitForm = () => {
             #{visit?.id}
           </Descriptions.Item>
           <Descriptions.Item label="التاريخ">
-            {dayjs(visit?.date, "DD/MM/YYYY").format("YYYY-MM-DD")}
+            <span dir="rtl">{visit?.date}</span>
           </Descriptions.Item>
           <Descriptions.Item label="الوقت">{visit?.time}</Descriptions.Item>
           <Descriptions.Item label="الموقع" span={2}>

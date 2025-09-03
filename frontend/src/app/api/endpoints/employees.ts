@@ -1,4 +1,3 @@
-
 import api from "../apiSlice";
 import qs from "query-string";
 import { Employee } from "@/types/employee";
@@ -14,7 +13,10 @@ export const employeesEndpoints = api.injectEndpoints({
       query: () => ({ url: "/employees/get-home-stats/", method: "GET" }),
     }),
     getModeratorHomeStats: builder.query<ModeratorHomeStats, void>({
-      query: () => ({ url: "/employees/get-moderator-home-stats/", method: "GET" }),
+      query: () => ({
+        url: "/employees/get-moderator-home-stats/",
+        method: "GET",
+      }),
     }),
     // getAllEmployees: builder.query<Employee[], void>({
     //   query: () => ({
@@ -55,7 +57,7 @@ export const employeesEndpoints = api.injectEndpoints({
     }),
     getSupervisorMonthlyRecord: builder.query<
       { month: string; data: Record<string, MonthRecord> },
-      { date: string; supervisor: string }
+      { date: string; supervisor: string; period: "morning" | "evening" }
     >({
       query: (params) => ({
         url: `/employees/supervisor-monthly-records/?${qs.stringify(params)}`,
@@ -64,7 +66,7 @@ export const employeesEndpoints = api.injectEndpoints({
     }),
     getSupervisorDailyRecord: builder.query<
       { visits: Visit[]; violations: Violation[] },
-      { date: string; supervisor: string }
+      { date: string; supervisor: string; period: "morning" | "evening" }
     >({
       query: (params) => ({
         url: `/employees/supervisor-daily-records/?${qs.stringify(params)}`,

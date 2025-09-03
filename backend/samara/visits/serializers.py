@@ -9,7 +9,7 @@ from projects.serializers import LocationSerializer
 class VisitReadSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(view_name='visit-detail')
     location = LocationSerializer()
-    date = serializers.DateField(format='%d/%m/%Y', read_only=True)
+    date = serializers.DateField(format='%Y-%m-%d', read_only=True)
     time = serializers.TimeField(format='%I:%M %p', read_only=True)
     status = serializers.StringRelatedField(source='get_status_display', read_only=True)
     completed_at = serializers.SerializerMethodField(read_only=True)
