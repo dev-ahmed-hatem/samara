@@ -9,13 +9,12 @@ import {
   Descriptions,
   Tag,
   Spin,
+  DatePicker,
 } from "antd";
 import { LoadingOutlined, UploadOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { RcFile, UploadFile } from "antd/lib/upload";
-import {
-  useViolationMutation,
-} from "@/app/api/endpoints/visits";
+import { useViolationMutation } from "@/app/api/endpoints/visits";
 import { useNavigate } from "react-router";
 import Loading from "@/components/Loading";
 import ErrorPage from "@/pages/ErrorPage";
@@ -72,6 +71,7 @@ const ViolationForm: React.FC = () => {
   const handleSubmit = (values: any) => {
     const data = {
       ...values,
+      date: values.date.format("YYYY-MM-DD"),
     };
 
     if (fileList?.length) {
@@ -190,6 +190,15 @@ const ViolationForm: React.FC = () => {
                   </Select.Option>
                 ))}
             </Select>
+          </Form.Item>
+
+          <Form.Item
+            label="التاريخ"
+            className="mb-0"
+            name={"date"}
+            rules={[{ required: true, message: "يرجى اختيار تاريخ المخالفة" }]}
+          >
+            <DatePicker className="w-full" format="YYYY-MM-DD" />
           </Form.Item>
 
           <Form.Item
