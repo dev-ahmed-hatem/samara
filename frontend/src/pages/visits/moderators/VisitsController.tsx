@@ -369,9 +369,8 @@ const VisitsController: React.FC = () => {
                     key={visit.id}
                     className={`w-full sm:w-[49%] lg:w-[49%] h-52 flex flex-col justify-between shadow-sm border rounded-md border-calypso-500`}
                     title={
-                      <div
-                        className={`py-2 px-3 rounded-t-md mx-0 bg-calypso-50`}
-                      >
+                      <div className="py-2 px-3 rounded-t-md mx-0 bg-calypso-50">
+                        {/* Row 1: Project + Location */}
                         <div className="flex items-center justify-between mb-1">
                           <Text
                             strong
@@ -381,8 +380,13 @@ const VisitsController: React.FC = () => {
                             {visit.location.name}
                           </Text>
                         </div>
-                        <div className="flex items-center justify-between">
-                          <Text className="text-xs">{visit.time}</Text>
+
+                        {/* Row 2: Date + Time on left, Status on right */}
+                        <div className="flex items-center justify-between flex-wrap gap-1">
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2 text-xs text-gray-700">
+                            <span dir="rtl">{visit.date}</span>
+                            <span>{visit.time}</span>
+                          </div>
                           <Tag color="blue" className="text-sm">
                             {visit.status}
                           </Tag>
