@@ -1,6 +1,17 @@
 import { useEffect, useState } from "react";
-import { Form, Select, TimePicker, Input, Button, Card, Spin } from "antd";
-import dayjs from "dayjs";
+import {
+  Form,
+  Select,
+  TimePicker,
+  Input,
+  Button,
+  Spin,
+  Radio,
+  Typography,
+  DatePicker,
+  Col,
+  Row,
+} from "antd";
 import "dayjs/locale/ar";
 import { useGetProjectsQuery } from "@/app/api/endpoints/projects";
 import { useLazyGetLocationsQuery } from "@/app/api/endpoints/locations";
@@ -11,23 +22,34 @@ import api from "@/app/api/apiSlice";
 import { useNotification } from "@/providers/NotificationProvider";
 import { useAppDispatch } from "@/app/redux/hooks";
 import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
+import { useGetEmployeesQuery } from "@/app/api/endpoints/employees";
+import ErrorPage from "@/pages/ErrorPage";
+import { Employee } from "@/types/employee";
+import { dayjs } from "@/utils/locale";
 
 const { Option } = Select;
 const { TextArea } = Input;
+const { Title } = Typography;
 
-const CreateVisitForm = ({
-  selectedSupervisor,
-  selectedDate,
-}: {
-  selectedSupervisor: string;
-  selectedDate: string;
+const CreateVisitForm = ({}: // selectedSupervisor,
+// selectedDate,
+{
+  // selectedSupervisor: string;
+  // selectedDate: string;
 }) => {
   const [projectId, setProjectId] = useState<number | null>(null);
   const notification = useNotification();
   const dispatch = useAppDispatch();
 
+  const [period, setPeriod] = useState<"morning" | "evening" | null>();
+
   const [form] = Form.useForm();
 
+  const {
+    data: supervisors,
+    isFetching: fetchingSupervisors,
+    isError: supervisorsError,
+  } = useGetEmployeesQuery({ no_pagination: true, role: "supervisor" });
   const {
     data: projects,
     isFetching: fetchingProjects,
@@ -50,15 +72,18 @@ const CreateVisitForm = ({
 
   const handleFinish = (values: any) => {
     const data = {
-      employee: selectedSupervisor,
-      date: selectedDate,
       ...values,
       time: values.time.format("HH:mm"),
+      date: values.date.format("YYYY-MM-DD"),
       status: "مجدولة",
     };
 
     createVisit({ data });
   };
+
+  useEffect(() => {
+    form.setFieldValue("time", undefined);
+  }, [period]);
 
   useEffect(() => {
     if (projectId) {
@@ -68,7 +93,12 @@ const CreateVisitForm = ({
 
   useEffect(() => {
     if (visitDone) {
-      dispatch(api.util.invalidateTags([{ type: "DailyRecords", id: "LIST" }]));
+      dispatch(
+        api.util.invalidateTags([
+          { type: "DailyRecord", id: "LIST" },
+          { type: "MonthlyRecord", id: "LIST" },
+        ])
+      );
       notification.success({ message: "تم إضافة الزيارة" });
     }
   }, [visitDone]);
@@ -92,101 +122,192 @@ const CreateVisitForm = ({
     }
   }, [visitIsError]);
 
-  if (fetchingProjects) return <Loading />;
-  if (ProjectsError || locationsError)
-    return (
-      <p className="text-red-600 text-base">حدث خطأ أثناء تحميل المشاريع!</p>
-    );
+  if (fetchingSupervisors || fetchingProjects) return <Loading />;
+  if (supervisorsError || ProjectsError || locationsError) return <ErrorPage />;
 
   return (
-    <Card className="shadow-md rounded-xl">
+    <div>
+      <Title level={4} className="mb-4">
+        إضافة زيارة
+      </Title>
+
       <Form
         layout="vertical"
         form={form}
         onFinish={handleFinish}
         initialValues={{ time: dayjs().hour(9).minute(0) }}
       >
-        {/* Project */}
-        <Form.Item
-          label="المشروع"
-          rules={[{ required: true, message: "يرجى اختيار المشروع" }]}
-        >
-          <Select
-            placeholder="اختر المشروع"
-            onChange={(value) => {
-              setProjectId(value);
-              form.setFieldValue("location", undefined);
-            }}
-          >
-            {projects!.map((project) => (
-              <Option key={project.id} value={project.id}>
-                {project.name}
-              </Option>
-            ))}
-          </Select>
-        </Form.Item>
+        <Row gutter={[16, 16]}>
+          {/* Supervisor */}
+          <Col xs={24} md={12}>
+            <Form.Item
+              label="المشرف"
+              name="employee"
+              rules={[{ required: true, message: "يرجى اختيار المشرف" }]}
+            >
+              <Select placeholder="اختر المشرف" className="w-full">
+                {(supervisors as Employee[])?.map((sup) => (
+                  <Option key={sup.id} value={sup.id}>
+                    {sup.name}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </Col>
 
-        {/* Location */}
-        <Form.Item
-          label={
-            <div className="flex gap-2 items-center">
-              <span>اختر الموقع</span>
-              {fetchingLocations && (
-                <Spin size="small" indicator={<LoadingOutlined spin />} />
-              )}
-            </div>
-          }
-          name="location"
-          rules={[{ required: true, message: "الرجاء اختيار الموقع" }]}
-        >
-          <Select placeholder="اختر الموقع" disabled={!projectId}>
-            {projectId &&
-              locations?.map((loc) => (
-                <Select.Option key={loc.id} value={loc.id}>
-                  {loc.name}
-                </Select.Option>
-              ))}
-          </Select>
-        </Form.Item>
+          {/* Project */}
+          <Col xs={24} md={12}>
+            <Form.Item
+              label="المشروع"
+              name="project"
+              rules={[{ required: true, message: "يرجى اختيار المشروع" }]}
+            >
+              <Select
+                placeholder="اختر المشروع"
+                onChange={(value) => {
+                  setProjectId(value);
+                  form.setFieldValue("location", undefined);
+                }}
+              >
+                {projects?.map((project) => (
+                  <Option key={project.id} value={project.id}>
+                    {project.name}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </Col>
 
-        {/* Time */}
-        <Form.Item
-          label="الوقت"
-          name="time"
-          rules={[{ required: true, message: "يرجى اختيار الوقت" }]}
-        >
-          <TimePicker
-            use12Hours
-            showSecond={false}
-            format={(value) =>
-              value.format("hh:mm") + (value.hour() >= 12 ? " م" : " ص")
-            }
-            className="w-full"
-          />
-        </Form.Item>
+          {/* Location */}
+          <Col xs={24} md={12}>
+            <Form.Item
+              label={
+                <div className="flex gap-2 items-center">
+                  <span>اختر الموقع</span>
+                  {fetchingLocations && (
+                    <Spin size="small" indicator={<LoadingOutlined spin />} />
+                  )}
+                </div>
+              }
+              name="location"
+              rules={[{ required: true, message: "الرجاء اختيار الموقع" }]}
+            >
+              <Select placeholder="اختر الموقع" disabled={!projectId}>
+                {projectId &&
+                  locations?.map((loc) => (
+                    <Option key={loc.id} value={loc.id}>
+                      {loc.name}
+                    </Option>
+                  ))}
+              </Select>
+            </Form.Item>
+          </Col>
 
-        {/* Purpose */}
-        <Form.Item
-          label="الغرض من الزيارة"
-          name="purpose"
-          rules={[{ required: true, message: "يرجى كتابة الغرض" }]}
-        >
-          <TextArea rows={3} placeholder="أدخل الغرض من الزيارة" />
-        </Form.Item>
+          {/* Date */}
+          <Col xs={24} md={12}>
+            <Form.Item
+              label="التاريخ"
+              name="date"
+              rules={[{ required: true, message: "يرجى اختيار تاريخ الزيارة" }]}
+            >
+              <DatePicker className="w-full" format="YYYY-MM-DD" />
+            </Form.Item>
+          </Col>
 
-        {/* Submit */}
-        <Form.Item className="flex justify-center">
-          <Button
-            type="primary"
-            htmlType="submit"
-            size="large"
-            loading={loadingVisit}
-          >
-            إنشاء الزيارة
-          </Button>
-        </Form.Item>
+          {/* Period */}
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="period"
+              label="الفترة"
+              rules={[{ required: true, message: "يرجى اختيار الفترة" }]}
+            >
+              <Radio.Group
+                className="flex"
+                onChange={(e) => {
+                  setPeriod(e.target.value);
+                  // optional: clear time when period changes to force re-pick
+                  form.setFieldValue("time", null);
+                  form.validateFields(["time"]).catch(() => null);
+                }}
+              >
+                <Radio.Button value="morning">صباحية</Radio.Button>
+                <Radio.Button value="evening">مسائية</Radio.Button>
+              </Radio.Group>
+            </Form.Item>
+          </Col>
+
+          {/* Time */}
+          <Col xs={24} md={12}>
+            <Form.Item
+              label="الوقت"
+              name="time"
+              dependencies={["period"]} // re-validate when period changes
+              rules={[
+                { required: true, message: "يرجى اختيار الوقت" },
+                {
+                  validator: (_, value) => {
+                    const p = form.getFieldValue("period");
+                    if (!value || !p) return Promise.resolve();
+
+                    const hour = value.hour();
+                    if (p === "morning") {
+                      return hour >= 9 && hour < 21
+                        ? Promise.resolve()
+                        : Promise.reject(
+                            new Error("الوقت خارج الفترة الصباحية (9 ص - 9 م)")
+                          );
+                    }
+                    if (p === "evening") {
+                      return hour >= 21 || hour < 9
+                        ? Promise.resolve()
+                        : Promise.reject(
+                            new Error("الوقت خارج الفترة المسائية (9 م - 9 ص)")
+                          );
+                    }
+                    return Promise.resolve();
+                  },
+                },
+              ]}
+            >
+              <TimePicker
+                use12Hours
+                showSecond={false}
+                format={(value) =>
+                  value.format("hh:mm") + (value.hour() >= 12 ? " م" : " ص")
+                }
+                className="w-full"
+                disabled={!period}
+              />
+            </Form.Item>
+          </Col>
+
+          {/* Purpose (full width) */}
+          <Col xs={24}>
+            <Form.Item
+              label="الغرض من الزيارة"
+              name="purpose"
+              rules={[{ required: true, message: "يرجى كتابة الغرض" }]}
+            >
+              <TextArea rows={3} placeholder="أدخل الغرض من الزيارة" />
+            </Form.Item>
+          </Col>
+
+          {/* Submit (full width) */}
+          <Col xs={24} className="flex justify-center">
+            <Form.Item className="mb-0">
+              <Button
+                type="primary"
+                htmlType="submit"
+                size="large"
+                loading={loadingVisit}
+              >
+                إنشاء الزيارة
+              </Button>
+            </Form.Item>
+          </Col>
+        </Row>
       </Form>
-    </Card>
+    </div>
   );
 };
 

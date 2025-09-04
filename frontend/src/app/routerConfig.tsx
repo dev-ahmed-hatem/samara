@@ -3,6 +3,7 @@ import appRoutes, { AppRoute } from "./appRoutes";
 import VisitForm from "@/pages/visits/supervisor/VisitForm";
 import ViolationForm from "@/pages/violations/supervisor/ViolationForm";
 import VisitReportPage from "@/pages/visits/moderators/VisitReportPage";
+import CreateVisitForm from "@/components/visits/moderators/CreateVisitForm";
 
 const alterRoute = function (
   appRoutes: AppRoute[],
@@ -68,6 +69,7 @@ let routes: RouteObject[] = addSubRoutes(appRoutes, {
   ],
   "/moderator/visits": [
     { path: "view-report/:report_id", element: <VisitReportPage /> },
+    { path: "add-visit/", element: <CreateVisitForm /> },
   ],
 });
 

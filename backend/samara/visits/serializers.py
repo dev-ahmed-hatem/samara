@@ -44,9 +44,32 @@ class VisitReadSerializer(serializers.ModelSerializer):
 
 
 class VisitWriteSerializer(serializers.ModelSerializer):
+    period = serializers.CharField(write_only=True, required=True)
+
     class Meta:
         model = Visit
         fields = '__all__'
+
+    def create(self, validated_data):
+        period = validated_data.pop("period")
+        visit_time = validated_data.get("time")
+        visit_date = validated_data.get("date")
+
+        if period == "evening" and visit_time and visit_date and visit_time < time(9, 0):
+            validated_data["date"] = visit_date + timedelta(days=1)
+
+        exists = Visit.objects.filter(employee=validated_data["employee"],
+                                      location=validated_data["location"],
+                                      date=validated_data["date"],
+                                      time=validated_data["time"]
+                                      ).exists()
+
+        if exists:
+            raise serializers.ValidationError(
+                {"non_field_errors": ["الزيارة بالتاريخ والوقت والموقع موجودة بالفعل"]}
+            )
+
+        return super().create(validated_data)
 
 
 class VisitReportReadSerializer(serializers.ModelSerializer):

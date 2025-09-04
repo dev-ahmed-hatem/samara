@@ -14,6 +14,7 @@ import {
   Divider,
   Radio,
 } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import {
@@ -171,7 +172,12 @@ const VisitsController: React.FC = () => {
 
   useEffect(() => {
     if (visitDone || violationIsDone) {
-      dispatch(api.util.invalidateTags([{ type: "DailyRecords", id: "LIST" }]));
+      dispatch(
+        api.util.invalidateTags([
+          { type: "DailyRecord", id: "LIST" },
+          { type: "MonthlyRecord", id: "LIST" },
+        ])
+      );
       notification.success({ message: message });
     }
   }, [visitDone, violationIsDone]);
@@ -196,41 +202,48 @@ const VisitsController: React.FC = () => {
       <Title level={3} className="mb-4">
         إدارة الزيارات الميدانية
       </Title>
+      <div className="flex justify-between flex-wrap gap-6 mb-8">
+        <div className="w-full max-w-md space-y-6">
+          <div className="flex flex-col w-full">
+            <label className="mb-2 text-gray-600 font-medium text-lg">
+              المشرف
+            </label>
+            <Select
+              placeholder="اختر المشرف"
+              className="w-full max-w-md"
+              onChange={(value) => setSelectedSupervisor(value)}
+            >
+              {(supervisors as Employee[])?.map((sup) => (
+                <Option key={sup.id} value={sup.id}>
+                  {sup.name}
+                </Option>
+              ))}
+            </Select>
+          </div>
 
-      <Col xs={24} md={8} className="mb-6">
-        <div className="flex flex-col">
-          <label className="mb-2 text-gray-600 font-medium text-lg">
-            المشرف
-          </label>
-          <Select
-            placeholder="اختر المشرف"
-            className="w-full"
-            onChange={(value) => setSelectedSupervisor(value)}
-          >
-            {(supervisors as Employee[])?.map((sup) => (
-              <Option key={sup.id} value={sup.id}>
-                {sup.name}
-              </Option>
-            ))}
-          </Select>
+          <div className="flex flex-col w-full">
+            <label className="mb-2 text-gray-600 font-medium text-lg">
+              الفترة
+            </label>
+            <Radio.Group
+              className="flex"
+              onChange={(event) => setPeriod(event.target.value)}
+              defaultValue={period}
+            >
+              <Radio.Button value="morning">صباحية</Radio.Button>
+              <Radio.Button value="evening">مسائية</Radio.Button>
+            </Radio.Group>
+          </div>
         </div>
-      </Col>
-
-      <Col xs={24} md={8} className="mb-6">
-        <div className="flex flex-col">
-          <label className="mb-2 text-gray-600 font-medium text-lg">
-            الفترة
-          </label>
-          <Radio.Group
-            className="flex"
-            onChange={(event) => setPeriod(event.target.value)}
-            defaultValue={period}
-          >
-            <Radio.Button value="morning">صباحية</Radio.Button>
-            <Radio.Button value="evening">مسائية</Radio.Button>
-          </Radio.Group>
-        </div>
-      </Col>
+        <Button
+          type="primary"
+          size="large"
+          icon={<PlusOutlined />}
+          onClick={() => navigate("add-visit")}
+        >
+          إضافة زيارة
+        </Button>
+      </div>
 
       {fetchingRecords ? (
         <Loading />
@@ -252,14 +265,6 @@ const VisitsController: React.FC = () => {
               </div>
             </div>
             <Divider />
-
-            <Title level={4} className="mb-4">
-              إضافة زيارة
-            </Title>
-            <CreateVisitForm
-              selectedSupervisor={selectedSupervisor!}
-              selectedDate={selectedDate.format("YYYY-MM-DD")}
-            />
           </Card>
         )
       )}
