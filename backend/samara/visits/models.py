@@ -217,6 +217,21 @@ class VisitReport(models.Model):
         null=True, blank=True,
         verbose_name=_("توجيهات أو توصيات من العميل")
     )
+
+    # Location fields
+    latitude = models.FloatField(
+        null=True, blank=True,
+        verbose_name=_("إحداثيات خط العرض للمشرف")
+    )
+    longitude = models.FloatField(
+        null=True, blank=True,
+        verbose_name=_("إحداثيات خط الطول للمشرف")
+    )
+    location_accuracy = models.FloatField(
+        null=True, blank=True,
+        verbose_name=_("دقة تحديد الموقع (بالمتر)")
+    )
+
     supervisor_notes = models.TextField(
         null=True, blank=True,
         verbose_name=_("ملاحظات المشرف")

@@ -75,6 +75,7 @@ class VisitWriteSerializer(serializers.ModelSerializer):
 class VisitReportReadSerializer(serializers.ModelSerializer):
     visit = serializers.SerializerMethodField()
     created_at = serializers.SerializerMethodField(read_only=True)
+    has_location = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = VisitReport
@@ -86,6 +87,9 @@ class VisitReportReadSerializer(serializers.ModelSerializer):
 
     def get_created_at(self, obj: VisitReport):
         return obj.created_at.astimezone(settings.SAUDI_TZ).strftime('%d-%m-%Y %I:%M %p')
+
+    def get_has_location(self, obj: VisitReport):
+        return obj.longitude is not None and obj.latitude is not None
 
 
 class VisitReportWriteSerializer(serializers.ModelSerializer):

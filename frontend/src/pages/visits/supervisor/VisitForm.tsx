@@ -9,6 +9,7 @@ import {
   Card,
   Descriptions,
   Tag,
+  Modal,
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
@@ -23,9 +24,9 @@ import {
   visitsEndpoints,
 } from "@/app/api/endpoints/visits";
 import { useNavigate, useParams } from "react-router";
-import { dayjs } from "@/utils/locale";
 import { useAppDispatch } from "@/app/redux/hooks";
 import { useNotification } from "@/providers/NotificationProvider";
+import { getCurrentLocation } from "@/utils/geolocation";
 
 interface NormalizedAttachments {
   [fieldWithAttachmentSuffix: string]: File;
@@ -45,6 +46,10 @@ const VisitForm = () => {
   const [attachments, setAttachments] = useState<Record<string, UploadFile[]>>(
     {}
   );
+  const [showPermissionModal, setShowPermissionModal] =
+    useState<boolean>(false);
+  const [modalmessage, setModalmessage] = useState("");
+  const [skipLocation, setSkipLocation] = useState(false);
 
   const handleStatusChange = (field: string, value: string) => {
     setFieldStatus((prev) => ({ ...prev, [field]: value }));
@@ -86,13 +91,36 @@ const VisitForm = () => {
     return result;
   };
 
-  const handleFinish = (values: VisitReportForm) => {
+  const handleFinish = async (values: VisitReportForm) => {
+    let coords;
+
+    try {
+      coords = (await getCurrentLocation()).coords;
+    } catch (err) {
+      if (!skipLocation) {
+        if (err instanceof GeolocationPositionError && err.PERMISSION_DENIED) {
+          setModalmessage(
+            "لم يتم تفعيل صلاحية تحديد الموقع. هل ترغب بالمتابعة على أي حال؟"
+          );
+          setShowPermissionModal(true);
+        } else {
+          setModalmessage(
+            "لم يتم الحصول على بيانات تحديد الموقع. هل ترغب بالمتابعة على أي حال؟"
+          );
+        }
+        return;
+      }
+    }
+
     const data = {
       ...values,
       visit: visit_id!,
       ...normalizeAttachments(attachments),
+      latitude: coords?.latitude,
+      longitude: coords?.longitude,
+      location_accuracy: coords?.accuracy,
     };
-
+    
     submitForm(data);
   };
 
@@ -330,6 +358,23 @@ const VisitForm = () => {
           </Form>
         )}
       </Card>
+
+      <Modal
+        title="تنبيه"
+        open={showPermissionModal}
+        onOk={() => {
+          setSkipLocation(true);
+          setShowPermissionModal(false);
+        }}
+        onCancel={() => {
+          setShowPermissionModal(false);
+        }}
+        centered
+        okText="متابعة على أي حال"
+        cancelText="إلغاء"
+      >
+        <p style={{ textAlign: "center", fontSize: "16px" }}>{modalmessage}</p>
+      </Modal>
     </>
   );
 };

@@ -47,5 +47,11 @@ export type VisitReport = {
   client_notes?: string;
   supervisor_notes?: string;
 
+  has_location: boolean;
+  longitude?: number;
+  latitude?: number;
+  location_accuracy?: number;
+
   created_at: string;
+  created_by: string;
 };

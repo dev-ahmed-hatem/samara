@@ -1,6 +1,5 @@
 import { Card, Descriptions, Tag, Typography, Collapse, Image } from "antd";
 import { FileOutlined } from "@ant-design/icons";
-import { useParams } from "react-router";
 import { useGetVisitReportQuery } from "@/app/api/endpoints/visits";
 import Loading from "@/components/Loading";
 import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
@@ -9,8 +8,7 @@ import ErrorPage from "@/pages/ErrorPage";
 const { Text, Paragraph } = Typography;
 const { Panel } = Collapse;
 
-const VisitReport = ({report_id}: {report_id: string}) => {
-
+const VisitReport = ({ report_id }: { report_id: string }) => {
   const {
     data: report,
     isFetching,
@@ -106,6 +104,20 @@ const VisitReport = ({report_id}: {report_id: string}) => {
           </Descriptions.Item>
           <Descriptions.Item label="وقت الإنشاء">
             {report?.created_at}
+          </Descriptions.Item>
+          <Descriptions.Item label="موقع المشرف">
+            {report?.has_location ? (
+              <a
+                href={`https://www.google.com/maps?q=${report.latitude},${report.longitude}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "#1890ff", fontWeight: "bold" }}
+              >
+                عرض الموقع على الخريطة
+              </a>
+            ) : (
+              <Tag className="text-base">غير محدد</Tag>
+            )}
           </Descriptions.Item>
         </Descriptions>
       </Card>
