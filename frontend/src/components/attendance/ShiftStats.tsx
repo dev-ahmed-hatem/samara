@@ -99,6 +99,18 @@ const ShiftStats = ({ shiftAttendance }: ShiftStatsProps) => {
           <span className="mx-1 font-bold">{shiftAttendance.created_at}</span>
         </span>
       </div>
+
+      {/* Suprvisor */}
+      <div
+        className="bg-blue-50 border border-blue-200 rounded-md p-4 
+          flex items-center gap-3 text-blue-800 shadow-sm mt-2"
+      >
+        <CheckCircleOutlined className="text-xl" />
+        <span className="text-sm sm:text-base font-medium">
+          تم تسجيل الحضور بواسطة
+          <span className="mx-1 font-bold">{shiftAttendance.created_by}</span>
+        </span>
+      </div>
     </Card>
   );
 };

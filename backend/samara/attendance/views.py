@@ -103,6 +103,8 @@ def get_shift_attendance(request):
     ]
 
     data = {"stats": stats, "records": records,
-            "created_at": shift_attendance.created_at.astimezone(settings.SAUDI_TZ).strftime("%Y-%m-%d   %I:%M%p")}
+            "created_at": shift_attendance.created_at.astimezone(settings.SAUDI_TZ).strftime("%Y-%m-%d   %I:%M%p"),
+            "created_by": shift_attendance.created_by.name
+            }
 
     return Response(data=data, status=status.HTTP_200_OK)
