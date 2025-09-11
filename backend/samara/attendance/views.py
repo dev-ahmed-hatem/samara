@@ -3,7 +3,7 @@ from django.db.utils import IntegrityError
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, viewsets
 from django.utils.translation import gettext_lazy as _
 
 from collections import Counter
@@ -12,6 +12,12 @@ from django.shortcuts import get_object_or_404
 from projects.models import Location, Project
 from employees.models import SecurityGuard, Shift
 from .models import ShiftAttendance, SecurityGuardAttendance
+from .serializers import ShiftAttendanceSerializer
+
+
+class ShiftAttendanceViewSet(viewsets.ModelViewSet):
+    queryset = ShiftAttendance.objects.all()
+    serializer_class = ShiftAttendanceSerializer
 
 
 @api_view(['GET'])

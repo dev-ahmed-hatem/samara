@@ -14,6 +14,7 @@ export const attendanceEndpoints = api.injectEndpoints({
         )}`,
         method: "GET",
       }),
+      providesTags: [{ type: "ProjectAttendances", id: "LIST" }],
     }),
     shiftAttendance: builder.mutation({
       query: (data) => ({
@@ -28,6 +29,13 @@ export const attendanceEndpoints = api.injectEndpoints({
         method: "GET",
       }),
     }),
+    deleteShiftAttendance: builder.mutation<void, number>({
+      query: (shift_id) => ({
+        url: `/attendance/shift-attendances/${shift_id}/`,
+        method: "DELETE",
+      }),
+      invalidatesTags: [{ type: "ProjectAttendances", id: "LIST" }],
+    }),
   }),
 });
 
@@ -35,5 +43,6 @@ export const {
   useLazyGetProjectAttendancesQuery,
   useShiftAttendanceMutation,
   useLazyGetShiftAttendanceQuery,
-  useGetShiftAttendanceQuery
+  useGetShiftAttendanceQuery,
+  useDeleteShiftAttendanceMutation,
 } = attendanceEndpoints;

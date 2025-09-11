@@ -3,7 +3,6 @@ from django.utils.translation import gettext_lazy as _
 from employees.models import Employee
 from datetime import datetime, time, timedelta
 from django.db.models import Q, QuerySet
-from django.utils.timezone import localdate
 
 
 class Visit(models.Model):

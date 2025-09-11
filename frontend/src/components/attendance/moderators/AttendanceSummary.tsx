@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Card, Form, DatePicker, Select, Button, Modal } from "antd";
 import type { FormInstance } from "antd/es/form";
-import { EyeOutlined } from "@ant-design/icons";
 import { useLazyGetProjectAttendancesQuery } from "@/app/api/endpoints/attendance";
 import ErrorPage from "@/pages/ErrorPage";
 import Loading from "@/components/Loading";
@@ -12,12 +11,6 @@ import SummaryModal from "./SummaryModal";
 const AttendanceSummary: React.FC = () => {
   const notification = useNotification();
   const [form] = Form.useForm<FormInstance>();
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalContent, setModalContent] = useState<{
-    location: string;
-    shift: string;
-  } | null>(null);
 
   const {
     data: projects,
@@ -32,16 +25,6 @@ const AttendanceSummary: React.FC = () => {
       isError: attendancesIsError,
     },
   ] = useLazyGetProjectAttendancesQuery();
-
-  const openModal = (location: string, shift: string) => {
-    setModalContent({ location, shift });
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setModalContent(null);
-  };
 
   const handleSave = (values: any) => {
     getAttendances({
@@ -141,7 +124,7 @@ const AttendanceSummary: React.FC = () => {
                   {Object.entries(loc.shifts).map(([shift, shiftData], i) => (
                     <div
                       key={i}
-                      className="flex justify-between items-center p-3 rounded-xl shadow-sm bg-white border border-gray-200"
+                      className="flex justify-between flex-wrap gap-2 items-center p-3 rounded-xl shadow-sm bg-white border border-gray-200"
                     >
                       <span className="font-medium text-gray-700">{shift}</span>
                       {shiftData.has_attendance ? (
@@ -156,24 +139,6 @@ const AttendanceSummary: React.FC = () => {
                 </div>
               </Card>
             ))}
-
-            {/* Attendance Modal */}
-            <Modal
-              open={isModalOpen}
-              onCancel={closeModal}
-              footer={null}
-              centered
-              title={
-                modalContent
-                  ? `ملخص الحضور - ${modalContent.location} - ${modalContent.shift}`
-                  : ""
-              }
-            >
-              <p>📋 هنا سيتم عرض تفاصيل الحضور الخاصة بهذه الوردية.</p>
-              <p className="text-gray-500">
-                يمكنك لاحقًا ربطها ببيانات الـ API.
-              </p>
-            </Modal>
           </div>
         </div>
       )}
