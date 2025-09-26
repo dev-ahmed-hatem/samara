@@ -1,7 +1,9 @@
+from django.db import IntegrityError
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
+from rest_framework.validators import UniqueTogetherValidator
 
-from projects.serializers import LocationSerializer
-from .models import Employee, SecurityGuard
+from .models import Employee, SecurityGuard, SecurityGuardLocationShift, Shift
 
 
 class EmployeeReadSerializer(serializers.ModelSerializer):
@@ -46,3 +48,38 @@ class SecurityGuardSerializer(serializers.ModelSerializer):
     def get_location_shifts(self, obj: SecurityGuard):
         return [{"location": f"{loc.location.project.name} - {loc.location.name}", "shift": loc.shift.name} for loc in
                 obj.location_shifts.all()]
+
+
+class LocationShiftSerializer(serializers.ModelSerializer):
+    shift = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = SecurityGuardLocationShift
+        fields = '__all__'
+        validators = [
+            UniqueTogetherValidator(
+                queryset=SecurityGuardLocationShift.objects.all(),
+                fields=["guard", "location", "shift"],
+                message="هذا الحارس لديه نفس الوردية في نفس الموقع بالفعل."
+            )
+        ]
+
+    def create(self, validated_data):
+        # Extract the shift name from input
+        shift_name = validated_data.pop("shift")
+
+        try:
+            shift_obj = Shift.objects.get(name=shift_name)
+        except Shift.DoesNotExist:
+            raise serializers.ValidationError(
+                {"shift": f"Shift with name '{shift_name}' does not exist."}
+            )
+
+        validated_data["shift"] = shift_obj
+        try:
+            return super().create(validated_data)
+        except IntegrityError:
+            # Catch the DB constraint error (unique_together)
+            raise ValidationError(
+                {"non_field_errors": "هذا الحارس لديه نفس الوردية في نفس الموقع بالفعل."}
+            )

@@ -12,7 +12,7 @@ from attendance.models import ShiftAttendance, SecurityGuardAttendance
 from visits.models import Visit, Violation, filter_visits_by_period
 from visits.serializers import VisitReadSerializer, ViolationReadSerializer
 from .serializers import EmployeeReadSerializer, EmployeeWriteSerializer, EmployeeListSerializer, \
-    SecurityGuardSerializer
+    SecurityGuardSerializer, LocationShiftSerializer
 from .models import Employee, SecurityGuard, SecurityGuardLocationShift
 from projects.models import Location, Project
 from rest_framework.decorators import action, api_view, permission_classes
@@ -153,11 +153,29 @@ class SecurityGuardViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['get'])
     def form_data(self, request, pk=None):
         try:
-            client = SecurityGuard.objects.get(id=pk)
-            serializer = SecurityGuardSerializer(client, context={"request": self.request}).data
+            guard = SecurityGuard.objects.get(id=pk)
+            serializer = SecurityGuardSerializer(guard, context={"request": self.request}).data
             return Response(serializer)
         except Exception:
             return Response({'detail': _('رجل أمن غير موجود')}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=True, methods=['get'])
+    def location_shifts(self, request, pk=None):
+        try:
+            guard = SecurityGuard.objects.get(id=pk)
+            assignments = [
+                {"id": loc.id, "project": loc.location.project.name, "location": loc.location.name,
+                 "shift": loc.shift.name} for loc
+                in guard.location_shifts.all()]
+
+            return Response(assignments)
+        except Exception:
+            return Response({'detail': _('رجل أمن غير موجود')}, status=status.HTTP_404_NOT_FOUND)
+
+
+class LocationShiftViewSet(viewsets.ModelViewSet):
+    queryset = SecurityGuardLocationShift.objects.all()
+    serializer_class = LocationShiftSerializer
 
 
 @api_view(["DELETE"])

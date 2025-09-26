@@ -127,6 +127,7 @@ class SecurityGuardLocationShift(models.Model):
     class Meta:
         verbose_name = _("وردية في موقع")
         verbose_name_plural = _("ورديات المواقع")
+        unique_together = ["guard", "location", "shift"]
 
     def __str__(self):
         return f"{self.guard.name} - {self.location.name} - {self.shift.name}"

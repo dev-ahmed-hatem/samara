@@ -4,6 +4,7 @@ import { Location } from "./location";
 export type SecurityGuard = {
   id: string;
   name: string;
+  employee_id: string;
   location: Location;
   shift: ShiftType;
   is_active: boolean;

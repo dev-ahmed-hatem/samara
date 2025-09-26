@@ -12,6 +12,7 @@ export const api = createApi({
     "ProjectAttendances",
     "Location",
     "SecurityGuard",
+    "SecurityGuardShifts",
     "Violation",
     "MonthlyRecord",
     "DailyRecord",

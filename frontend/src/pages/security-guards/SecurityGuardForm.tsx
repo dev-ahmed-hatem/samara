@@ -1,5 +1,6 @@
 import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 import { useSecurityGuardMutation } from "@/app/api/endpoints/security_guards";
+import { useAppSelector } from "@/app/redux/hooks";
 import { useNotification } from "@/providers/NotificationProvider";
 import { SecurityGuard } from "@/types/scurityGuard";
 import { handleServerErrors } from "@/utils/handleForm";
@@ -22,6 +23,7 @@ const SecurityGuardForm = ({
   const navigate = useNavigate();
   const notification = useNotification();
   const [form] = Form.useForm<SecurityGuardFormValues>();
+  const user = useAppSelector((state) => state.auth.user);
 
   const [
     handleSecurityGuard,
@@ -58,7 +60,7 @@ const SecurityGuardForm = ({
         message: `تم ${initialValues ? "تعديل بيانات" : "إضافة"} رجل الأمن`,
       });
       navigate(
-        `/security-guards/guard-profile/${
+        `/${user!.role}/security-guards/guard-profile/${
           initialValues ? initialValues.id : client.id
         }`
       );
@@ -103,7 +105,7 @@ const SecurityGuardForm = ({
             size="large"
             loading={isLoading}
           >
-            إضافة
+            {initialValues ? "تعديل" : "إضافة"}
           </Button>
         </Form.Item>
       </Form>

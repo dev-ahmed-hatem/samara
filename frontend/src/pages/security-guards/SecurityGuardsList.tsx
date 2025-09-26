@@ -195,7 +195,7 @@ const SecurityGuardsList = () => {
           dataSource={guards?.data}
           columns={columns}
           onRow={(record) => ({
-            onClick: () => navigate(`security-guard-profile/${record.id}`),
+            onClick: () => navigate(`guard-profile/${record.id}`),
           })}
           rowKey="id"
           pagination={tablePaginationConfig({

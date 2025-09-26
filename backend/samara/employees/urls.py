@@ -1,11 +1,12 @@
 from rest_framework.routers import DefaultRouter
-from .views import EmployeeViewSet, SecurityGuardViewSet, SupervisorMonthlyRecord, SupervisorDailyRecord, \
-    multiple_delete, get_home_stats, get_moderator_home_stats
+from .views import EmployeeViewSet, SecurityGuardViewSet, LocationShiftViewSet, SupervisorMonthlyRecord, \
+    SupervisorDailyRecord, multiple_delete, get_home_stats, get_moderator_home_stats
 from django.urls import path, include
 
 router = DefaultRouter()
 router.register('employees', EmployeeViewSet, basename='employee')
 router.register('security-guards', SecurityGuardViewSet, basename='security-guard')
+router.register('location-shifts', LocationShiftViewSet, basename='location-shift')
 
 urlpatterns = [
     path('', include(router.urls)),

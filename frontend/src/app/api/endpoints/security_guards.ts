@@ -2,6 +2,7 @@ import { PaginatedResponse } from "@/types/paginatedResponse";
 import api from "../apiSlice";
 import qs from "query-string";
 import { SecurityGuard } from "@/types/scurityGuard";
+import { ShiftType } from "@/types/attendance";
 
 export const securityGuardsEndpoints = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -41,6 +42,18 @@ export const securityGuardsEndpoints = api.injectEndpoints({
         { type: "SecurityGuard", id: arg.id },
       ],
     }),
+    getSecurityGuardShifts: builder.query<
+      { id: string, project: string; location: string; shift: ShiftType }[],
+      string
+    >({
+      query: (guard_id) => ({
+        url: `/employees/security-guards/${guard_id}/location_shifts/`,
+        method: "GET",
+      }),
+      providesTags: (res, error, arg) => [
+        { type: "SecurityGuardShifts", id: "LIST" },
+      ],
+    }),
     securityGuard: builder.mutation<
       SecurityGuard,
       { data: Partial<SecurityGuard>; method?: string; url?: string }
@@ -78,6 +91,7 @@ export const securityGuardsEndpoints = api.injectEndpoints({
 export const {
   useGetSecurityGuardsQuery,
   useLazyGetSecurityGuardsQuery,
+  useGetSecurityGuardShiftsQuery,
   useGetSecurityGuardQuery,
   useSecurityGuardMutation,
   useSwitchGuardActiveMutation,
