@@ -121,7 +121,8 @@ const AttendanceRecords: React.FC = () => {
 
     if (
       incomplete.length > 0 ||
-      Object.entries(attendance).length < securityGuards?.length
+      Object.entries(attendance).length <
+        (securityGuards as SecurityGuard[])?.length
     ) {
       notification.error({ message: "يرجى تحديد حالة الحضور لجميع الحراس" });
       return;
@@ -139,7 +140,7 @@ const AttendanceRecords: React.FC = () => {
 
   useEffect(() => {
     if (securityGuards) {
-      setGuards(securityGuards);
+      setGuards(securityGuards as SecurityGuard[]);
     }
   }, [securityGuards]);
 
@@ -150,6 +151,7 @@ const AttendanceRecords: React.FC = () => {
   useEffect(() => {
     if (location && shift) {
       getSecurityGuards({
+        no_pagination: true,
         location_id: location,
         shift: shift,
         date: currentDate,
@@ -320,7 +322,7 @@ const AttendanceRecords: React.FC = () => {
           <div className="space-y-6">
             <Table
               columns={columns}
-              dataSource={securityGuards}
+              dataSource={securityGuards as SecurityGuard[]}
               rowKey={"id"}
               pagination={false}
               className="calypso-header"

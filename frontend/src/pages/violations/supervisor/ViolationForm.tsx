@@ -23,6 +23,7 @@ import { ViolationForm as ViolationFormType, Visit } from "@/types/visit";
 import { useGetProjectsQuery } from "@/app/api/endpoints/projects";
 import { useLazyGetLocationsQuery } from "@/app/api/endpoints/locations";
 import { useLazyGetSecurityGuardsQuery } from "@/app/api/endpoints/security_guards";
+import { SecurityGuard } from "@/types/scurityGuard";
 
 const { TextArea } = Input;
 
@@ -115,6 +116,7 @@ const ViolationForm: React.FC = () => {
   useEffect(() => {
     if (projectId && location) {
       getSecurityGuards({
+        no_pagination: true,
         location_id: location,
       });
     }
@@ -218,7 +220,7 @@ const ViolationForm: React.FC = () => {
           >
             <Select placeholder="اختر الموظف المخالف" disabled={!location}>
               {location &&
-                securityGuards?.map((sec) => (
+                (securityGuards as SecurityGuard[])?.map((sec) => (
                   <Select.Option key={sec.id} value={sec.id}>
                     {sec.name}
                   </Select.Option>

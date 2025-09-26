@@ -3,12 +3,13 @@ import api from "../apiSlice";
 import qs from "query-string";
 import { SecurityGuard } from "@/types/scurityGuard";
 import { ShiftType } from "@/types/attendance";
+import { QueryParams } from "@/types/query_param";
 
 export const securityGuardsEndpoints = api.injectEndpoints({
   endpoints: (builder) => ({
     getSecurityGuards: builder.query<
       PaginatedResponse<SecurityGuard> | SecurityGuard[],
-      Record<string, any> | void
+      QueryParams | void
     >({
       query: (params) => ({
         url: `/employees/security-guards/?${qs.stringify({
