@@ -1,5 +1,4 @@
 import { IoMenu } from "react-icons/io5";
-import Logo from "../Logo";
 import { RxAvatar } from "react-icons/rx";
 import { Popover } from "antd";
 import { useState } from "react";
@@ -22,29 +21,40 @@ const Navbar = ({
   };
 
   return (
-    <div className="padding-container flex justify-between items-center bg-gray-500 py-2 h-24">
+    <div className="px-10 md:px-14 flex justify-between items-center h-20 bg-gradient-to-r from-[#b79237] via-[#a07f30] to-[#7a6123] shadow-md">
+      {/* Left: Menu Button */}
       <IoMenu
-        className="text-calypso-900 hover:text-calypso-950 text-4xl md:text-5xl cursor-pointer"
+        className="text-white hover:text-yellow-200 text-4xl md:text-5xl cursor-pointer"
         onClick={() => {
           setMenuOpen(!menuOpen);
         }}
       />
-      <div className="logo h-12 md:h-16">
-        <NavLink to={"/"}>
-          {/* <Logo className="fill-calypso-900 hover:fill-calypso-950" /> */}
-          
-          <img src="/samara.jpg" alt="samara logo" className="h-full rounded-lg" />
+
+      {/* Center: Logo */}
+      <div className="logo h-12 md:h-16 flex items-center">
+        <NavLink to={"/"} className="h-full">
+          <img
+            src="/samara.jpg"
+            alt="samara logo"
+            className="h-full rounded border-2 border-white shadow-sm"
+          />
         </NavLink>
       </div>
+
+      {/* Right: User Avatar */}
       <div className="user">
         <Popover
           content={<UserMenu role={user?.role_arabic!} />}
-          title={user?.employee_profile.name || <span className="text-red-500">بلا اسم</span>}
+          title={
+            user?.employee_profile.name || (
+              <span className="text-red-500">بلا اسم</span>
+            )
+          }
           trigger="click"
           open={open}
           onOpenChange={handleOpenChange}
         >
-          <RxAvatar className="text-4xl md:text-5xl text-calypso-900 hover:text-calypso-950 cursor-pointer" />
+          <RxAvatar className="text-white hover:text-yellow-200 text-4xl md:text-5xl cursor-pointer" />
         </Popover>
       </div>
     </div>
