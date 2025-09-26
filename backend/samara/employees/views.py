@@ -131,6 +131,34 @@ class SecurityGuardViewSet(viewsets.ModelViewSet):
 
         return super().list(request, *args, **kwargs)
 
+    @action(detail=True, methods=['get'])
+    def detailed(self, request, pk=None):
+        try:
+            guard = SecurityGuard.objects.get(pk=pk)
+            data = SecurityGuardSerializer(guard, context={"request": self.request}).data
+            return Response(data)
+        except Exception:
+            return Response({'detail': _('رجل أمن غير موجود')}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=True, methods=['post'])
+    def switch_active(self, request, pk=None):
+        try:
+            guard = SecurityGuard.objects.get(pk=pk)
+            guard.is_active = not guard.is_active
+            guard.save()
+            return Response({"is_active": guard.is_active})
+        except Exception:
+            return Response({'detail': _('رجل أمن غير موجود')}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=True, methods=['get'])
+    def form_data(self, request, pk=None):
+        try:
+            client = SecurityGuard.objects.get(id=pk)
+            serializer = SecurityGuardSerializer(client, context={"request": self.request}).data
+            return Response(serializer)
+        except Exception:
+            return Response({'detail': _('رجل أمن غير موجود')}, status=status.HTTP_404_NOT_FOUND)
+
 
 @api_view(["DELETE"])
 def multiple_delete(request):
