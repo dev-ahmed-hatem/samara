@@ -37,7 +37,7 @@ const Base = ({ error }: { error?: any }) => {
   }
 
   return (
-    <>
+    <div className="min-h-screen bg-gradient-to-l from-gray-50 via-[#faf8f3] to-[#f5f2ea]">
       <ScrollToTop />
       <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
       <Menu menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
@@ -45,7 +45,7 @@ const Base = ({ error }: { error?: any }) => {
         <Outlet />
       </main>
       <Footer />
-    </>
+    </div>
   );
 };
 

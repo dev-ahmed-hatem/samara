@@ -6,6 +6,9 @@ import {
   UserSwitchOutlined,
   TeamOutlined,
   UserOutlined,
+  IdcardOutlined,
+  ScheduleOutlined,
+  SmileOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router";
@@ -36,41 +39,80 @@ const ModeratorHome: React.FC = () => {
   if (isError) return <ErrorPage />;
 
   return (
-    <div className="p-4 space-y-10">
+    <div className="space-y-10">
       {/* Welcome Message */}
-      <Typography.Title level={4} className="text-right">
-        أهلاً،{" "}
-        <span className="text-blue-600 font-semibold">
-          {user?.employee_profile.name}
-        </span>
-      </Typography.Title>
+      <div className="flex flex-col items-center justify-center px-6 py-6 bg-gradient-to-r from-[#b79237] via-yellow-600 to-[#b79237] rounded-2xl shadow-xl text-white text-center">
+        {/* Logo */}
+        <img
+          src="./samara.jpg"
+          alt="Logo"
+          className="size-24 object-contain rounded-full border-4 border-white shadow-lg bg-white mb-4"
+        />
+
+        {/* Text */}
+        <h1 className="text-2xl sm:text-3xl font-bold flex items-center justify-center gap-2">
+          مرحبًا بك،
+          <span className="text-white">{user?.employee_profile.name}</span>
+          <SmileOutlined className="text-yellow-300" />
+        </h1>
+      </div>
 
       <Divider />
 
       {/* Navigation Cards */}
       <Row gutter={[16, 16]}>
+        {/* رجال الأمن */}
         <Col xs={24} sm={12}>
           <Card
-            className="flex items-center justify-between p-4 hover:bg-blue-50 transition-all duration-200 cursor-pointer shadow-md rounded-2xl"
+            className="h-full flex items-center justify-between p-6 bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer rounded-2xl"
+            onClick={() => navigate("security")}
+          >
+            <div className="flex items-center gap-4 w-full">
+              <IdcardOutlined className="text-4xl text-white drop-shadow-lg" />
+              <div className="text-xl font-bold leading-tight">رجال الأمن</div>
+            </div>
+          </Card>
+        </Col>
+
+        {/* المشروعات والمواقع */}
+        <Col xs={24} sm={12}>
+          <Card
+            className="h-full flex items-center justify-between p-6 bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer rounded-2xl"
+            onClick={() => navigate("projects")}
+          >
+            <div className="flex items-center gap-4 w-full">
+              <EnvironmentOutlined className="text-4xl text-white drop-shadow-lg" />
+              <div className="text-xl font-bold leading-tight">
+                المشروعات والمواقع
+              </div>
+            </div>
+          </Card>
+        </Col>
+
+        {/* سجل الزيارات والمخالفات */}
+        <Col xs={24} sm={12}>
+          <Card
+            className="h-full flex items-center justify-between p-6 bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer rounded-2xl"
             onClick={() => navigate("visits")}
           >
-            <div className="flex items-center gap-4">
-              <CalendarOutlined className="text-3xl text-blue-600" />
-              <div className="text-lg font-semibold text-blue-600">
+            <div className="flex items-center gap-4 w-full">
+              <CalendarOutlined className="text-4xl text-white drop-shadow-lg" />
+              <div className="text-xl font-bold leading-tight">
                 سجل الزيارات والمخالفات
               </div>
             </div>
           </Card>
         </Col>
 
+        {/* تسجيلات حضور رجال الأمن */}
         <Col xs={24} sm={12}>
           <Card
-            className="flex items-center justify-between p-4 hover:bg-green-50 transition-all duration-200 cursor-pointer shadow-md rounded-2xl"
+            className="h-full flex items-center justify-between p-6 bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer rounded-2xl"
             onClick={() => navigate("attendance")}
           >
-            <div className="flex items-center gap-4">
-              <TeamOutlined className="text-3xl text-green-600" />
-              <div className="text-lg font-semibold text-green-600">
+            <div className="flex items-center gap-4 w-full">
+              <ScheduleOutlined className="text-4xl text-white drop-shadow-lg" />
+              <div className="text-xl font-bold leading-tight">
                 تسجيلات حضور رجال الأمن
               </div>
             </div>
