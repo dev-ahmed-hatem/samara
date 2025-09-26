@@ -55,21 +55,24 @@ const LoginPage = () => {
   }, [logged, verified]);
 
   if (verifying || logged || verified) return <Loading />;
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <div className="bg-white shadow-xl rounded-md overflow-hidden flex flex-col md:flex-row w-full max-w-md md:max-w-4xl">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f2f1ed] via-[#ecebe7] to-[#e6e5e1] p-4">
+      <div className="bg-white shadow-2xl rounded-2xl overflow-hidden flex flex-col md:flex-row w-full max-w-md md:max-w-4xl">
         {/* Left: Logo */}
-        <div className="md:w-1/2 max-md:h-52 bg-calypso flex items-center justify-center">
+        <div className="md:w-1/2 max-md:h-52 bg-gradient-to-br from-calypso-700 to-calypso-800 flex items-center justify-center">
           <img
             src="/samara.jpg"
             alt="samara logo"
-            className="h-full md:w-full object-cover"
+            className="h-36 md:h-64 object-contain opacity-95 rounded-lg shadow-lg"
           />
         </div>
 
         {/* Right: Form */}
-        <div className="md:w-1/2 w-full p-6 sm:p-10 flex flex-col justify-center text-right border-t-4 md:border-t-0 md:border-e-4 border-calypso">
-          <h2 className="text-2xl font-bold mb-8">تسجيل دخول</h2>
+        <div className="md:w-1/2 w-full p-8 sm:p-12 flex flex-col justify-center text-right bg-gradient-to-tl from-white to-[#fdfcf9]">
+          <h2 className="text-3xl font-extrabold text-[#b79237] mb-6 text-center">
+            تسجيل دخول
+          </h2>
 
           <Form
             layout="vertical"
@@ -78,45 +81,47 @@ const LoginPage = () => {
             className="rtl text-right"
           >
             <Form.Item
-              label="اسم المستخدم:"
+              label="اسم المستخدم"
               name="username"
               rules={[{ required: true, message: "يرجى إدخال اسم المستخدم" }]}
             >
               <Input
                 size="large"
                 placeholder="اسم المستخدم"
-                prefix={<UserOutlined />}
+                prefix={<UserOutlined className="text-[#b79237]" />}
+                className="rounded-lg"
                 autoFocus
               />
             </Form.Item>
 
             <Form.Item
-              label="كلمة المرور:"
+              label="كلمة المرور"
               name="password"
               rules={[{ required: true, message: "يرجى إدخال كلمة المرور" }]}
             >
               <Input.Password
                 size="large"
                 placeholder="كلمة المرور"
-                prefix={<LockOutlined />}
+                prefix={<LockOutlined className="text-[#b79237]" />}
+                className="rounded-lg"
               />
             </Form.Item>
 
             {message && (
-              <div className="text-center text-base text-red-600 font-bold">
-                بيانات تسجيل خاطئة
+              <div className="text-center text-base text-red-600 font-semibold mt-2">
+                {message}
               </div>
             )}
 
-            <Form.Item className="text-center mt-5">
+            <Form.Item className="text-center mt-6">
               <Button
                 type="primary"
                 htmlType="submit"
                 size="large"
-                className="text-white w-full"
+                className="w-full bg-[#b79237] border-[#b79237] hover:bg-[#a98530] hover:border-[#a98530] rounded-lg shadow-md"
                 loading={logging}
               >
-                تسجيل دخول
+                دخول
               </Button>
             </Form.Item>
           </Form>
