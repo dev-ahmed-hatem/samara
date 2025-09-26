@@ -7,11 +7,16 @@ import PermissionProvider from "@/providers/PermissionProvider";
 import SectionView from "@/pages/SectionView";
 import VisitsList from "@/pages/visits/supervisor/VisitsList";
 import AttendancePage from "@/pages/attendance/supervisors/AttendancePage";
-import { CalendarOutlined, WarningOutlined } from "@ant-design/icons";
+import {
+  CalendarOutlined,
+  IdcardOutlined,
+  WarningOutlined,
+} from "@ant-design/icons";
 import { BsFillPersonCheckFill } from "react-icons/bs";
 import ViolationsList from "@/pages/violations/supervisor/ViolationsList";
 import VisitsController from "@/pages/visits/moderators/VisitsController";
 import AttendanceReports from "@/pages/attendance/moderators/AttendanceReports";
+import SecurityGuardsList from "@/pages/security-guards/SecurityGuardsList";
 
 export type AppRoute = RouteObject & {
   key?: string;
@@ -35,6 +40,17 @@ export const routesMap = {
     path: "/moderator",
     element: <PermissionProvider role="moderator" />,
     children: [
+      {
+        path: "security-guards",
+        label: "حراس الأمن",
+        icon: <IdcardOutlined />,
+        element: (
+          <SectionView
+            parentComponent={<SecurityGuardsList />}
+            parentUrl="/moderator/security-guards"
+          />
+        ),
+      },
       {
         path: "visits",
         label: "سجل الزيارات والمخالفات",

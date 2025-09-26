@@ -6,4 +6,9 @@ export type SecurityGuard = {
   name: string;
   location: Location;
   shift: ShiftType;
+  is_active: boolean;
+  location_shifts?: {
+    location: string;
+    shift: string;
+  }[];
 };

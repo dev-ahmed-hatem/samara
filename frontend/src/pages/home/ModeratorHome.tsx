@@ -65,7 +65,7 @@ const ModeratorHome: React.FC = () => {
         <Col xs={24} sm={12}>
           <Card
             className="h-full flex items-center justify-between p-6 bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer rounded-2xl"
-            onClick={() => navigate("security")}
+            onClick={() => navigate("security-guards")}
           >
             <div className="flex items-center gap-4 w-full">
               <IdcardOutlined className="text-4xl text-white drop-shadow-lg" />

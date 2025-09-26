@@ -6,7 +6,6 @@ from django.conf import settings
 from django.utils.dateparse import parse_date
 from django.http import JsonResponse
 from django.db.models import Count, Q
-from django.db.models.functions import TruncDate
 from collections import Counter
 
 from attendance.models import ShiftAttendance, SecurityGuardAttendance
@@ -80,11 +79,16 @@ class SecurityGuardViewSet(viewsets.ModelViewSet):
         queryset = SecurityGuard.objects.all()
 
         search = self.request.query_params.get('search', None)
+        search_type = self.request.query_params.get('search_type', "name__icontains")
         location_id = self.request.query_params.get('location_id', None)
         shift = self.request.query_params.get('shift', None)
 
+        status_filters = self.request.query_params.get('is_active', [])
+        sort_by = self.request.query_params.get('sort_by', None)
+        order = self.request.query_params.get('order', None)
+
         if search:
-            queryset = queryset.filter(name__icontains=search)
+            queryset = queryset.filter(**{search_type: search})
         if shift and location_id:
             location_shifts_ids = SecurityGuardLocationShift.objects.filter(shift__name=shift,
                                                                             location_id=location_id).values_list(
@@ -94,6 +98,14 @@ class SecurityGuardViewSet(viewsets.ModelViewSet):
             location_shifts_ids = SecurityGuardLocationShift.objects.filter(location_id=location_id).values_list(
                 "guard__employee_id", flat=True)
             queryset = queryset.filter(employee_id__in=location_shifts_ids)
+
+        if status_filters == "active":
+            queryset = queryset.filter(is_active=True)
+        elif status_filters == "inactive":
+            queryset = queryset.filter(is_active=False)
+
+        if sort_by is not None:
+            queryset = queryset.order_by(f"{order}{sort_by}")
 
         return queryset
 

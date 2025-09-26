@@ -37,7 +37,12 @@ class EmployeeWriteSerializer(serializers.ModelSerializer):
 
 class SecurityGuardSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(view_name='security-guard-detail')
+    location_shifts = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = SecurityGuard
         fields = '__all__'
+
+    def get_location_shifts(self, obj: SecurityGuard):
+        return [{"location": f"{loc.location.project.name} - {loc.location.name}", "shift": loc.shift.name} for loc in
+                obj.location_shifts.all()]
