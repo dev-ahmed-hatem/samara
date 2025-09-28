@@ -25,6 +25,7 @@ import {
 } from "@/app/api/endpoints/projects";
 import { useAppSelector } from "@/app/redux/hooks";
 import ProjectLocationsList from "@/components/projects/ProjectLocations";
+import ProjectGuardsList from "@/components/projects/ProjectGuardsList";
 
 const ProjectProfile: React.FC = () => {
   const [messageApi, contextHolder] = message.useMessage();
@@ -76,6 +77,7 @@ const ProjectProfile: React.FC = () => {
       navigate(`/${user!.role}/projects`);
     }
   }, [deleted]);
+  
   useEffect(() => {
     if (isFetching) {
       messageApi.open({
@@ -164,7 +166,7 @@ const ProjectProfile: React.FC = () => {
           {
             label: `رجال الأمن`,
             key: "2",
-            children: <></>,
+            children: <ProjectGuardsList />,
           },
         ]}
       />

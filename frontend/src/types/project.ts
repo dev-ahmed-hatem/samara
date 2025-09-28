@@ -1,5 +1,3 @@
-import { ShiftType } from "./attendance";
-
 export type Project = {
   id: string;
   name: string;

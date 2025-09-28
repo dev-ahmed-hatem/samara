@@ -2,6 +2,8 @@ import { PaginatedResponse } from "@/types/paginatedResponse";
 import api from "../apiSlice";
 import { Project } from "@/types/project";
 import qs from "query-string";
+import { ProjectGuard } from "@/types/scurityGuard";
+import { QueryParams } from "@/types/query_param";
 
 export const projectsEndpoints = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -29,7 +31,6 @@ export const projectsEndpoints = api.injectEndpoints({
           : [{ type: "Project", id: "LIST" }];
       },
     }),
-
     getProject: builder.query<
       Project,
       { id: string; format: "detailed" | "form_data" }
@@ -66,15 +67,22 @@ export const projectsEndpoints = api.injectEndpoints({
         }
       },
     }),
-    // deleteProject: builder.mutation<void, string>({
-    //   query: (id) => ({
-    //     url: `/projects/projects/${id}/`,
-    //     method: "DELETE",
-    //   }),
-    //   invalidatesTags: [{ type: "Project", id: "LIST" }],
-    // }),
+    getProjectGuards: builder.query<
+      PaginatedResponse<ProjectGuard>,
+      QueryParams
+    >({
+      query: (params) => ({
+        url: `/projects/project-guards/?${qs.stringify(params || {})}`,
+        method: "GET",
+      }),
+      providesTags: [{ type: "ProjectGuard", id: "LIST" }],
+    }),
   }),
 });
 
-export const { useGetProjectsQuery, useGetProjectQuery, useProjectMutation } =
-  projectsEndpoints;
+export const {
+  useGetProjectsQuery,
+  useGetProjectQuery,
+  useProjectMutation,
+  useGetProjectGuardsQuery,
+} = projectsEndpoints;

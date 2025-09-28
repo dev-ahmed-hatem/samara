@@ -9,6 +9,7 @@ export const api = createApi({
     "Employee",
     "Visit",
     "Project",
+    "ProjectGuard",
     "ProjectAttendances",
     "Location",
     "SecurityGuard",

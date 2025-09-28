@@ -1,7 +1,9 @@
 from rest_framework import status
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 
+from employees.models import SecurityGuardLocationShift
+from samara.rest_framework_utils.custom_pagination import CustomPageNumberPagination
 from .models import Project, Location
 from .serializers import ProjectSerializer, LocationSerializer, ProjectListSerializer, ProjectReadSerializer
 from rest_framework.viewsets import ModelViewSet
@@ -60,3 +62,34 @@ class LocationViewSet(ModelViewSet):
             queryset = queryset.filter(project_id=project_id)
 
         return queryset
+
+
+@api_view(["GET"])
+def get_project_guards(request):
+    project_id = request.query_params.get('project', None)
+    location = request.query_params.get('location', [])
+    shift = request.query_params.get('shift', [])
+
+    if not project_id:
+        return Response({"detail": "project id must be provided"}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        project = Project.objects.get(pk=project_id)
+        location_shifts = SecurityGuardLocationShift.objects.filter(location__project_id=project.id)
+
+        if len(location) > 0:
+            location_filters = location.split(',')
+            location_shifts = location_shifts.filter(location_id__in=location_filters)
+
+        if len(shift) > 0:
+            shift_filters = shift.split(',')
+            location_shifts = location_shifts.filter(shift__name__in=shift_filters)
+
+        paginator = CustomPageNumberPagination()
+        page = paginator.paginate_queryset(location_shifts, request)
+
+        data = [{"id": ls.id, "name": ls.guard.name, "location": ls.location.name, "shift": ls.shift.name} for ls in
+                page]
+        return paginator.get_paginated_response(data)
+    except Project.DoesNotExist:
+        return Response({'detail': _('مشروع غير موجود')}, status=status.HTTP_404_NOT_FOUND)

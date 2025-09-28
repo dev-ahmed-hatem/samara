@@ -13,3 +13,10 @@ export type SecurityGuard = {
     shift: string;
   }[];
 };
+
+export type ProjectGuard = {
+  id: number;
+  name: string;
+  location: string;
+  shift: string;
+};
