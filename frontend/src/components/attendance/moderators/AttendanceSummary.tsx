@@ -7,6 +7,7 @@ import Loading from "@/components/Loading";
 import { useNotification } from "@/providers/NotificationProvider";
 import { useGetProjectsQuery } from "@/app/api/endpoints/projects";
 import SummaryModal from "./SummaryModal";
+import { Project } from "@/types/project";
 
 const AttendanceSummary: React.FC = () => {
   const notification = useNotification();
@@ -72,7 +73,7 @@ const AttendanceSummary: React.FC = () => {
             rules={[{ required: true, message: "الرجاء اختيار المشروع" }]}
           >
             <Select placeholder="اختر المشروع">
-              {projects?.map((p) => (
+              {(projects as Project[])?.map((p) => (
                 <Select.Option key={p.id} value={p.id}>
                   {p.name}
                 </Select.Option>

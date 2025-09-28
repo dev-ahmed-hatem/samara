@@ -26,6 +26,7 @@ import { useGetEmployeesQuery } from "@/app/api/endpoints/employees";
 import ErrorPage from "@/pages/ErrorPage";
 import { Employee } from "@/types/employee";
 import { dayjs } from "@/utils/locale";
+import { Project } from "@/types/project";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -169,7 +170,7 @@ const CreateVisitForm = ({}: // selectedSupervisor,
                   form.setFieldValue("location", undefined);
                 }}
               >
-                {projects?.map((project) => (
+                {(projects as Project[])?.map((project) => (
                   <Option key={project.id} value={project.id}>
                     {project.name}
                   </Option>
