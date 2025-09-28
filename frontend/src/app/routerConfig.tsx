@@ -7,6 +7,8 @@ import CreateVisitForm from "@/components/visits/moderators/CreateVisitForm";
 import SecurityGuardForm from "@/pages/security-guards/SecurityGuardForm";
 import SecurityGuardEdit from "@/pages/security-guards/SecurityGuardEdit";
 import SecurityGuardProfile from "@/pages/security-guards/SecurityGuardProfile";
+import ProjectForm from "@/pages/projects/ProjectForm";
+import ProjectEdit from "@/pages/projects/ProjectEdit";
 
 const alterRoute = function (
   appRoutes: AppRoute[],
@@ -77,6 +79,11 @@ let routes: RouteObject[] = addSubRoutes(appRoutes, {
   "/moderator/security-guards": [
     { path: "add/", element: <SecurityGuardForm /> },
     { path: "edit/:guard_id", element: <SecurityGuardEdit /> },
+    { path: "guard-profile/:guard_id", element: <SecurityGuardProfile /> },
+  ],
+  "/moderator/projects": [
+    { path: "add/", element: <ProjectForm /> },
+    { path: "edit/:project_id", element: <ProjectEdit /> },
     { path: "guard-profile/:guard_id", element: <SecurityGuardProfile /> },
   ],
 });
