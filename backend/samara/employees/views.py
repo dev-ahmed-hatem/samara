@@ -87,8 +87,14 @@ class SecurityGuardViewSet(viewsets.ModelViewSet):
         sort_by = self.request.query_params.get('sort_by', None)
         order = self.request.query_params.get('order', None)
 
-        if search:
-            queryset = queryset.filter(**{search_type: search})
+        if search not in (None, ""):
+            try:
+                if search_type == "employee_id" and not search.isdigit():
+                    raise ValueError("employee_id must be number")
+                queryset = queryset.filter(**{search_type: search})
+            except ValueError:
+                pass
+
         if shift and location_id:
             location_shifts_ids = SecurityGuardLocationShift.objects.filter(shift__name=shift,
                                                                             location_id=location_id).values_list(

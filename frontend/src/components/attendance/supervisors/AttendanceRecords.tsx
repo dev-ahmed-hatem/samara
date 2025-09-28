@@ -13,6 +13,7 @@ import { useShiftAttendanceMutation } from "@/app/api/endpoints/attendance";
 import { useNotification } from "@/providers/NotificationProvider";
 import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 import { SecurityGuard } from "@/types/scurityGuard";
+import { Project } from "@/types/project";
 
 const today = dayjs().format("YYYY-MM-DD");
 const yesterday = dayjs().subtract(1, "day").format("YYYY-MM-DD");
@@ -31,10 +32,11 @@ const AttendanceRecords: React.FC = () => {
   const notification = useNotification();
 
   const {
-    data: projects,
+    data: projectsRow,
     isFetching: fetchingProjects,
     isError: ProjectsError,
-  } = useGetProjectsQuery();
+  } = useGetProjectsQuery({ no_pagination: true });
+  const projects = projectsRow as Project[];
   const [
     getLocations,
     { data: locations, isFetching: fetchingLocations, isError: locationsError },

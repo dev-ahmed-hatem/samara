@@ -10,6 +10,21 @@ class ProjectSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ProjectReadSerializer(serializers.ModelSerializer):
+    locations_count = serializers.SerializerMethodField()
+    guards_total = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Project
+        fields = '__all__'
+
+    def get_locations_count(self, obj: Project):
+        return obj.locations.count()
+
+    def get_guards_total(self, obj: Project):
+        return sum(loc.guard_shifts.count() for loc in obj.locations.all())
+
+
 class ProjectListSerializer(serializers.ModelSerializer):
     locations = serializers.SerializerMethodField()
     guards_count = serializers.SerializerMethodField()

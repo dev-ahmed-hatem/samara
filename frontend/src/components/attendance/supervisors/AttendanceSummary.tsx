@@ -9,6 +9,7 @@ import { useLazyGetShiftAttendanceQuery } from "@/app/api/endpoints/attendance";
 import { useNotification } from "@/providers/NotificationProvider";
 import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 import ShiftStats from "../ShiftStats";
+import { Project } from "@/types/project";
 
 const AttendanceSummary: React.FC = () => {
   const [form] = Form.useForm();
@@ -18,10 +19,11 @@ const AttendanceSummary: React.FC = () => {
   const notification = useNotification();
 
   const {
-    data: projects,
+    data: projectsRow,
     isFetching: fetchingProjects,
     isError: ProjectsError,
-  } = useGetProjectsQuery();
+  } = useGetProjectsQuery({ no_pagination: true });
+  const projects = projectsRow as Project[];
   const [
     getLocations,
     { data: locations, isFetching: fetchingLocations, isError: locationsError },

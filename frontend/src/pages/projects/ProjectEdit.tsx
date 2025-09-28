@@ -14,7 +14,7 @@ const ProjectEdit = () => {
     isFetching,
     isError,
     error: projectError,
-  } = useGetProjectQuery(project_id);
+  } = useGetProjectQuery({ id: project_id, format: "form_data" });
 
   if (isFetching) return <Loading />;
   if (isError) {

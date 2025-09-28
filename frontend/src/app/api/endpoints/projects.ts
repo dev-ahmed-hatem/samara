@@ -30,13 +30,16 @@ export const projectsEndpoints = api.injectEndpoints({
       },
     }),
 
-    getProject: builder.query<Project, string>({
-      query: (project_id) => ({
-        url: `/projects/projects/${project_id}/`,
+    getProject: builder.query<
+      Project,
+      { id: string; format: "detailed" | "form_data" }
+    >({
+      query: ({ id, format }) => ({
+        url: `/projects/projects/${id}/${format}/`,
         method: "GET",
       }),
       providesTags: (res, error, arg) => [
-        { type: "Project", id: parseInt(arg) },
+        { type: "Project", id: parseInt(arg.id) },
       ],
     }),
     project: builder.mutation<

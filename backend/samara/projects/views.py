@@ -1,6 +1,11 @@
+from rest_framework import status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+
 from .models import Project, Location
-from .serializers import ProjectSerializer, LocationSerializer, ProjectListSerializer
+from .serializers import ProjectSerializer, LocationSerializer, ProjectListSerializer, ProjectReadSerializer
 from rest_framework.viewsets import ModelViewSet
+from django.utils.translation import gettext_lazy as _
 
 
 class ProjectViewSet(ModelViewSet):
@@ -22,6 +27,24 @@ class ProjectViewSet(ModelViewSet):
             queryset = queryset.filter(name__icontains=search)
 
         return queryset
+
+    @action(detail=True, methods=['get'])
+    def form_data(self, request, pk=None):
+        try:
+            project = Project.objects.get(id=pk)
+            serializer = ProjectSerializer(project, context={"request": self.request}).data
+            return Response(serializer)
+        except Exception:
+            return Response({'detail': _('مشروع غير موجود')}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=True, methods=['get'])
+    def detailed(self, request, pk=None):
+        try:
+            project = Project.objects.get(pk=pk)
+            data = ProjectReadSerializer(project, context={"request": self.request}).data
+            return Response(data)
+        except Exception:
+            return Response({'detail': _('مشروع غير موجود')}, status=status.HTTP_404_NOT_FOUND)
 
 
 class LocationViewSet(ModelViewSet):
