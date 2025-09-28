@@ -166,6 +166,7 @@ const SecurityGuardShifts = ({ guard }: { guard: SecurityGuard }) => {
         loading={fetchingAssignments}
         pagination={false}
         className="calypso-header"
+        scroll={{ x: "max-content" }}
       />
 
       {/* Modal for Add */}

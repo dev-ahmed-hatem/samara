@@ -187,16 +187,15 @@ const SecurityGuardsList = () => {
         </Link>
       </div>
 
-      {isFetching && <Loading />}
-
       {/* Table */}
-      {!isFetching && guards && (
+      {guards && (
         <Table
           dataSource={guards?.data}
           columns={columns}
           onRow={(record) => ({
             onClick: () => navigate(`guard-profile/${record.id}`),
           })}
+          loading={isFetching}
           rowKey="id"
           pagination={tablePaginationConfig({
             total: guards?.count,

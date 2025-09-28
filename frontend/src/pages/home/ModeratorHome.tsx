@@ -78,7 +78,7 @@ const ModeratorHome: React.FC = () => {
         <Col xs={24} sm={12}>
           <Card
             className="h-full flex items-center justify-between p-6 bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer rounded-2xl"
-            // onClick={() => navigate("projects")}
+            onClick={() => navigate("projects")}
           >
             <div className="flex items-center gap-4 w-full">
               <EnvironmentOutlined className="text-4xl text-white drop-shadow-lg" />
@@ -123,7 +123,10 @@ const ModeratorHome: React.FC = () => {
       <Divider />
 
       {/* Today's Overview Header */}
-      <Typography.Title level={5} className="text-right text-gray-600">
+      <Typography.Title
+        level={5}
+        className="text-right text-gray-700 border-r-4 border-[#b79237] pr-3"
+      >
         إحصائيات اليوم ( {today} )
       </Typography.Title>
 

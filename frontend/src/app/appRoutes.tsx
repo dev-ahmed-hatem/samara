@@ -10,6 +10,7 @@ import AttendancePage from "@/pages/attendance/supervisors/AttendancePage";
 import {
   CalendarOutlined,
   IdcardOutlined,
+  ProjectOutlined,
   WarningOutlined,
 } from "@ant-design/icons";
 import { BsFillPersonCheckFill } from "react-icons/bs";
@@ -17,6 +18,7 @@ import ViolationsList from "@/pages/violations/supervisor/ViolationsList";
 import VisitsController from "@/pages/visits/moderators/VisitsController";
 import AttendanceReports from "@/pages/attendance/moderators/AttendanceReports";
 import SecurityGuardsList from "@/pages/security-guards/SecurityGuardsList";
+import ProjectsList from "@/pages/projects/ProjectsList";
 
 export type AppRoute = RouteObject & {
   key?: string;
@@ -42,12 +44,23 @@ export const routesMap = {
     children: [
       {
         path: "security-guards",
-        label: "حراس الأمن",
+        label: "رجال الأمن",
         icon: <IdcardOutlined />,
         element: (
           <SectionView
             parentComponent={<SecurityGuardsList />}
             parentUrl="/moderator/security-guards"
+          />
+        ),
+      },
+      {
+        path: "projects",
+        label: "المشروعات والمواقع",
+        icon: <ProjectOutlined />,
+        element: (
+          <SectionView
+            parentComponent={<ProjectsList />}
+            parentUrl="/moderator/projects"
           />
         ),
       },

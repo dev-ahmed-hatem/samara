@@ -5,7 +5,10 @@ import qs from "query-string";
 
 export const projectsEndpoints = api.injectEndpoints({
   endpoints: (builder) => ({
-    getProjects: builder.query<Project[], Record<string, any> | void>({
+    getProjects: builder.query<
+      PaginatedResponse<Project> | Project[],
+      Record<string, any> | void
+    >({
       query: (params) => ({
         url: `/projects/projects/?${qs.stringify({
           no_pagination: true,
@@ -13,16 +16,18 @@ export const projectsEndpoints = api.injectEndpoints({
         })}`,
         method: "GET",
       }),
-      providesTags: (result) =>
-        result
+      providesTags: (result) => {
+        let array = Array.isArray(result) ? result : result?.data;
+        return array
           ? [
-              ...result.map((project) => ({
+              ...array.map((project) => ({
                 type: "Project" as const,
                 id: project.id,
               })),
               { type: "Project", id: "LIST" },
             ]
-          : [{ type: "Project", id: "LIST" }],
+          : [{ type: "Project", id: "LIST" }];
+      },
     }),
 
     // getProject: builder.query<
