@@ -1,18 +1,22 @@
 import { useState } from "react";
-import { Table, Button, Modal, Popconfirm, Result } from "antd";
+import { Table, Button, Modal, Popconfirm, Result, Card } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useParams } from "react-router";
 import {
+  projectsEndpoints,
   useGetProjectGuardsQuery,
-  // useProjectGuardMutation,
 } from "@/app/api/endpoints/projects";
 import Loading from "@/components/Loading";
-import ProjectGuardForm from "./ProjectGuardForm";
+import ProjectGuardForm, { ProjectGuardFormValues } from "./ProjectGuardForm";
 import { ProjectGuard } from "@/types/scurityGuard";
 import { tablePaginationConfig } from "@/utils/antd";
 import { useGetLocationsQuery } from "@/app/api/endpoints/locations";
 import { ShiftType } from "@/types/attendance";
+import { useLocationShiftMutation } from "@/app/api/endpoints/location_shifts";
+import { useNotification } from "@/providers/NotificationProvider";
+import { useAppDispatch } from "@/app/redux/hooks";
+import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 
 type ControlsType = {
   filters: {
@@ -27,6 +31,9 @@ const ProjectGuardsList: React.FC = () => {
   const [editingGuard, setEditingGuard] = useState<ProjectGuard | null>(null);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+
+  const notification = useNotification();
+  const dispatch = useAppDispatch();
 
   const [controls, setControls] = useState<ControlsType>();
 
@@ -47,14 +54,61 @@ const ProjectGuardsList: React.FC = () => {
     refetch: refetchLocations,
   } = useGetLocationsQuery({ project_id: project_id });
 
-  // const [mutateGuard, { isLoading: deleting }] = useProjectGuardMutation();
+  const [handleAssignment, { isLoading: handling, error: handlingError }] =
+    useLocationShiftMutation();
 
-  const handleDelete = (id: number) => {
-    // mutateGuard({
-    //   url: `/projects/${project_id}/guards/${id}/`,
-    //   method: "DELETE",
-    //   data: {},
-    // });
+  const handleSubmit = async (values: ProjectGuardFormValues) => {
+    try {
+      if (editingGuard) {
+        // Edit
+        await handleAssignment({
+          url: `/employees/location-shifts/${editingGuard.id}/`,
+          method: "PATCH",
+          data: values,
+        }).unwrap();
+        notification.success({ message: "تم تعديل رجل الأمن" });
+      } else {
+        // Add
+        await handleAssignment({
+          url: `/employees/location-shifts/`,
+          method: "POST",
+          data: values,
+        }).unwrap();
+        notification.success({ message: "تمت إضافة رجل الأمن" });
+      }
+      setIsModalOpen(false);
+      dispatch(
+        projectsEndpoints.util.invalidateTags([
+          { type: "Project", id: parseInt(project_id!) },
+          { type: "ProjectGuard", id: "LIST" },
+        ])
+      );
+    } catch {
+      if (editingGuard) {
+        notification.error({ message: "حدث خطأ أثناء تعديل رجل الأمن" });
+      } else {
+        notification.error({ message: "حدث خطأ أثناء حفظ رجل الأمن" });
+      }
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    try {
+      await handleAssignment({
+        url: `/employees/location-shifts/${id}/`,
+        method: "DELETE",
+      }).unwrap();
+      notification.success({ message: "تم حذف رجل الأمن" });
+      refetch();
+      dispatch(
+        projectsEndpoints.util.invalidateTags([
+          { type: "Project", id: parseInt(project_id!) },
+          { type: "ProjectGuard", id: "LIST" },
+        ])
+      );
+    } catch {
+      notification.error({ message: "حدث خطأ أثناء حذف رجل الأمن" });
+    }
   };
 
   const columns: ColumnsType<ProjectGuard> = [
@@ -70,7 +124,7 @@ const ProjectGuardsList: React.FC = () => {
     },
     {
       title: "الموقع",
-      dataIndex: "location",
+      dataIndex: ["location", "name"],
       key: "location",
       filters: locations?.map((loc) => ({ text: loc.name, value: loc.id })),
       defaultFilteredValue: controls?.filters?.location?.split(",") ?? [],
@@ -111,7 +165,7 @@ const ProjectGuardsList: React.FC = () => {
               type="primary"
               danger
               icon={<DeleteOutlined />}
-              // loading={deleting}
+              loading={handling}
             >
               حذف
             </Button>
@@ -141,8 +195,9 @@ const ProjectGuardsList: React.FC = () => {
     );
 
   return (
-    <>
-      <div className="flex justify-end mb-4">
+    <Card
+      title="رجال الأمن"
+      extra={
         <Button
           type="primary"
           icon={<PlusOutlined />}
@@ -153,8 +208,8 @@ const ProjectGuardsList: React.FC = () => {
         >
           إضافة رجل أمن
         </Button>
-      </div>
-
+      }
+    >
       <Table
         rowKey="id"
         columns={columns}
@@ -193,13 +248,11 @@ const ProjectGuardsList: React.FC = () => {
         <ProjectGuardForm
           project_id={project_id as string}
           initialValues={editingGuard || undefined}
-          onSubmit={() => {
-            setIsModalOpen(false);
-            refetch();
-          }}
+          onSubmit={handleSubmit}
+          handlingError={handlingError as axiosBaseQueryError}
         />
       </Modal>
-    </>
+    </Card>
   );
 };
 

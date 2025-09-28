@@ -77,7 +77,7 @@ const ProjectProfile: React.FC = () => {
       navigate(`/${user!.role}/projects`);
     }
   }, [deleted]);
-  
+
   useEffect(() => {
     if (isFetching) {
       messageApi.open({

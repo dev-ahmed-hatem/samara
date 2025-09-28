@@ -17,6 +17,6 @@ export type SecurityGuard = {
 export type ProjectGuard = {
   id: number;
   name: string;
-  location: string;
-  shift: string;
+  location: { name: string; id: string };
+  shift: ShiftType;
 };

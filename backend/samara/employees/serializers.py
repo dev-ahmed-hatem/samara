@@ -83,3 +83,23 @@ class LocationShiftSerializer(serializers.ModelSerializer):
             raise ValidationError(
                 {"non_field_errors": "هذا الحارس لديه نفس الوردية في نفس الموقع بالفعل."}
             )
+
+    def update(self, instance, validated_data):
+        # Extract the shift name from input
+        shift_name = validated_data.pop("shift")
+
+        try:
+            shift_obj = Shift.objects.get(name=shift_name)
+        except Shift.DoesNotExist:
+            raise serializers.ValidationError(
+                {"shift": f"Shift with name '{shift_name}' does not exist."}
+            )
+
+        validated_data["shift"] = shift_obj
+        try:
+            return super().update(instance, validated_data)
+        except IntegrityError:
+            # Catch the DB constraint error (unique_together)
+            raise ValidationError(
+                {"non_field_errors": "هذا الحارس لديه نفس الوردية في نفس الموقع بالفعل."}
+            )

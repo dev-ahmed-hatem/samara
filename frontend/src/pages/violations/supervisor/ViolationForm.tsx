@@ -24,6 +24,7 @@ import { useGetProjectsQuery } from "@/app/api/endpoints/projects";
 import { useLazyGetLocationsQuery } from "@/app/api/endpoints/locations";
 import { useLazyGetSecurityGuardsQuery } from "@/app/api/endpoints/security_guards";
 import { SecurityGuard } from "@/types/scurityGuard";
+import { Project } from "@/types/project";
 
 const { TextArea } = Input;
 
@@ -156,7 +157,7 @@ const ViolationForm: React.FC = () => {
                 form.setFieldValue("location", undefined);
               }}
             >
-              {projects!.map((p) => (
+              {(projects as Project[])?.map((p) => (
                 <Select.Option key={p.id} value={p.id}>
                   {p.name}
                 </Select.Option>

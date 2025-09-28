@@ -12,6 +12,7 @@ import {
   Radio,
   Spin,
   Alert,
+  Result,
 } from "antd";
 import {
   PlusOutlined,
@@ -27,6 +28,8 @@ import { SecurityGuard } from "@/types/scurityGuard";
 import { useLocationShiftMutation } from "@/app/api/endpoints/location_shifts";
 import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 import { handleServerErrors } from "@/utils/handleForm";
+import { Project } from "@/types/project";
+import Loading from "../Loading";
 
 const SecurityGuardShifts = ({ guard }: { guard: SecurityGuard }) => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -36,13 +39,20 @@ const SecurityGuardShifts = ({ guard }: { guard: SecurityGuard }) => {
   const [projectId, setProjectId] = useState<number | null>(null);
   const notification = useNotification();
 
-  const { data: projects, isFetching: fetchingProjects } =
+  const { data: projectsRow, isFetching: fetchingProjects } =
     useGetProjectsQuery();
+  const projects = projectsRow as Project[];
+
   const [getLocations, { data: locations, isFetching: fetchingLocations }] =
     useLazyGetLocationsQuery();
 
-  const { data: assignments, isFetching: fetchingAssignments } =
-    useGetSecurityGuardShiftsQuery(guard.id);
+  const {
+    data: assignments,
+    isFetching: fetchingAssignments,
+    isLoading: loadingAssignments,
+    isError,
+    refetch,
+  } = useGetSecurityGuardShiftsQuery(guard.id);
 
   const [
     handleAssignment,
@@ -145,6 +155,21 @@ const SecurityGuardShifts = ({ guard }: { guard: SecurityGuard }) => {
       notification.error({ message: "خطأ في إضافة رجل الأمن!" });
     }
   }, [handlingIsError]);
+
+  if (loadingAssignments) return <Loading />;
+  if (isError)
+    return (
+      <Result
+        status="error"
+        title="فشل تحميل البيانات"
+        subTitle="حدث خطأ أثناء جلب البيانات. برجاء المحاولة مرة أخرى."
+        extra={[
+          <Button type="primary" key="reload" onClick={refetch}>
+            إعادة المحاولة
+          </Button>,
+        ]}
+      />
+    );
 
   return (
     <Card

@@ -88,7 +88,8 @@ def get_project_guards(request):
         paginator = CustomPageNumberPagination()
         page = paginator.paginate_queryset(location_shifts, request)
 
-        data = [{"id": ls.id, "name": ls.guard.name, "location": ls.location.name, "shift": ls.shift.name} for ls in
+        data = [{"id": ls.id, "name": ls.guard.name, "location": {"name": ls.location.name, "id": ls.location.id},
+                 "shift": ls.shift.name} for ls in
                 page]
         return paginator.get_paginated_response(data)
     except Project.DoesNotExist:
