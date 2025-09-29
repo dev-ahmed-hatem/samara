@@ -11,6 +11,7 @@ import {
   CalendarOutlined,
   IdcardOutlined,
   ProjectOutlined,
+  SettingOutlined,
   WarningOutlined,
 } from "@ant-design/icons";
 import { BsFillPersonCheckFill } from "react-icons/bs";
@@ -19,6 +20,7 @@ import VisitsController from "@/pages/visits/moderators/VisitsController";
 import AttendanceReports from "@/pages/attendance/moderators/AttendanceReports";
 import SecurityGuardsList from "@/pages/security-guards/SecurityGuardsList";
 import ProjectsList from "@/pages/projects/ProjectsList";
+import SettingsPage from "@/pages/Settings";
 
 export type AppRoute = RouteObject & {
   key?: string;
@@ -81,6 +83,12 @@ export const routesMap = {
         icon: <BsFillPersonCheckFill />,
         element: <AttendanceReports />,
       },
+      {
+        path: "settings",
+        element: <SettingsPage />,
+        icon: <SettingOutlined />,
+        label: "الإعدادات",
+      },
     ],
   },
   supervisor: {
@@ -114,6 +122,12 @@ export const routesMap = {
         path: "attendance",
         icon: <BsFillPersonCheckFill />,
         element: <AttendancePage />,
+      },
+      {
+        path: "settings",
+        element: <SettingsPage />,
+        icon: <SettingOutlined />,
+        label: "الإعدادات",
       },
     ],
   },

@@ -1,16 +1,11 @@
 from rest_framework import status
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.viewsets import ModelViewSet
 from django.db.models import Q
 from .serializers import UserSerializer
 from .models import User
-
-# for getting models permissions
-from django.apps import apps
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.auth.models import Permission
 
 
 class UserViewSet(ModelViewSet):
@@ -38,55 +33,51 @@ class UserViewSet(ModelViewSet):
         return queryset
 
 
-@api_view(['GET'])
+@api_view(["PATCH"])
 @permission_classes([IsAuthenticated])
-def get_user_permissions(request):
-    user_permissions = {}
-    username = request.GET.get('username', None)
-    if username is not None:
-        try:
-            user = User.objects.get(username=username)
-        except:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-    else:
-        user = request.user
-    permissions = user.get_user_permissions()
-    return Response(data=permissions, status=status.HTTP_200_OK)
-
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def get_models_permissions(request):
-    user_permissions = {}
+def change_password(request):
+    """
+    Change password for the currently authenticated user.
+    Expected payload:
+    {
+        "current_password": "old123",
+        "new_password": "new123",
+        "confirm_password": "new123"
+    }
+    """
     user = request.user
     data = request.data
-    models = [apps.get_model(app_label, model_name) for app_label, model_name in
-              (model.split(".") for model in data["models"])]
-    for model in models:
-        content_type = ContentType.objects.get_for_model(model)
-        model_permissions = Permission.objects.filter(content_type=content_type)
-        permissions = user.user_permissions.filter(id__in=model_permissions)
-        user_permissions[f"{model._meta.app_label}.{model._meta.model_name}"] = [permission.codename for permission in
-                                                                                 permissions]
 
-    # model = apps.get_model('users', user.username)
-    return Response(data=user_permissions, status=status.HTTP_200_OK)
+    current_password = data.get("current_password")
+    new_password = data.get("new_password")
+    confirm_password = data.get("confirm_password")
 
+    # Validate current password
+    if not user.check_password(current_password):
+        return Response(
+            {"current_password": ["كلمة المرور الحالية غير صحيحة"]},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
-@api_view(["POST"])
-@permission_classes([IsAuthenticated])
-def set_user_permissions(request):
-    try:
-        permission_list = request.data.get("permissions", [])
-        username = request.data.get("username", None)
-        user = User.objects.get(username=username)
-        user.user_permissions.clear()
-        for permission in permission_list:
-            permission = permission.split(".")[-1]
-            perm = Permission.objects.filter(codename=permission).first()
-            if perm:
-                user.user_permissions.add(perm)
-        user.save()
-        return Response(status=status.HTTP_200_OK)
-    except:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+    # Validate new password match
+    if new_password != confirm_password:
+        return Response(
+            {"confirm_password": ["كلمتا المرور غير متطابقتان"]},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # Optional: add validation rules (min length, complexity, etc.)
+    if len(new_password) < 8:
+        return Response(
+            {"new_password": ["كلمة المرور يجب أن تكون 8 أحرف على الأقل"]},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # Save new password
+    user.set_password(new_password)
+    user.save()
+
+    return Response(
+        {"detail": "تم تغيير كلمة المرور بنجاح"},
+        status=status.HTTP_200_OK,
+    )

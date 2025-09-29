@@ -1,7 +1,7 @@
 import { Drawer, Menu as AntdMenu } from "antd";
-import Logo from "./Logo";
+import { SettingOutlined } from "@ant-design/icons";
 import "../styles/menu.css";
-import { NavLink, useLocation } from "react-router";
+import { Link, NavLink, useLocation } from "react-router";
 import { useEffect, useMemo, useState } from "react";
 import { routesMap, type AppRoute } from "../app/appRoutes";
 import { ItemType } from "antd/es/menu/interface";
@@ -72,7 +72,24 @@ const Menu = ({
 
   return (
     <>
-      <Drawer title="القائمة" onClose={onClose} open={menuOpen}>
+      <Drawer
+        title={
+          <div className="flex justify-between items-center">
+            {" "}
+            <span>القائمة</span>
+            <Link
+              to={`/${user?.role}/settings`}
+              title="الإعدادات"
+              onClick={() => onClose()}
+              className="rounded-lg p-1 hover:bg-slate-300 flex items-center justify-center"
+            >
+              <SettingOutlined className="text-2xl text-gray-600 hover:text-minsk hover:bg-shark-100 rounded" />
+            </Link>
+          </div>
+        }
+        onClose={onClose}
+        open={menuOpen}
+      >
         <NavLink
           to={"/"}
           className="logo h-36 flex items-center justify-center rounded-lg mb-10"

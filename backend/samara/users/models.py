@@ -32,6 +32,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=20, unique=True)
     role = models.CharField(max_length=10, choices=RoleChoices.choices, default=RoleChoices.SYS_USER)
 
+    email = models.EmailField(_("البريد الإلكتروني"), unique=True, blank=True, null=True)
+    phone = models.CharField(_("رقم الهاتف"), max_length=20, blank=True, null=True)
+    photo = models.ImageField(_("الصورة"), upload_to="users/photos/", blank=True, null=True)
+
     is_active = models.BooleanField(default=True)
 
     # for django admin site

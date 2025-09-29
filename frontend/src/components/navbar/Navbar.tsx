@@ -44,7 +44,9 @@ const Navbar = ({
       {/* Right: User Avatar */}
       <div className="user">
         <Popover
-          content={<UserMenu role={user?.role_arabic!} />}
+          content={
+            <UserMenu role={user?.role!} close={() => setOpen(false)} />
+          }
           title={
             user?.employee_profile.name || (
               <span className="text-red-500">بلا اسم</span>

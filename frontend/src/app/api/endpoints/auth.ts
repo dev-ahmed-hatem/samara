@@ -1,5 +1,6 @@
 import { User } from "@/types/user";
 import api from "../apiSlice";
+import { ChangePasswordFields } from "@/components/settings/account/ChangePassword";
 
 const auth = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -35,6 +36,13 @@ const auth = api.injectEndpoints({
     getAuthUser: builder.query<User, void>({
       query: () => ({ url: "/auth/authenticated-user/", method: "GET" }),
     }),
+    changePassword: builder.mutation<void, ChangePasswordFields>({
+      query: (data) => ({
+        url: "/users/change-password/",
+        method: "PATCH",
+        data,
+      }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -45,4 +53,5 @@ export const {
   useVerifyMutation,
   useLogoutMutation,
   useGetAuthUserQuery,
+  useChangePasswordMutation,
 } = auth;

@@ -120,7 +120,7 @@ const VisitForm = () => {
       longitude: coords?.longitude,
       location_accuracy: coords?.accuracy,
     };
-    
+
     submitForm(data);
   };
 
@@ -350,7 +350,7 @@ const VisitForm = () => {
                     size="large"
                     loading={isLoading}
                   >
-                    إرسال النموذج
+                    حفظ بيانات الزيارة
                   </Button>
                 </Form.Item>
               </Col>
