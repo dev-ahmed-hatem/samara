@@ -63,7 +63,7 @@ export const employeesEndpoints = api.injectEndpoints({
         url: `/employees/supervisor-monthly-records/?${qs.stringify(params)}`,
         method: "GET",
       }),
-      providesTags: [{ type: "MonthlyRecord", id: "LIST" }]
+      providesTags: [{ type: "MonthlyRecord", id: "LIST" }],
     }),
     getSupervisorDailyRecord: builder.query<
       { visits: Visit[]; violations: Violation[] },
@@ -75,40 +75,33 @@ export const employeesEndpoints = api.injectEndpoints({
       }),
       providesTags: [{ type: "DailyRecord", id: "LIST" }],
     }),
-    // switchEmployeeActive: builder.mutation<{ is_active: boolean }, string>({
-    //   query: (id) => ({
-    //     url: `/employees/employees/${id}/switch_active/`,
-    //     method: "GET",
-    //   }),
-    //   invalidatesTags: [{ type: "Employee", id: "LIST" }],
-    // }),
-    // employee: builder.mutation<
-    //   Employee,
-    //   { data: Partial<Employee>; method?: string; url?: string }
-    // >({
-    //   query: ({ data, method, url }) => ({
-    //     url: url || `employees/employees/`,
-    //     method: method || "POST",
-    //     headers: {
-    //       "Content-Type": "multipart/form-data",
-    //     },
-    //     data,
-    //   }),
-    //   async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-    //     try {
-    //       await queryFulfilled;
-    //       // Invalidate the Employee LIST tag on successful POST
-    //       dispatch(
-    //         api.util.invalidateTags([
-    //           { type: "Employee", id: "LIST" },
-    //           { type: "Employee", id: arg.data.id },
-    //         ])
-    //       );
-    //     } catch {
-    //       // Do nothing if the request fails
-    //     }
-    //   },
-    // }),
+    employee: builder.mutation<
+      Employee,
+      { data?: Partial<Employee> & {file: File | string | null}; method?: string; url?: string }
+    >({
+      query: ({ data, method, url }) => ({
+        url: url || `employees/employees/`,
+        method: method || "POST",
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        data,
+      }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          // Invalidate the Employee LIST tag on successful POST
+          dispatch(
+            api.util.invalidateTags([
+              { type: "Employee", id: "LIST" },
+              { type: "Employee", id: arg.data?.id },
+            ])
+          );
+        } catch {
+          // Do nothing if the request fails
+        }
+      },
+    }),
     // deleteEmployee: builder.mutation<void, string>({
     //   query: (id) => ({
     //     url: `/employees/employees/${id}/`,
@@ -147,6 +140,7 @@ export const {
   useGetHomeStatsQuery,
   useGetModeratorHomeStatsQuery,
   useGetEmployeesQuery,
+  useEmployeeMutation,
   useLazyGetSupervisorMonthlyRecordQuery,
   useLazyGetSupervisorDailyRecordQuery,
 } = employeesEndpoints;

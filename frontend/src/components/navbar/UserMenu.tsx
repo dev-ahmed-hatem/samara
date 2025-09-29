@@ -58,7 +58,7 @@ const UserMenu = ({
       {/* User Avatar */}
       <div className="flex flex-col items-center mb-3">
         <Avatar
-          size={64}
+          size={80}
           src={photo || undefined}
           icon={!photo && <UserOutlined />}
           className="bg-gray-200 text-gray-600"

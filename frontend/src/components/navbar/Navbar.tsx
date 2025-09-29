@@ -45,7 +45,11 @@ const Navbar = ({
       <div className="user">
         <Popover
           content={
-            <UserMenu role={user?.role!} close={() => setOpen(false)} />
+            <UserMenu
+              role={user?.role!}
+              photo={user?.employee_profile.image}
+              close={() => setOpen(false)}
+            />
           }
           title={
             user?.employee_profile.name || (

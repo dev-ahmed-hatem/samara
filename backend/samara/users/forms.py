@@ -5,14 +5,14 @@ from .models import User
 class UserAdminForm(UserAdmin):
     model = User
 
-    list_display = ('username', 'name', 'is_superuser')
-    list_filter = ('username', 'name')
+    list_display = ('username', 'is_superuser')
+    list_filter = ('username',)
     fieldsets = [
-        ("Personal Information", {'fields': ['name', 'role']}),
+        ("Personal Information", {'fields': ['role']}),
         ("Authentication", {'fields': ['username', 'password']}),
         ("Permissions", {'fields': ['is_active', 'is_moderator', 'is_superuser', 'is_root', 'user_permissions']}),
     ]
     add_fieldsets = [
-        (None, {'fields': ['username', 'password1', 'password2', 'name', 'is_active',
+        (None, {'fields': ['username', 'password1', 'password2', 'is_active',
                            'is_moderator', 'is_superuser']}),
     ]

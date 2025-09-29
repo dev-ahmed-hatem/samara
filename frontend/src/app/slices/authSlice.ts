@@ -19,8 +19,13 @@ const authSlice = createSlice({
     clearUser(state, action) {
       state.user = null;
     },
+    setEmployeeProfile(state, action) {
+      if (state.user && state.user.employee_profile) {
+        state.user.employee_profile = action.payload;
+      }
+    },
   },
 });
 
-export const { setUser, clearUser } = authSlice.actions;
+export const { setUser, setEmployeeProfile, clearUser } = authSlice.actions;
 export default authSlice.reducer;

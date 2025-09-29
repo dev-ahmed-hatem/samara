@@ -10,6 +10,7 @@ export type Employee = {
   employee_id: string;
   birthdate: string;
   position: string;
+  image?: string;
   created_by: User;
 };
 

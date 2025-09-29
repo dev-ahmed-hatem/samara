@@ -6,6 +6,7 @@ from .models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
+    name = serializers.StringRelatedField(read_only=True, source="employee_profile.name")
     password = serializers.CharField(write_only=True)
     password2 = serializers.CharField(write_only=True)
     role_arabic = serializers.CharField(source='get_role_display', read_only=True)
@@ -15,7 +16,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'name', 'is_superuser', 'is_moderator', 'password',
-                  'password2', 'url', 'is_root', 'role', 'role_arabic', 'employee_profile']
+                  'password2', 'url', 'is_root', 'role', 'role_arabic', "employee_profile"]
 
     def validate(self, data):
         if 'password' in data and 'password2' in data:

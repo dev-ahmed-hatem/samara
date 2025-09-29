@@ -28,13 +28,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         SUPERVISOR = 'supervisor', _("مشرف")
         SYS_USER = "moderator", _("مستخدم نظام")
 
-    name = models.CharField(max_length=100, default="")
     username = models.CharField(max_length=20, unique=True)
     role = models.CharField(max_length=10, choices=RoleChoices.choices, default=RoleChoices.SYS_USER)
-
-    email = models.EmailField(_("البريد الإلكتروني"), unique=True, blank=True, null=True)
-    phone = models.CharField(_("رقم الهاتف"), max_length=20, blank=True, null=True)
-    photo = models.ImageField(_("الصورة"), upload_to="users/photos/", blank=True, null=True)
 
     is_active = models.BooleanField(default=True)
 
@@ -50,6 +45,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     # groups and permissions
     groups = models.ManyToManyField(Group, blank=True, related_name='custom_users')
     user_permissions = models.ManyToManyField(Permission, blank=True, related_name='custom_user_permissions')
+
+    @property
+    def name(self):
+        return self.employee_profile.name
 
     def has_perm(self, perm, obj=None):
         if self.is_superuser:

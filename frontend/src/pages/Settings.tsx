@@ -23,16 +23,6 @@ const SettingsPage = () => {
             label: "الحساب",
             children: <AccountSettingsTab />,
           },
-          {
-            key: "clients",
-            label: "الأعضاء",
-            // children: <ClientSettingsTab />,
-          },
-          {
-            key: "financials",
-            label: "الماليات",
-            // children: <FinancialsSettingsTab />,
-          },
           // ...(user?.role === "مدير"
           //   ? [
           //       {

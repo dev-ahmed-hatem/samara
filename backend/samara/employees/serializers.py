@@ -3,6 +3,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueTogetherValidator
 
+from users.models import User
 from .models import Employee, SecurityGuard, SecurityGuardLocationShift, Shift
 
 
@@ -28,13 +29,40 @@ class EmployeeListSerializer(serializers.ModelSerializer):
 
 
 class EmployeeWriteSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(write_only=True, required=False)
+
     class Meta:
         model = Employee
         exclude = ['created_by']
 
+    def validate_username(self, value):
+        if not value:
+            return value
+        user = self.context["request"].user
+        if User.objects.exclude(pk=user.pk).filter(username=value).exists():
+            raise serializers.ValidationError("اسم المستخدم موجود")
+        return value
+
     def create(self, validated_data):
         auth_user = self.context['request'].user
         return Employee.objects.create(**validated_data, created_by=auth_user)
+
+    def update(self, instance, validated_data):
+        image = validated_data.pop('image', None)
+        username = validated_data.pop("username")
+
+        super().update(instance, validated_data)
+
+        if image:
+            if instance.image:
+                instance.image.delete()
+            instance.image = image
+            instance.save()
+
+        if username and instance.user.username != username:
+            instance.user.username = username
+            instance.user.save(update_fields=['username'])
+        return instance
 
 
 class SecurityGuardSerializer(serializers.ModelSerializer):

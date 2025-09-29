@@ -66,6 +66,8 @@ class Employee(models.Model):
         verbose_name=_("تاريخ الانضمام"),
     )
 
+    image = models.ImageField(_("الصورة"), upload_to="employees/photos/", blank=True, null=True)
+
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("أُضيف بواسطة"))
 
     user = models.OneToOneField(
@@ -81,6 +83,11 @@ class Employee(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.employee_id})"
+
+    def delete(self, using=None, keep_parents=False):
+        if self.image:
+            self.image.delete()
+        return super().delete(using, keep_parents)
 
 
 class Shift(models.Model):
