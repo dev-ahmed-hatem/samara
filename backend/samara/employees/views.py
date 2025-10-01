@@ -1,3 +1,4 @@
+from dateutil.relativedelta import relativedelta
 from rest_framework.response import Response
 from rest_framework import viewsets, status
 from rest_framework.views import APIView
@@ -276,33 +277,52 @@ def get_moderator_home_stats(request):
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
-def get_home_stats(request):
+def get_supervisor_home_stats(request):
     user: User = request.user
     today = datetime.today().astimezone(settings.SAUDI_TZ).date()
+    yesterday = today - relativedelta(days=1)
 
     visits = Visit.objects.filter()
-    violations = Violation.objects.filter(date=today)
-    attendance_records = ShiftAttendance.objects.filter(date=today)
+    violations = Violation.objects.all()
+    attendance_records = ShiftAttendance.objects.all()
     if user.role == User.RoleChoices.SUPERVISOR:
         employee = user.employee_profile
-        visits.filter(employee=employee)
-        violations.filter(created_by=employee)
-        attendance_records.filter(created_by=employee)
-
-    locations_ids = visits.values_list('location_id', flat=True).distinct()
-    project_ids = Location.objects.filter(id__in=locations_ids).values_list('project_id', flat=True).distinct()
-
-    locations_count = locations_ids.count()
-    project_ids_count = project_ids.count()
+        visits = visits.filter(employee=employee)
+        violations = Violation.objects.filter(created_by=employee)
+        attendance_records = ShiftAttendance.objects.filter(created_by=employee)
 
     data = {
-        "project_count": project_ids_count,
-        "location_count": locations_count,
-        "scheduled_visits": visits.filter(status=Visit.VisitStatus.SCHEDULED, date=today).count(),
-        "completed_visits": visits.filter(status=Visit.VisitStatus.COMPLETED, date=today).count(),
-        "violations": violations.count(),
-        "attendance_records": attendance_records.count(),
-        "guards_count": SecurityGuard.objects.count()
+        "general": {"projects_count": Project.objects.count(),
+                    "locations_count": Location.objects.count(),
+                    "guards_count": SecurityGuard.objects.count()},
+        "today": {
+            "scheduled": {
+                "morning": filter_visits_by_period(visits.filter(status=Visit.VisitStatus.SCHEDULED), today,
+                                                   "morning").count(),
+                "evening": filter_visits_by_period(visits.filter(status=Visit.VisitStatus.SCHEDULED), today,
+                                                   "evening").count()},
+            "completed": {
+                "morning": filter_visits_by_period(visits.filter(status=Visit.VisitStatus.COMPLETED), today,
+                                                   "morning").count(),
+                "evening": filter_visits_by_period(visits.filter(status=Visit.VisitStatus.COMPLETED), today,
+                                                   "evening").count()},
+            "violations": violations.filter(date=today).count(),
+            "attendance_records": attendance_records.filter(date=today).count(),
+        },
+        "yesterday": {
+            "scheduled": {
+                "morning": filter_visits_by_period(visits.filter(status=Visit.VisitStatus.SCHEDULED), yesterday,
+                                                   "morning").count(),
+                "evening": filter_visits_by_period(visits.filter(status=Visit.VisitStatus.SCHEDULED), yesterday,
+                                                   "evening").count()},
+            "completed": {
+                "morning": filter_visits_by_period(visits.filter(status=Visit.VisitStatus.COMPLETED), yesterday,
+                                                   "morning").count(),
+                "evening": filter_visits_by_period(visits.filter(status=Visit.VisitStatus.COMPLETED), yesterday,
+                                                   "evening").count()},
+            "violations": violations.filter(date=yesterday).count(),
+            "attendance_records": attendance_records.filter(date=yesterday).count(),
+        },
     }
 
     return Response(data, status=status.HTTP_200_OK)

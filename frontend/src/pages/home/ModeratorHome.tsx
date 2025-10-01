@@ -9,7 +9,6 @@ import {
   IdcardOutlined,
   ScheduleOutlined,
   SmileOutlined,
-  SettingOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router";

@@ -9,8 +9,8 @@ import { HomeStats, ModeratorHomeStats } from "@/types/homeStat";
 
 export const employeesEndpoints = api.injectEndpoints({
   endpoints: (builder) => ({
-    getHomeStats: builder.query<HomeStats, void>({
-      query: () => ({ url: "/employees/get-home-stats/", method: "GET" }),
+    getSupervisorHomeStats: builder.query<HomeStats, void>({
+      query: () => ({ url: "/employees/get-supervisor-home-stats/", method: "GET" }),
     }),
     getModeratorHomeStats: builder.query<ModeratorHomeStats, void>({
       query: () => ({
@@ -137,7 +137,7 @@ export const employeesEndpoints = api.injectEndpoints({
 });
 
 export const {
-  useGetHomeStatsQuery,
+  useGetSupervisorHomeStatsQuery,
   useGetModeratorHomeStatsQuery,
   useGetEmployeesQuery,
   useEmployeeMutation,

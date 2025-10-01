@@ -7,26 +7,27 @@ import {
   WarningOutlined,
   ClockCircleOutlined,
   SmileOutlined,
+  IdcardOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router";
 import Loading from "@/components/Loading";
 import ErrorPage from "../ErrorPage";
-import { useGetHomeStatsQuery } from "@/app/api/endpoints/employees";
+import { useGetSupervisorHomeStatsQuery } from "@/app/api/endpoints/employees";
 import { useAppSelector } from "@/app/redux/hooks";
 
 const SupervisorHome: React.FC = () => {
   const navigate = useNavigate();
-  const today = dayjs().format("DD-MM-YYYY");
+  const today = dayjs();
   const user = useAppSelector((state) => state.auth.user);
 
-  const { data: stats, isFetching, isError } = useGetHomeStatsQuery();
+  const { data: stats, isFetching, isError } = useGetSupervisorHomeStatsQuery();
 
   if (isFetching || !user) return <Loading />;
   if (isError) return <ErrorPage />;
 
   return (
-    <div className="p-4 space-y-8">
+    <div className="p-4 space-y-12">
       {/* Welcome Message */}
       <div className="flex flex-col items-center justify-center px-6 py-6 bg-gradient-to-r from-[#b79237] via-yellow-600 to-[#b79237] rounded-2xl shadow-xl text-white text-center">
         {/* Logo */}
@@ -44,101 +45,261 @@ const SupervisorHome: React.FC = () => {
         </h1>
       </div>
 
-      {/* Today's Overview Header */}
+      {/* === General Overview Section === */}
       <Typography.Title
         level={5}
-        className="text-right text-gray-700 border-r-4 border-[#b79237] pr-3"
+        className="text-right text-gray-700 border-r-4 border-[#b79237] pr-3 mt-6"
       >
-        إحصائيات اليوم ( {today} )
+        نظرة عامة
+      </Typography.Title>
+      <Row gutter={[16, 16]}>
+        {/* Projects */}
+        <Col xs={24} sm={12} md={8}>
+          <Card
+            className="h-full flex rounded-2xl border-0 shadow-xl hover:shadow-2xl transition-shadow duration-300 
+                 bg-gradient-to-br from-cyan-500 to-blue-700 text-white"
+          >
+            <Statistic
+              title={
+                <span className="text-white font-medium">عدد المشاريع</span>
+              }
+              value={stats!.general.projects_count}
+              prefix={<ProjectOutlined className="text-white text-2xl" />}
+              valueStyle={{
+                fontSize: "1.5rem",
+                fontWeight: "bold",
+                color: "white",
+              }}
+            />
+          </Card>
+        </Col>
+
+        {/* Locations */}
+        <Col xs={24} sm={12} md={8}>
+          <Card
+            className="h-full flex rounded-2xl border-0 shadow-xl hover:shadow-2xl transition-shadow duration-300 
+                 bg-gradient-to-br from-emerald-500 to-green-700 text-white"
+          >
+            <Statistic
+              title={
+                <span className="text-white font-medium">عدد المواقع</span>
+              }
+              value={stats!.general.locations_count}
+              prefix={<EnvironmentOutlined className="text-white text-2xl" />}
+              valueStyle={{
+                fontSize: "1.5rem",
+                fontWeight: "bold",
+                color: "white",
+              }}
+            />
+          </Card>
+        </Col>
+
+        {/* Guards */}
+        <Col xs={24} sm={12} md={8}>
+          <Card
+            className="h-full flex rounded-2xl border-0 shadow-xl hover:shadow-2xl transition-shadow duration-300 
+                 bg-gradient-to-br from-pink-500 to-rose-700 text-white"
+          >
+            <Statistic
+              title={
+                <span className="text-white font-medium">عدد رجال الأمن</span>
+              }
+              value={stats!.general.guards_count}
+              prefix={<IdcardOutlined className="text-white text-2xl" />}
+              valueStyle={{
+                fontSize: "1.5rem",
+                fontWeight: "bold",
+                color: "white",
+              }}
+            />
+          </Card>
+        </Col>
+      </Row>
+
+      {/* === Today's Overview Section === */}
+      <Typography.Title
+        level={5}
+        className="text-right text-gray-700 border-r-4 border-[#b79237] pr-3 mt-8"
+      >
+        إحصائيات اليوم ( {today.format("DD-MM-YYYY")} )
       </Typography.Title>
 
-      {/* Overview Cards */}
-      <Row gutter={[16, 16]}>
+      <Row gutter={[16, 16]} className="mb-4">
         <Col xs={24} sm={12} md={6}>
-          <Card className="rounded-2xl border border-blue-300 shadow-md hover:shadow-lg transition-shadow duration-300">
-            <Statistic
-              title={
-                <span className="text-gray-600 font-medium">عدد المشاريع</span>
-              }
-              value={stats!.project_count}
-              prefix={<ProjectOutlined className="text-blue-500 text-2xl" />}
-              valueStyle={{ fontSize: "1.5rem", fontWeight: "bold" }}
-            />
+          <Card
+            className="h-full flex flex-col rounded-2xl border-0 shadow-xl hover:shadow-2xl transition-shadow duration-300 
+               bg-gradient-to-br from-yellow-400 to-orange-600 text-white"
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <CalendarOutlined className="text-white text-2xl" />
+              <span className="text-lg font-semibold">الزيارات المجدولة</span>
+            </div>
+
+            <div className="flex justify-between mt-2">
+              <div className="text-center flex-1">
+                <div className="text-sm text-white/90">صباحية</div>
+                <div className="text-xl font-bold">
+                  {stats!.today.scheduled.morning}
+                </div>
+              </div>
+              <div className="w-px bg-white/30 mx-2"></div>
+              <div className="text-center flex-1">
+                <div className="text-sm text-white/90">مسائية</div>
+                <div className="text-xl font-bold">
+                  {stats!.today.scheduled.evening}
+                </div>
+              </div>
+            </div>
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} md={6}>
+          <Card
+            className="h-full flex flex-col rounded-2xl border-0 shadow-xl hover:shadow-2xl transition-shadow duration-300 
+               bg-gradient-to-br from-green-400 to-emerald-600 text-white"
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <CheckCircleOutlined className="text-white text-2xl" />
+              <span className="text-lg font-semibold">الزيارات المكتملة</span>
+            </div>
+
+            <div className="flex justify-between mt-2">
+              <div className="text-center flex-1">
+                <div className="text-sm text-white/90">صباحية</div>
+                <div className="text-xl font-bold">
+                  {stats!.today.completed.morning}
+                </div>
+              </div>
+              <div className="w-px bg-white/30 mx-2"></div>
+              <div className="text-center flex-1">
+                <div className="text-sm text-white/90">مسائية</div>
+                <div className="text-xl font-bold">
+                  {stats!.today.completed.evening}
+                </div>
+              </div>
+            </div>
           </Card>
         </Col>
 
         <Col xs={24} sm={12} md={6}>
-          <Card className="rounded-2xl border border-green-300 shadow-md hover:shadow-lg transition-shadow duration-300">
-            <Statistic
-              title={
-                <span className="text-gray-600 font-medium">عدد المواقع</span>
-              }
-              value={stats!.location_count}
-              prefix={
-                <EnvironmentOutlined className="text-green-500 text-2xl" />
-              }
-              valueStyle={{ fontSize: "1.5rem", fontWeight: "bold" }}
-            />
-          </Card>
-        </Col>
-
-        <Col xs={24} sm={12} md={6}>
-          <Card className="rounded-2xl border border-yellow-300 shadow-md hover:shadow-lg transition-shadow duration-300">
-            <Statistic
-              title={
-                <span className="text-gray-600 font-medium">
-                  الزيارات المجدولة اليوم
-                </span>
-              }
-              value={stats!.scheduled_visits}
-              prefix={<CalendarOutlined className="text-yellow-500 text-2xl" />}
-              valueStyle={{ fontSize: "1.5rem", fontWeight: "bold" }}
-            />
-          </Card>
-        </Col>
-
-        <Col xs={24} sm={12} md={6}>
-          <Card className="rounded-2xl border border-green-400 shadow-md hover:shadow-lg transition-shadow duration-300">
-            <Statistic
-              title={
-                <span className="text-gray-600 font-medium">
-                  الزيارات المكتملة
-                </span>
-              }
-              value={stats!.completed_visits}
-              prefix={
-                <CheckCircleOutlined className="text-green-500 text-2xl" />
-              }
-              valueStyle={{ fontSize: "1.5rem", fontWeight: "bold" }}
-            />
-          </Card>
-        </Col>
-
-        <Col xs={24} sm={12} md={6}>
-          <Card className="rounded-2xl border border-red-300 shadow-md hover:shadow-lg transition-shadow duration-300">
-            <Statistic
-              title={
-                <span className="text-gray-600 font-medium">عدد المخالفات</span>
-              }
-              value={stats!.violations}
-              prefix={<WarningOutlined className="text-red-500 text-2xl" />}
-              valueStyle={{ fontSize: "1.5rem", fontWeight: "bold" }}
-            />
-          </Card>
-        </Col>
-
-        <Col xs={24} sm={12} md={6}>
-          <Card className="rounded-2xl border border-indigo-300 shadow-md hover:shadow-lg transition-shadow duration-300">
+          <Card className="h-full flex rounded-2xl border border-indigo-300 shadow-md hover:shadow-lg transition-shadow duration-300">
             <Statistic
               title={
                 <span className="text-gray-600 font-medium">
                   تسجيلات الحضور
                 </span>
               }
-              value={stats!.attendance_records}
+              value={stats!.today.attendance_records}
               prefix={
                 <ClockCircleOutlined className="text-indigo-500 text-2xl" />
               }
+              valueStyle={{ fontSize: "1.5rem", fontWeight: "bold" }}
+            />
+          </Card>
+        </Col>
+
+        <Col xs={24} sm={12} md={6}>
+          <Card className="h-full flex rounded-2xl border border-red-300 shadow-md hover:shadow-lg transition-shadow duration-300">
+            <Statistic
+              title={
+                <span className="text-gray-600 font-medium">عدد المخالفات</span>
+              }
+              value={stats!.today.violations}
+              prefix={<WarningOutlined className="text-red-500 text-2xl" />}
+              valueStyle={{ fontSize: "1.5rem", fontWeight: "bold" }}
+            />
+          </Card>
+        </Col>
+      </Row>
+
+      {/* === Yesterday's Overview Section === */}
+      <Typography.Title
+        level={5}
+        className="text-right text-gray-700 border-r-4 border-[#b79237] pr-3 mt-8"
+      >
+        إحصائيات الأمس ( {today.subtract(1, "day").format("DD-MM-YYYY")} )
+      </Typography.Title>
+      <Row gutter={[16, 16]} className="mb-4">
+        <Col xs={24} sm={12} md={6}>
+          <Card
+            className="h-full flex flex-col rounded-2xl border-0 shadow-xl hover:shadow-2xl transition-shadow duration-300 
+               bg-gradient-to-br from-yellow-400 to-orange-600 text-white"
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <CalendarOutlined className="text-white text-2xl" />
+              <span className="text-lg font-semibold">الزيارات المجدولة</span>
+            </div>
+
+            <div className="flex justify-between mt-2">
+              <div className="text-center flex-1">
+                <div className="text-sm text-white/90">صباحية</div>
+                <div className="text-xl font-bold">
+                  {stats!.yesterday.scheduled.morning}
+                </div>
+              </div>
+              <div className="w-px bg-white/30 mx-2"></div>
+              <div className="text-center flex-1">
+                <div className="text-sm text-white/90">مسائية</div>
+                <div className="text-xl font-bold">
+                  {stats!.yesterday.scheduled.evening}
+                </div>
+              </div>
+            </div>
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} md={6}>
+          <Card
+            className="h-full flex flex-col rounded-2xl border-0 shadow-xl hover:shadow-2xl transition-shadow duration-300 
+               bg-gradient-to-br from-green-400 to-emerald-600 text-white"
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <CheckCircleOutlined className="text-white text-2xl" />
+              <span className="text-lg font-semibold">الزيارات المكتملة</span>
+            </div>
+
+            <div className="flex justify-between mt-2">
+              <div className="text-center flex-1">
+                <div className="text-sm text-white/90">صباحية</div>
+                <div className="text-xl font-bold">
+                  {stats!.yesterday.completed.morning}
+                </div>
+              </div>
+              <div className="w-px bg-white/30 mx-2"></div>
+              <div className="text-center flex-1">
+                <div className="text-sm text-white/90">مسائية</div>
+                <div className="text-xl font-bold">
+                  {stats!.yesterday.completed.evening}
+                </div>
+              </div>
+            </div>
+          </Card>
+        </Col>
+
+        <Col xs={24} sm={12} md={6}>
+          <Card className="h-full flex rounded-2xl border border-indigo-300 shadow-md hover:shadow-lg transition-shadow duration-300">
+            <Statistic
+              title={
+                <span className="text-gray-600 font-medium">
+                  تسجيلات الحضور
+                </span>
+              }
+              value={stats!.yesterday.attendance_records}
+              prefix={
+                <ClockCircleOutlined className="text-indigo-500 text-2xl" />
+              }
+              valueStyle={{ fontSize: "1.5rem", fontWeight: "bold" }}
+            />
+          </Card>
+        </Col>
+
+        <Col xs={24} sm={12} md={6}>
+          <Card className="h-full flex rounded-2xl border border-red-300 shadow-md hover:shadow-lg transition-shadow duration-300">
+            <Statistic
+              title={
+                <span className="text-gray-600 font-medium">عدد المخالفات</span>
+              }
+              value={stats!.yesterday.violations}
+              prefix={<WarningOutlined className="text-red-500 text-2xl" />}
               valueStyle={{ fontSize: "1.5rem", fontWeight: "bold" }}
             />
           </Card>

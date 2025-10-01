@@ -1,11 +1,23 @@
-export type HomeStats = {
-  project_count: number;
-  location_count: number;
-  scheduled_visits: number;
-  completed_visits: number;
+type VisitPeriodStats = {
+  morning: number;
+  evening: number;
+};
+
+type DayStats = {
+  scheduled: VisitPeriodStats;
+  completed: VisitPeriodStats;
   violations: number;
   attendance_records: number;
-  guards_count: number;
+};
+
+export type HomeStats = {
+  general: {
+    projects_count: number;
+    locations_count: number;
+    guards_count: number;
+  };
+  today: DayStats;
+  yesterday: DayStats;
 };
 
 type VisitSummary = {

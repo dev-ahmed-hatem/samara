@@ -1,6 +1,6 @@
 from rest_framework.routers import DefaultRouter
 from .views import EmployeeViewSet, SecurityGuardViewSet, LocationShiftViewSet, SupervisorMonthlyRecord, \
-    SupervisorDailyRecord, multiple_delete, get_home_stats, get_moderator_home_stats
+    SupervisorDailyRecord, multiple_delete, get_supervisor_home_stats, get_moderator_home_stats
 from django.urls import path, include
 
 router = DefaultRouter()
@@ -10,7 +10,7 @@ router.register('location-shifts', LocationShiftViewSet, basename='location-shif
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('get-home-stats/', get_home_stats, name="get-home-stats"),
+    path('get-supervisor-home-stats/', get_supervisor_home_stats, name="get-supervisor-home-stats"),
     path('get-moderator-home-stats/', get_moderator_home_stats, name="moderator-home-stats"),
     path('supervisor-monthly-records/', SupervisorMonthlyRecord.as_view(), name="supervisor-monthly-records"),
     path('supervisor-daily-records/', SupervisorDailyRecord.as_view(), name="supervisor-daily-records"),
