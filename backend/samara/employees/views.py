@@ -393,6 +393,9 @@ class SupervisorMonthlyRecord(APIView):
                 d = v.date
                 if v.time < time(9, 0):
                     d = d - timedelta(days=1)
+                    # TOP IMPORTANT: skip if date converted to previous month
+                    if d.month != first_day.month:
+                        continue
 
                 summary.setdefault(d.day, {"completed": 0, "scheduled": 0})
                 if v.status == Visit.VisitStatus.SCHEDULED:
