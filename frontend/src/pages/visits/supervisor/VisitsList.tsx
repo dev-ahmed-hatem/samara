@@ -27,13 +27,12 @@ const VisitsList: React.FC = () => {
 
   const [fromDate, setFromDate] = useState<Dayjs>(dayjs());
   const [toDate, setToDate] = useState<Dayjs | null>(dayjs());
-  const [period, setPeriod] = useState<"morning" | "evening">();
 
   const user = useAppSelector((state) => state.auth.user);
   const [getVisits, { data: visits, isFetching, isError, isSuccess }] =
     useLazyGetVisitsQuery();
 
-  const handleSubmit = () => {
+  const handleSubmit = (values: any) => {
     if (!fromDate || !toDate) {
       notification.warning({ message: "يرجى اختيار تاريخ البداية والنهاية" });
       return;
@@ -50,7 +49,7 @@ const VisitsList: React.FC = () => {
       employee: user?.employee_profile.id,
       from: fromDate?.format("YYYY-MM-DD"),
       to: toDate?.format("YYYY-MM-DD"),
-      period,
+      period: values.period,
     });
   };
 
@@ -78,6 +77,11 @@ const VisitsList: React.FC = () => {
           form={form}
           className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end"
           onFinish={handleSubmit}
+          initialValues={{
+            from: dayjs(),
+            to: dayjs(),
+            period: "morning",
+          }}
         >
           <Form.Item
             label="من"
@@ -122,10 +126,7 @@ const VisitsList: React.FC = () => {
             className="mb-0"
             rules={[{ required: true, message: "يرجى اختيار الفترة" }]}
           >
-            <Radio.Group
-              className="flex"
-              onChange={(event) => setPeriod(event.target.value)}
-            >
+            <Radio.Group className="flex" buttonStyle="solid">
               <Radio.Button value="morning">صباحية</Radio.Button>
               <Radio.Button value="evening">مسائية</Radio.Button>
             </Radio.Group>

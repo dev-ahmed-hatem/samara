@@ -143,7 +143,7 @@ const AttendanceSummary: React.FC = () => {
             className="col-span-1"
             rules={[{ required: true, message: "الرجاء اختيار الوردية" }]}
           >
-            <Radio.Group className="flex">
+            <Radio.Group className="flex" buttonStyle="solid">
               <Radio.Button value="الوردية الأولى">الأولى</Radio.Button>
               <Radio.Button value="الوردية الثانية">الثانية</Radio.Button>
               <Radio.Button value="الوردية الثالثة">الثالثة</Radio.Button>

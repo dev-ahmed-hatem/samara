@@ -271,7 +271,10 @@ const VisitForm = () => {
                         <Form.Item
                           name={`${field}_notes`}
                           label="ملاحظة إضافية"
-                          rules={[{ max: 300, message: "الحد الأقصى 300 حرف" }]}
+                          rules={[
+                            { required: true, message: "إضافة ملاحظة إلزامية" },
+                            { max: 300, message: "الحد الأقصى 300 حرف" },
+                          ]}
                         >
                           <Input.TextArea
                             rows={2}
@@ -282,6 +285,21 @@ const VisitForm = () => {
                         <Form.Item
                           name={`${field}_attachment`}
                           label="إرفاق صورة"
+                          valuePropName="fileList"
+                          getValueFromEvent={(e) =>
+                            Array.isArray(e) ? e : e?.fileList
+                          }
+                          rules={[
+                            {
+                              required: true,
+                              validator: (_, value) =>
+                                value && value.length > 0
+                                  ? Promise.resolve()
+                                  : Promise.reject(
+                                      new Error("إرفاق صورة إلزامي")
+                                    ),
+                            },
+                          ]}
                         >
                           <Upload
                             beforeUpload={() => false}

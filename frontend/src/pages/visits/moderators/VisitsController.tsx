@@ -202,54 +202,57 @@ const VisitsController: React.FC = () => {
       <Title level={3} className="mb-4">
         إدارة الزيارات الميدانية
       </Title>
-      <div className="flex justify-between flex-wrap gap-6 mb-8">
-        <div className="w-full max-w-md space-y-6">
-          <div className="flex flex-col w-full">
-            <label className="mb-2 text-gray-600 font-medium text-lg">
-              المشرف
-            </label>
-            <Select
-              placeholder="اختر المشرف"
-              className="w-full max-w-md"
-              onChange={(value) => setSelectedSupervisor(value)}
-            >
-              {(supervisors as Employee[])?.map((sup) => (
-                <Option key={sup.id} value={sup.id}>
-                  {sup.name}
-                </Option>
-              ))}
-            </Select>
-          </div>
+      <Card className="shadow-lg mb-8">
+        <div className="flex justify-between flex-wrap gap-6">
+          <div className="w-full max-w-md space-y-6">
+            <div className="flex flex-col w-full">
+              <label className="mb-2 text-gray-600 font-medium text-lg">
+                المشرف
+              </label>
+              <Select
+                placeholder="اختر المشرف"
+                className="w-full max-w-md"
+                onChange={(value) => setSelectedSupervisor(value)}
+              >
+                {(supervisors as Employee[])?.map((sup) => (
+                  <Option key={sup.id} value={sup.id}>
+                    {sup.name}
+                  </Option>
+                ))}
+              </Select>
+            </div>
 
-          <div className="flex flex-col w-full">
-            <label className="mb-2 text-gray-600 font-medium text-lg">
-              الفترة
-            </label>
-            <Radio.Group
-              className="flex"
-              onChange={(event) => setPeriod(event.target.value)}
-              defaultValue={period}
-            >
-              <Radio.Button value="morning">صباحية</Radio.Button>
-              <Radio.Button value="evening">مسائية</Radio.Button>
-            </Radio.Group>
+            <div className="flex flex-col w-full">
+              <label className="mb-2 text-gray-600 font-medium text-lg">
+                الفترة
+              </label>
+              <Radio.Group
+                className="flex"
+                onChange={(event) => setPeriod(event.target.value)}
+                defaultValue={period}
+                buttonStyle="solid"
+              >
+                <Radio.Button value="morning">صباحية</Radio.Button>
+                <Radio.Button value="evening">مسائية</Radio.Button>
+              </Radio.Group>
+            </div>
           </div>
+          <Button
+            type="primary"
+            size="middle"
+            icon={<PlusOutlined />}
+            onClick={() => navigate("add-visit")}
+          >
+            إضافة زيارة
+          </Button>
         </div>
-        <Button
-          type="primary"
-          size="large"
-          icon={<PlusOutlined />}
-          onClick={() => navigate("add-visit")}
-        >
-          إضافة زيارة
-        </Button>
-      </div>
+      </Card>
 
       {fetchingRecords ? (
         <Loading />
       ) : (
         records && (
-          <Card className="shadow-sm mb-8">
+          <Card className="shadow-lg mb-8">
             <Title level={4} className="mb-4">
               اختر اليوم:
             </Title>

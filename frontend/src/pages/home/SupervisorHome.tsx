@@ -309,49 +309,52 @@ const SupervisorHome: React.FC = () => {
       <Divider />
 
       {/* Navigation Cards */}
-      <Row gutter={[16, 16]}>
-        <Col xs={24} sm={12}>
-          <Card
-            className="h-full flex items-center justify-between p-4 rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 text-white shadow-md hover:shadow-xl hover:scale-[1.03] transition-all duration-300 cursor-pointer"
-            onClick={() => navigate("visits")}
-          >
-            <div className="flex items-center gap-3">
-              <CalendarOutlined className="text-3xl md:text-4xl" />
-              <div className="text-lg md:text-xl font-bold">
-                جدول الزيارات الميدانية
+      <div className="space-y-4">
+        <Row gutter={[16, 16]}>
+          <Col xs={24} sm={12}>
+            <Card
+              className="h-full flex items-center justify-between p-4 rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 text-white shadow-md hover:shadow-xl hover:scale-[1.03] transition-all duration-300 cursor-pointer"
+              onClick={() => navigate("visits")}
+            >
+              <div className="flex items-center gap-3">
+                <CalendarOutlined className="text-3xl md:text-4xl" />
+                <div className="text-lg md:text-xl font-bold">
+                  جدول الزيارات الميدانية
+                </div>
               </div>
-            </div>
-          </Card>
-        </Col>
+            </Card>
+          </Col>
 
-        <Col xs={24} sm={12}>
-          <Card
-            className="h-full flex items-center justify-between p-4 rounded-2xl bg-gradient-to-br from-yellow-400 to-yellow-600 text-white shadow-md hover:shadow-xl hover:scale-[1.03] transition-all duration-300 cursor-pointer"
-            onClick={() => navigate("attendance")}
-          >
-            <div className="flex items-center gap-3">
-              <ClockCircleOutlined className="text-3xl md:text-4xl" />
-              <div className="text-lg md:text-xl font-bold">
-                التحضير اليومي لرجال الأمن
+          <Col xs={24} sm={12}>
+            <Card
+              className="h-full flex items-center justify-between p-4 rounded-2xl bg-gradient-to-br from-yellow-400 to-yellow-600 text-white shadow-md hover:shadow-xl hover:scale-[1.03] transition-all duration-300 cursor-pointer"
+              onClick={() => navigate("attendance")}
+            >
+              <div className="flex items-center gap-3">
+                <ClockCircleOutlined className="text-3xl md:text-4xl" />
+                <div className="text-lg md:text-xl font-bold">
+                  التحضير اليومي لرجال الأمن
+                </div>
               </div>
-            </div>
-          </Card>
-        </Col>
-      </Row>
-
-      <Row gutter={[16, 16]}>
-        <Col xs={24} sm={12}>
-          <Card
-            className="h-full flex items-center justify-between p-4 rounded-2xl bg-gradient-to-br from-red-400 to-red-600 text-white shadow-md hover:shadow-xl hover:scale-[1.03] transition-all duration-300 cursor-pointer"
-            onClick={() => navigate("violations")}
-          >
-            <div className="flex items-center gap-3">
-              <WarningOutlined className="text-3xl md:text-4xl" />
-              <div className="text-lg md:text-xl font-bold">سجل المخالفات</div>
-            </div>
-          </Card>
-        </Col>
-      </Row>
+            </Card>
+          </Col>
+        </Row>
+        <Row gutter={[16, 16]}>
+          <Col xs={24} sm={12}>
+            <Card
+              className="h-full flex items-center justify-between p-4 rounded-2xl bg-gradient-to-br from-red-400 to-red-600 text-white shadow-md hover:shadow-xl hover:scale-[1.03] transition-all duration-300 cursor-pointer"
+              onClick={() => navigate("violations")}
+            >
+              <div className="flex items-center gap-3">
+                <WarningOutlined className="text-3xl md:text-4xl" />
+                <div className="text-lg md:text-xl font-bold">
+                  سجل المخالفات
+                </div>
+              </div>
+            </Card>
+          </Col>
+        </Row>
+      </div>
     </div>
   );
 };

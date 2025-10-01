@@ -225,6 +225,7 @@ const AttendanceRecords: React.FC = () => {
                 value={currentDate}
                 onChange={(e) => setCurrentDate(e.target.value)}
                 className="font-semibold"
+                buttonStyle="solid"
               >
                 <Radio.Button value={yesterday}>{yesterday}</Radio.Button>
                 <Radio.Button value={today}>{today}</Radio.Button>
@@ -281,6 +282,7 @@ const AttendanceRecords: React.FC = () => {
               <Radio.Group
                 onChange={(event) => setShift(event.target.value)}
                 value={shift}
+                buttonStyle="solid"
               >
                 <Radio.Button value="الوردية الأولى">
                   الوردية الأولى
