@@ -7,6 +7,8 @@ export interface Visit {
     id: number;
     name: string;
     project_name: string;
+    guards_count: number;
+    supervisors_count: number;
   };
   date: string;
   time: string;
@@ -36,15 +38,17 @@ export const visitReportFieldLabels: Record<string, string> = {
   other: "اخرى",
 };
 
+export type VisitReportStatus = "جيد" | "يحتاج إلى معالجة" | "غير متوفر";
+
 export type VisitReportForm = {
-  guard_presence: "جيد" | "يحتاج إلى معالجة";
-  uniform_cleanliness: "جيد" | "يحتاج إلى معالجة";
-  attendance_records: "جيد" | "يحتاج إلى معالجة";
-  shift_handover: "جيد" | "يحتاج إلى معالجة";
-  lighting: "جيد" | "يحتاج إلى معالجة";
-  cameras: "جيد" | "يحتاج إلى معالجة";
-  security_vehicles: "جيد" | "يحتاج إلى معالجة";
-  radio_devices: "جيد" | "يحتاج إلى معالجة";
+  guard_presence: VisitReportStatus;
+  uniform_cleanliness: VisitReportStatus;
+  attendance_records: VisitReportStatus;
+  shift_handover: VisitReportStatus;
+  lighting: VisitReportStatus;
+  cameras: VisitReportStatus;
+  security_vehicles: VisitReportStatus;
+  radio_devices: VisitReportStatus;
   notes?: string;
   attachment?: RcFile;
 };

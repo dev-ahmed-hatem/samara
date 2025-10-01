@@ -190,62 +190,69 @@ const VisitForm = () => {
         تقرير زيارة ميدانية
       </h1>
       {/* Visit Info */}
-      <Card title="معلومات الزيارة" className="bg-orange-50 mb-6 shadow-md">
+
+      {/* Project Info */}
+      <Card
+        title="معلومات المشروع"
+        className="rounded-2xl mb-6 shadow-md bg-gradient-to-r from-calypso-100 via-calypso-50 to-calypso-100"
+      >
+        <Descriptions
+          column={{ xs: 1, sm: 1, md: 2 }}
+          styles={{ label: { fontWeight: 600, fontSize: 14 } }}
+          bordered
+        >
+          <Descriptions.Item label="اسم المشروع" span={2}>
+            {visit?.location.project_name}
+          </Descriptions.Item>
+
+          <Descriptions.Item label="الموقع" span={2}>
+            {visit?.location.name}
+          </Descriptions.Item>
+
+          <Descriptions.Item label="إجمالي رجال الأمن" span={2}>
+            {visit?.location.guards_count ?? 0}
+          </Descriptions.Item>
+
+          <Descriptions.Item label="إجمالي المشرفين" span={2}>
+            {visit?.location.supervisors_count ?? 0}
+          </Descriptions.Item>
+        </Descriptions>
+      </Card>
+
+      <Card
+        title="معلومات الزيارة"
+        className="rounded-2xl mb-6 shadow-md bg-gradient-to-r from-calypso-100 via-calypso-50 to-calypso-100"
+      >
         <Descriptions
           bordered
           column={{ xs: 1, sm: 1, md: 2 }}
           styles={{ label: { fontWeight: 600, fontSize: 14 } }}
           size="default"
         >
-          <Descriptions.Item label="رقم الزيارة">
+          <Descriptions.Item label="رقم الزيارة" span={2}>
             #{visit?.id}
           </Descriptions.Item>
-          <Descriptions.Item label="التاريخ">
+
+          <Descriptions.Item label="التاريخ" span={2}>
             <span dir="rtl">{visit?.date}</span>
           </Descriptions.Item>
-          <Descriptions.Item label="الوقت">{visit?.time}</Descriptions.Item>
-          <Descriptions.Item label="الموقع" span={2}>
-            {visit?.location.name}
+
+          <Descriptions.Item label="الوقت" span={2}>
+            {visit?.time}
           </Descriptions.Item>
-          <Descriptions.Item label="إحداثيات GPS">
-            {/* <div className="flex items-center gap-2">
-              <Button
-                size="small"
-                type="link"
-                href="https://www.google.com/maps?q=24.7136,46.6753"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                24.7136°N, 46.6753°E
-              </Button>
-            </div> */}
+
+          <Descriptions.Item label="إحداثيات GPS" span={2}>
             -
           </Descriptions.Item>
 
-          {/* Purpose on its own full row */}
           <Descriptions.Item label="الهدف من الزيارة" span={2}>
             {visit?.purpose}
           </Descriptions.Item>
         </Descriptions>
       </Card>
 
-      {/* Project Info */}
-      <Card title="معلومات المشروع" className="bg-orange-50 mb-6 shadow-md">
-        <Descriptions
-          column={{ xs: 1, sm: 1, md: 2 }}
-          styles={{ label: { fontWeight: 600, fontSize: 14 } }}
-          bordered
-        >
-          <Descriptions.Item label="اسم المشروع">
-            {visit?.location.project_name}
-          </Descriptions.Item>
-          <Descriptions.Item label="إجمالي رجال الأمن">12</Descriptions.Item>
-          <Descriptions.Item label="إجمالي المشرفين">2</Descriptions.Item>
-        </Descriptions>
-      </Card>
-
       {/* Visit Comments */}
-      <Card title="ملاحظات أثناء الزيارة" className="p-4 mx-auto">
+      <Card title="ملاحظات أثناء الزيارة" className="p-4 mx-auto shadow-md">
         {visit!.status == "مكتملة" ? (
           <Tag className="text-lg" color="green">
             تم تسجيل الملاحظات لهذه الزيارة
@@ -338,7 +345,7 @@ const VisitForm = () => {
                       ملاحظات إضافية
                     </span>
                   }
-                  bordered
+                  variant="outlined"
                   className="shadow-sm"
                 >
                   <Form.Item

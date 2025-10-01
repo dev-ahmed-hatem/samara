@@ -1,14 +1,15 @@
 from django.conf import settings
 from datetime import datetime, timedelta, time
 
+from employees.models import SecurityGuardLocationShift, Employee
+from users.models import User
 from .models import Visit, VisitReport, Violation
 from rest_framework import serializers
-from projects.serializers import LocationSerializer
 
 
 class VisitReadSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(view_name='visit-detail')
-    location = LocationSerializer()
+    location = serializers.SerializerMethodField(read_only=True)
     date = serializers.DateField(format='%Y-%m-%d', read_only=True)
     time = serializers.TimeField(format='%I:%M %p', read_only=True)
     status = serializers.StringRelatedField(source='get_status_display', read_only=True)
@@ -41,6 +42,11 @@ class VisitReadSerializer(serializers.ModelSerializer):
         is_scheduled = obj.status == Visit.VisitStatus.SCHEDULED
 
         return (is_today or is_last_night) and is_scheduled
+
+    def get_location(self, obj: Visit):
+        return {"name": obj.location.name, "project_name": obj.location.project.name,
+                "guards_count": SecurityGuardLocationShift.objects.filter(location=obj.location).count(),
+                "supervisors_count": Employee.objects.filter(user__role=User.RoleChoices.SUPERVISOR).count()}
 
 
 class VisitWriteSerializer(serializers.ModelSerializer):
