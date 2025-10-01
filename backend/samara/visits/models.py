@@ -68,6 +68,7 @@ class VisitReport(models.Model):
     class EvaluationChoices(models.TextChoices):
         GOOD = "جيد", _("جيد")
         NEEDS_ATTENTION = "يحتاج إلى معالجة", _("يحتاج إلى معالجة")
+        NOT_AVAILABLE = "غير متوفر", _("غير متوفر")
 
     visit = models.OneToOneField(
         "Visit",

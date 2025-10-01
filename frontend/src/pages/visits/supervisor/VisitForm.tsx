@@ -35,6 +35,7 @@ interface NormalizedAttachments {
 const options = [
   { label: "جيد", value: "جيد" },
   { label: "يحتاج إلى معالجة", value: "يحتاج إلى معالجة" },
+  { label: "غير متوفر", value: "غير متوفر" },
 ];
 
 const VisitForm = () => {
@@ -52,7 +53,18 @@ const VisitForm = () => {
   const [skipLocation, setSkipLocation] = useState(false);
 
   const handleStatusChange = (field: string, value: string) => {
-    setFieldStatus((prev) => ({ ...prev, [field]: value }));
+    setFieldStatus((prev) => {
+      const newStatus = { ...prev, [field]: value };
+
+      if (["جيد", "غير متوفر"].includes(value)) {
+        const newAttachments = { ...attachments };
+
+        delete newAttachments[field];
+        setAttachments(newAttachments);
+      }
+
+      return newStatus;
+    });
   };
 
   const handleUploadChange = (field: string, info: any) => {
@@ -136,7 +148,7 @@ const VisitForm = () => {
         )
       );
       notification.success({
-        message: "تم إرسال النموذج",
+        message: "تم حفظ بيانات الزيارة",
       });
 
       navigate("/supervisor/visits/");
@@ -146,7 +158,7 @@ const VisitForm = () => {
   useEffect(() => {
     if (submitError) {
       notification.error({
-        message: "حدث خطأ أثناء إرسال النموذج ! برجاء إعادة المحاولة",
+        message: "حدث خطأ أثناء حفظ بيانات الزيارة ! برجاء إعادة المحاولة",
       });
     }
   }, [submitError]);
@@ -247,7 +259,7 @@ const VisitForm = () => {
                     title={
                       <span className="text-lg font-semibold">{label}</span>
                     }
-                    bordered
+                    variant="outlined"
                     className="shadow-sm"
                   >
                     <Form.Item

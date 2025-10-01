@@ -130,7 +130,18 @@ const VisitReport = ({ report_id }: { report_id: string }) => {
               header={
                 <div className="flex justify-between w-full">
                   <Text strong>{section.label}</Text>
-                  <Tag color={section.value === "جيد" ? "green" : "red"}>
+                  <Tag
+                    color={
+                      section.value === "جيد"
+                        ? "green"
+                        : section.value === "يحتاج إلى معالجة"
+                        ? "red"
+                        : section.value === "غير متوفر"
+                        ? "cyan"
+                        : "blue"
+                    }
+                    className="text-base"
+                  >
                     {section.value}
                   </Tag>
                 </div>
