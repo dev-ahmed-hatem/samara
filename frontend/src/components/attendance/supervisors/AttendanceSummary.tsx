@@ -78,7 +78,7 @@ const AttendanceSummary: React.FC = () => {
           layout="vertical"
           form={form}
           onFinish={handleSave}
-          className="grid grid-cols-1 md:grid-cols-5 gap-4"
+          className="grid grid-cols-1 md:grid-cols-5 gap-4 py-3"
         >
           <Form.Item
             label="اليوم"

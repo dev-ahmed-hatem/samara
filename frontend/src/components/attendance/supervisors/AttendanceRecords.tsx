@@ -213,7 +213,7 @@ const AttendanceRecords: React.FC = () => {
     <div className="space-y-6">
       {/* Section 1 */}
       <Card title="تفاصيل الحضور" className="shadow-md">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 py-3">
           <Form
             layout="vertical"
             form={form}

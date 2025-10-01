@@ -22,11 +22,6 @@ const columns = [
     title: "التاريخ",
     dataIndex: "created_at",
     key: "created_at",
-    render: (text: string, record: Violation) => (
-      <>
-        {record.date} {text}
-      </>
-    ),
   },
   {
     title: "المشروع",
@@ -87,20 +82,26 @@ const ViolationsList = () => {
       </div>
 
       {/* Violations filters */}
-      <div className="bg-white p-4 shadow-md rounded-md w-full mx-auto">
-        <Title level={4} className="mb-4 text-right">
-          عرض المخالفات
-        </Title>
+      <Card
+        title={
+          <Title level={4} className="!mb-0 text-right">
+            عرض المخالفات
+          </Title>
+        }
+        className="shadow-md rounded-2xl w-full mx-auto"
+        variant="outlined"
+      >
         <Form
           layout="vertical"
           form={form}
-          className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end"
+          className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end py-4"
           onFinish={handleSubmit}
+          initialValues={{ from: dayjs(), to: dayjs() }}
         >
           <Form.Item
             label="من"
             className="mb-0"
-            name={"from"}
+            name="from"
             rules={[{ required: true, message: "يرجى اختيار تاريخ البداية" }]}
           >
             <DatePicker
@@ -117,7 +118,7 @@ const ViolationsList = () => {
           </Form.Item>
 
           <Form.Item
-            name={"to"}
+            name="to"
             label="إلى"
             className="mb-0"
             rules={[{ required: true, message: "يرجى اختيار تاريخ النهاية" }]}
@@ -144,7 +145,7 @@ const ViolationsList = () => {
             </Button>
           </Form.Item>
         </Form>
-      </div>
+      </Card>
 
       {isFetching && <Loading />}
 

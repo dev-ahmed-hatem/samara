@@ -68,14 +68,19 @@ const VisitsList: React.FC = () => {
       <h1 className="mb-6 text-2xl font-bold">الزيارات</h1>
 
       {/* Visits filters */}
-      <div className="bg-white p-4 shadow-md rounded-md w-full mx-auto">
-        <Title level={4} className="mb-4 text-right">
-          عرض الزيارات
-        </Title>
+      <Card
+        title={
+          <Title level={4} className="!mb-0 text-right">
+            عرض الزيارات
+          </Title>
+        }
+        className="shadow-lg rounded-2xl w-full mx-auto"
+        variant="outlined"
+      >
         <Form
           layout="vertical"
           form={form}
-          className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end"
+          className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end py-4"
           onFinish={handleSubmit}
           initialValues={{
             from: dayjs(),
@@ -119,7 +124,6 @@ const VisitsList: React.FC = () => {
             />
           </Form.Item>
 
-          {/* Period field */}
           <Form.Item
             name="period"
             label="الفترة"
@@ -132,7 +136,6 @@ const VisitsList: React.FC = () => {
             </Radio.Group>
           </Form.Item>
 
-          {/* Submit button with better alignment */}
           <Form.Item className="mb-0 md:flex md:justify-end">
             <Button
               type="primary"
@@ -144,7 +147,7 @@ const VisitsList: React.FC = () => {
             </Button>
           </Form.Item>
         </Form>
-      </div>
+      </Card>
 
       {isFetching && <Loading />}
 
