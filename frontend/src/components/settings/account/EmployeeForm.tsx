@@ -128,12 +128,12 @@ const EmployeeEditForm = ({
           <Input value={initialValues?.position} disabled />
         </Form.Item>
 
-        <Form.Item label="رقم الهوية">
-          <Input value={initialValues?.national_id} disabled />
+        <Form.Item label="الرقم الوظيفي">
+          <Input value={initialValues?.employee_id} disabled />
         </Form.Item>
 
-        <Form.Item label="رقم الموظف">
-          <Input value={initialValues?.employee_id} disabled />
+        <Form.Item label="رقم الهوية">
+          <Input value={initialValues?.national_id} disabled />
         </Form.Item>
 
         <Form.Item className="text-center">

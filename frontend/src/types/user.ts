@@ -4,6 +4,7 @@ export type ENGLISH_ROLES = "admin" | "moderator" | "supervisor";
 export type ARABBIC_ROLES = "مدير" | "مستخدم نظام" | "مشرف";
 
 export type User = {
+  id: string;
   name: string;
   username: string;
   is_active: boolean;

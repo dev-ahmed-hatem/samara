@@ -1,7 +1,9 @@
+from django.db import transaction
 from rest_framework import serializers
 from rest_framework.relations import HyperlinkedIdentityField
 
-from employees.serializers import EmployeeReadSerializer
+from employees.models import Employee
+from employees.serializers import EmployeeReadSerializer, EmployeeWriteSerializer
 from .models import User
 
 
@@ -13,10 +15,12 @@ class UserSerializer(serializers.ModelSerializer):
     url = HyperlinkedIdentityField(view_name='user-detail', lookup_field='pk')
     employee_profile = EmployeeReadSerializer(read_only=True)
 
+    employee_data = serializers.DictField(write_only=True, required=True)
+
     class Meta:
         model = User
         fields = ['id', 'username', 'name', 'is_superuser', 'is_moderator', 'password',
-                  'password2', 'url', 'is_root', 'role', 'role_arabic', "employee_profile"]
+                  'password2', 'url', 'is_root', 'role', 'role_arabic', "employee_profile", "employee_data"]
 
     def validate(self, data):
         if 'password' in data and 'password2' in data:
@@ -27,23 +31,40 @@ class UserSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        password = validated_data.pop('password', None)
-        password2 = validated_data.pop('password2')
-        is_superuser = validated_data.pop('is_superuser', False)
+        password = validated_data.pop("password", None)
+        validated_data.pop("password2", None)
+        employee_data = validated_data.pop("employee_data")
 
-        user = super().create(validated_data)
+        with transaction.atomic():
+            user = User(**validated_data)
+            if password:
+                user.set_password(password)
+            user.save()
 
-        if is_superuser:
-            user.is_superuser = is_superuser
-        user.set_password(password)
-        user.save()
+            employee_serializer = EmployeeWriteSerializer(
+                data=employee_data,
+                context=self.context
+            )
+            employee_serializer.is_valid(raise_exception=True)
+            employee_serializer.save(user=user)
+
         return user
 
     def update(self, instance, validated_data):
-        password = validated_data.pop('password', None)
-        password2 = validated_data.pop('password2', None)
-        user = super().update(instance, validated_data)
+        password = validated_data.pop("password", None)
+        validated_data.pop("password2", None)
+        employee_data = validated_data.pop("employee_data")
 
-        user.set_password(password)
-        user.save()
-        return user
+        instance = super(UserSerializer, self).update(instance, validated_data)
+
+        if password:
+            instance.set_password(password)
+            instance.save()
+
+        if employee_data:
+            employee_serializer = EmployeeWriteSerializer(
+                instance.employee_profile, data=employee_data, partial=True
+            )
+            employee_serializer.is_valid(raise_exception=True)
+            employee_serializer.save()
+        return instance

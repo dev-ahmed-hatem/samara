@@ -17,6 +17,7 @@ export const api = createApi({
     "Violation",
     "MonthlyRecord",
     "DailyRecord",
+    "Users"
   ],
   keepUnusedDataFor: 180,
   refetchOnReconnect: true,

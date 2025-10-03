@@ -10,7 +10,10 @@ import { HomeStats, ModeratorHomeStats } from "@/types/homeStat";
 export const employeesEndpoints = api.injectEndpoints({
   endpoints: (builder) => ({
     getSupervisorHomeStats: builder.query<HomeStats, void>({
-      query: () => ({ url: "/employees/get-supervisor-home-stats/", method: "GET" }),
+      query: () => ({
+        url: "/employees/get-supervisor-home-stats/",
+        method: "GET",
+      }),
     }),
     getModeratorHomeStats: builder.query<ModeratorHomeStats, void>({
       query: () => ({
@@ -18,22 +21,6 @@ export const employeesEndpoints = api.injectEndpoints({
         method: "GET",
       }),
     }),
-    // getAllEmployees: builder.query<Employee[], void>({
-    //   query: () => ({
-    //     url: `/employees/employees?no_pagination=true`,
-    //     method: "GET",
-    //   }),
-    // }),
-    // getEmployee: builder.query<
-    //   Employee,
-    //   { id: string; format: "detailed" | "form_data" }
-    // >({
-    //   query: ({ id, format }) => ({
-    //     url: `/employees/employees/${id}/${format}/`,
-    //     method: "GET",
-    //   }),
-    //   providesTags: (res, error, arg) => [{ type: "Employee", id: arg.id }],
-    // }),
     getEmployees: builder.query<
       PaginatedResponse<Employee> | Employee[],
       QueryParams
@@ -77,7 +64,11 @@ export const employeesEndpoints = api.injectEndpoints({
     }),
     employee: builder.mutation<
       Employee,
-      { data?: Partial<Employee> & {file: File | string | null}; method?: string; url?: string }
+      {
+        data?: Partial<Employee> & { file: File | string | null };
+        method?: string;
+        url?: string;
+      }
     >({
       query: ({ data, method, url }) => ({
         url: url || `employees/employees/`,
@@ -102,36 +93,6 @@ export const employeesEndpoints = api.injectEndpoints({
         }
       },
     }),
-    // deleteEmployee: builder.mutation<void, string>({
-    //   query: (id) => ({
-    //     url: `/employees/employees/${id}/`,
-    //     method: "DELETE",
-    //   }),
-    //   invalidatesTags: [{ type: "Employee", id: "LIST" }],
-    // }),
-    // deleteEmployees: builder.mutation<void, number[]>({
-    //   query: (data) => ({
-    //     url: `/employees/multiple-delete/`,
-    //     method: "DELETE",
-    //     data,
-    //   }),
-    //   invalidatesTags: [{ type: "Employee", id: "LIST" }],
-    // }),
-    // getPaginatedDepartments: builder.query<
-    //   PaginatedResponse<Department>,
-    //   Record<string, any> | void
-    // >({
-    //   query: (params) => ({
-    //     url: `/employees/departments?${qs.stringify(params || {})}`,
-    //   }),
-    // }),
-    // getAllDepartments: builder.query<Department[], Record<string, any> | void>({
-    //   query: (params) => ({
-    //     url: `/employees/departments?no_pagination=true&${qs.stringify(
-    //       params || {}
-    //     )}`,
-    //   }),
-    // }),
   }),
   overrideExisting: false,
 });

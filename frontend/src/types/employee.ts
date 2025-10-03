@@ -12,6 +12,7 @@ export type Employee = {
   position: string;
   image?: string;
   created_by: User;
+  user?: User;
 };
 
 export interface AssignedEmployee {

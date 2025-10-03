@@ -16,6 +16,7 @@ class UserViewSet(ModelViewSet):
         queryset = super(UserViewSet, self).get_queryset()
 
         search_query = self.request.query_params.get('search', None)
+        role = self.request.query_params.get('role', None)
 
         if search_query:
             queryset = queryset.filter(
@@ -24,6 +25,9 @@ class UserViewSet(ModelViewSet):
                 Q(national_id__icontains=search_query) |
                 Q(phone__icontains=search_query)
             )
+
+        if role is not None:
+            queryset = queryset.filter(role=role)
 
         is_superuser_param = self.request.query_params.get('is_superuser', None)
         if is_superuser_param:

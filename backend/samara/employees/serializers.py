@@ -34,6 +34,9 @@ class EmployeeWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         exclude = ['created_by']
+        extra_kwargs = {
+            "user": {"required": False, "allow_null": True}
+        }
 
     def validate_username(self, value):
         if not value:
@@ -44,12 +47,13 @@ class EmployeeWriteSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
+        validated_data.pop('created_by', None)
         auth_user = self.context['request'].user
         return Employee.objects.create(**validated_data, created_by=auth_user)
 
     def update(self, instance, validated_data):
         image = validated_data.pop('image', None)
-        username = validated_data.pop("username")
+        username = validated_data.pop("username", None)
 
         super().update(instance, validated_data)
 

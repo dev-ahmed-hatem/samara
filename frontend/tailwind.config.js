@@ -69,22 +69,22 @@ export default {
         },
 
         ".padding-container": {
-          paddingInline: "1rem",
+          paddingInline: "0.5rem",
 
           "@screen sm": {
-            paddingInline: "2rem",
+            paddingInline: "1rem",
           },
           "@screen md": {
-            paddingInline: "3rem",
+            paddingInline: "1.5rem",
           },
           "@screen lg": {
-            paddingInline: "4rem",
+            paddingInline: "2rem",
           },
           "@screen xl": {
-            paddingInline: "5rem",
+            paddingInline: "4rem",
           },
           "@screen 2xl": {
-            paddingInline: "7rem",
+            paddingInline: "5rem",
           },
         },
       });
