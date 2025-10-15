@@ -1,0 +1,8 @@
+client stats in home
+inactive client aren't shown in attendace record
+active and inactive locations
+actions in violations
+vists reports view stats and moderator notes
+moderator add notes to non-compledted scheduled vists
+add time in violation form
+add "other" security guards list selection in violation form
