@@ -1,6 +1,17 @@
-import { Card, Statistic, Table, Tooltip, Typography } from "antd";
+import {
+  Button,
+  Card,
+  Select,
+  Statistic,
+  Table,
+  Tooltip,
+  Typography,
+} from "antd";
 import { PieChart, Pie, Cell, Legend } from "recharts";
 import { CheckCircleOutlined, TeamOutlined } from "@ant-design/icons";
+import { useState } from "react";
+import { useSecurityGuardAttendanceMutation } from "@/app/api/endpoints/attendance";
+import { useNotification } from "@/providers/NotificationProvider";
 
 const { Title } = Typography;
 
@@ -8,31 +19,88 @@ type ShiftStatsProps = {
   shiftAttendance: any;
 };
 
-const columns = [
-  {
-    title: "الرقم الوظيفي",
-    dataIndex: "employee_id",
-    name: "employee_id",
-  },
-  {
-    title: "حارس الأمن",
-    dataIndex: "name",
-    key: "name",
-  },
-  {
-    title: "الحالة",
-    dataIndex: "status",
-    key: "status",
-  },
-  {
-    title: "ملاحظات",
-    dataIndex: "notes",
-    key: "notes",
-    render: (text: string) => text || "-",
-  },
-];
+const statuses = ["حاضر", "متأخر", "غائب", "راحة"];
 
 const ShiftStats = ({ shiftAttendance }: ShiftStatsProps) => {
+  const [editingRow, setEditingRow] = useState<string | null>(null);
+  const [editedStatus, setEditedStatus] = useState<string>("");
+
+  const notification = useNotification();
+
+  const [handleRecord, { isLoading }] = useSecurityGuardAttendanceMutation();
+
+  const handleEditClick = (record: any) => {
+    setEditingRow(record.id);
+    setEditedStatus(record.status);
+  };
+
+  const handleSave = async () => {
+    if (!editingRow || !editedStatus) return;
+    try {
+      await handleRecord({ id: editingRow, status: editedStatus });
+      notification.success({ message: "تم تعديل الحالة" });
+    } catch {
+      notification.success({ message: "خطأ في تعديل الحالة" });
+    }
+  };
+
+  const columns = [
+    {
+      title: "الرقم الوظيفي",
+      dataIndex: "employee_id",
+      name: "employee_id",
+    },
+    {
+      title: "حارس الأمن",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "الحالة",
+      dataIndex: "status",
+      key: "status",
+      render: (text: string, record: any) => {
+        if (editingRow === record.id) {
+          return (
+            <div className="flex items-center gap-2">
+              <Select
+                value={editedStatus}
+                onChange={(value) => setEditedStatus(value)}
+                options={statuses.map((s) => ({ label: s, value: s }))}
+                className="w-28"
+              />
+              <Button
+                type="primary"
+                size="small"
+                onClick={() => handleSave()}
+                loading={isLoading}
+              >
+                حفظ
+              </Button>
+              <Button size="small" onClick={() => setEditingRow(null)}>
+                إلغاء
+              </Button>
+            </div>
+          );
+        }
+        return (
+          <span
+            className="cursor-pointer text-blue-600 hover:underline"
+            onClick={() => handleEditClick(record)}
+          >
+            {text || "-"}
+          </span>
+        );
+      },
+    },
+    {
+      title: "ملاحظات",
+      dataIndex: "notes",
+      key: "notes",
+      render: (text: string) => text || "-",
+    },
+  ];
+
   return (
     <Card title="ملخص الحضور" className="shadow-md">
       {/* total scurity guards */}

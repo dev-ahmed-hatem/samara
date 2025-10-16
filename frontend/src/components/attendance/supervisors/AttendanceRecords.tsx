@@ -157,6 +157,7 @@ const AttendanceRecords: React.FC = () => {
         location_id: location,
         shift: shift,
         date: currentDate,
+        is_active: "active",
       });
     }
   }, [currentDate, location, shift]);

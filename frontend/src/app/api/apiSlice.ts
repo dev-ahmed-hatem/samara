@@ -14,10 +14,11 @@ export const api = createApi({
     "Location",
     "SecurityGuard",
     "SecurityGuardShifts",
+    "ShiftAttendance",
     "Violation",
     "MonthlyRecord",
     "DailyRecord",
-    "Users"
+    "Users",
   ],
   keepUnusedDataFor: 180,
   refetchOnReconnect: true,

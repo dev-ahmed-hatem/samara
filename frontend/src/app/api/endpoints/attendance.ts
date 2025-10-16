@@ -5,8 +5,8 @@ import { LocationAttendance } from "@/types/attendance";
 export const attendanceEndpoints = api.injectEndpoints({
   endpoints: (builder) => ({
     getProjectAttendances: builder.query<
-      { project: string; date: string; attendances: LocationAttendance[] },
-      { project: string; date: string }
+    { project: string; date: string; attendances: LocationAttendance[] },
+    { project: string; date: string }
     >({
       query: (params) => ({
         url: `/attendance/get-project-attendances/?${qs.stringify(
@@ -23,11 +23,23 @@ export const attendanceEndpoints = api.injectEndpoints({
         data,
       }),
     }),
+    securityGuardAttendance: builder.mutation<
+    void,
+    { id: string; status: string }
+    >({
+      query: ({ id, status }) => ({
+        url: `/attendance/security-guard-attendances/${id}/`,
+        method: "PATCH",
+        data: { status },
+      }),
+      invalidatesTags: [{type: "ShiftAttendance", id: "LIST"}]
+    }),
     getShiftAttendance: builder.query({
       query: (params) => ({
         url: `/attendance/get-shift-attendance/?${qs.stringify(params || {})}`,
         method: "GET",
       }),
+      providesTags: [{type: "ShiftAttendance", id: "LIST"}]
     }),
     deleteShiftAttendance: builder.mutation<void, number>({
       query: (shift_id) => ({
@@ -43,6 +55,7 @@ export const {
   useLazyGetProjectAttendancesQuery,
   useShiftAttendanceMutation,
   useLazyGetShiftAttendanceQuery,
+  useSecurityGuardAttendanceMutation,
   useGetShiftAttendanceQuery,
   useDeleteShiftAttendanceMutation,
 } = attendanceEndpoints;

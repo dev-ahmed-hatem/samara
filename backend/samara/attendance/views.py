@@ -12,12 +12,17 @@ from django.shortcuts import get_object_or_404
 from projects.models import Location, Project
 from employees.models import SecurityGuard, Shift
 from .models import ShiftAttendance, SecurityGuardAttendance
-from .serializers import ShiftAttendanceSerializer
+from .serializers import ShiftAttendanceSerializer, SecurityGuardAttendanceSerializer
 
 
 class ShiftAttendanceViewSet(viewsets.ModelViewSet):
-    queryset = ShiftAttendance.objects.all()
+    queryset = SecurityGuardAttendance.objects.all()
     serializer_class = ShiftAttendanceSerializer
+
+
+class SecurityGuardAttendanceViewSet(viewsets.ModelViewSet):
+    queryset = SecurityGuardAttendance.objects.all()
+    serializer_class = SecurityGuardAttendanceSerializer
 
 
 @api_view(['GET'])
@@ -100,6 +105,7 @@ def get_shift_attendance(request):
     # Build record list
     records = [
         {
+            "id": guard.id,
             "status": guard.status,
             "notes": guard.notes,
             "name": guard.security_guard.name,

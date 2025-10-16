@@ -1,9 +1,11 @@
 from django.urls import path, include
-from .views import ShiftAttendanceViewSet, record_shift_attendance, get_shift_attendance, get_project_attendances
+from .views import ShiftAttendanceViewSet, SecurityGuardAttendanceViewSet, record_shift_attendance, \
+    get_shift_attendance, get_project_attendances
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 router.register('shift-attendances', ShiftAttendanceViewSet, basename="shift-attendance")
+router.register('security-guard-attendances', SecurityGuardAttendanceViewSet, basename="security-guard-attendance")
 
 urlpatterns = [
     path('', include(router.urls)),
