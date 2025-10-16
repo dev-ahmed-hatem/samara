@@ -79,7 +79,7 @@ const ViolationForm: React.FC = () => {
       data["violation_image"] = fileList[0];
     }
 
-    submitForm(data);
+    submitForm({data});
   };
 
   const handleUploadChange = ({ fileList }: any) => {
@@ -221,11 +221,8 @@ const ViolationForm: React.FC = () => {
             }
             name="security_guard"
             className="col-span-1"
-            rules={[
-              { required: true, message: "الرجاء اختيار الموظف المخالف" },
-            ]}
           >
-            <Select placeholder="اختر الموظف المخالف" disabled={!location}>
+            <Select placeholder="اختر الموظف المخالف" disabled={!location} allowClear>
               {location &&
                 (securityGuards as SecurityGuard[])?.map((sec) => (
                   <Select.Option key={sec.id} value={sec.id}>

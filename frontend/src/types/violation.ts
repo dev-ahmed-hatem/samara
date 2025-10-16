@@ -15,7 +15,7 @@ export type Violation = {
     | "استخدام الجوال أثناء العمل"
     | "أخرى";
   severity: "منخفضة" | "متوسطة" | "عالية";
-  security_guard: string;
+  security_guard?: string;
   details: string;
   supervisor_explanation?: string;
   violation_image?: string; // URL if returned in GET

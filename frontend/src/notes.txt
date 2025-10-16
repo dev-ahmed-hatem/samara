@@ -3,7 +3,8 @@ inactive client aren't shown in attendace record
 edit attendance record
 active and inactive locations
 actions in violations
+edit schedueld visit
 vists reports view stats and moderator notes
-moderator add notes to non-compledted scheduled vists
+moderator add notes to non-completed scheduled vists
 add time field in violation form
 add "other" security guards list selection in violation form

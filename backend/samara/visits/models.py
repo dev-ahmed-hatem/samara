@@ -288,7 +288,9 @@ class Violation(models.Model):
         "employees.SecurityGuard",
         on_delete=models.CASCADE,
         related_name="violation",
-        verbose_name=_("الموظف المخالف")
+        verbose_name=_("الموظف المخالف"),
+        null=True,
+        blank=True
     )
 
     violation_type = models.CharField(

@@ -45,9 +45,11 @@ const ViolationReport = ({ report_id }: { report_id: string }) => {
           <Descriptions.Item label="الموقع">
             {violation?.project_name} - {violation!.location_name}
           </Descriptions.Item>
-          <Descriptions.Item label="الموظف المخالف">
-            {violation!.security_guard}
-          </Descriptions.Item>
+          {violation?.security_guard && (
+            <Descriptions.Item label="الموظف المخالف">
+              {violation!.security_guard}
+            </Descriptions.Item>
+          )}
           <Descriptions.Item label="نوع المخالفة">
             <Tag color="red">{violation!.violation_type}</Tag>
           </Descriptions.Item>

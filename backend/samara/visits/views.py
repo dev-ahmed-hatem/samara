@@ -136,7 +136,7 @@ class ViolationViewSet(ModelViewSet):
         serializer = self.get_serializer(
             violation, data=request.data, partial=True
         )
-        
+
         if serializer.is_valid():
             serializer.save(confirmed_by_monitoring=True)
             return Response(serializer.data, status=status.HTTP_200_OK)

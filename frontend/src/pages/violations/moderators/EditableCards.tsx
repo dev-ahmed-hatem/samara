@@ -1,6 +1,6 @@
 import { Card, Input, Button, Tag } from "antd";
 import { EditOutlined, SaveOutlined, CloseOutlined } from "@ant-design/icons";
-import { ReactNode, useState } from "react";
+import { useState } from "react";
 import { textify } from "@/utils";
 import { useNotification } from "@/providers/NotificationProvider";
 import { useViolationMutation } from "@/app/api/endpoints/visits";
