@@ -8,6 +8,7 @@ import {
   ClockCircleOutlined,
   SmileOutlined,
   IdcardOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router";
@@ -54,7 +55,7 @@ const SupervisorHome: React.FC = () => {
       </Typography.Title>
       <Row gutter={[16, 16]}>
         {/* Projects */}
-        <Col xs={24} sm={12} md={8}>
+        <Col xs={24} sm={12} md={6}>
           <Card
             className="h-full flex rounded-2xl border-0 shadow-xl hover:shadow-2xl transition-shadow duration-300 
                  bg-gradient-to-br from-cyan-500 to-blue-700 text-white"
@@ -75,7 +76,7 @@ const SupervisorHome: React.FC = () => {
         </Col>
 
         {/* Locations */}
-        <Col xs={24} sm={12} md={8}>
+        <Col xs={24} sm={12} md={6}>
           <Card
             className="h-full flex rounded-2xl border-0 shadow-xl hover:shadow-2xl transition-shadow duration-300 
                  bg-gradient-to-br from-emerald-500 to-green-700 text-white"
@@ -95,8 +96,8 @@ const SupervisorHome: React.FC = () => {
           </Card>
         </Col>
 
-        {/* Guards */}
-        <Col xs={24} sm={12} md={8}>
+        {/* Active Guards */}
+        <Col xs={24} sm={12} md={6}>
           <Card
             className="h-full flex rounded-2xl border-0 shadow-xl hover:shadow-2xl transition-shadow duration-300 
                  bg-gradient-to-br from-pink-500 to-rose-700 text-white"
@@ -105,8 +106,31 @@ const SupervisorHome: React.FC = () => {
               title={
                 <span className="text-white font-medium">عدد رجال الأمن</span>
               }
-              value={stats!.general.guards_count}
+              value={stats!.general.guards_count.active}
               prefix={<IdcardOutlined className="text-white text-2xl" />}
+              valueStyle={{
+                fontSize: "1.5rem",
+                fontWeight: "bold",
+                color: "white",
+              }}
+            />
+          </Card>
+        </Col>
+
+        {/* Inactive Guards */}
+        <Col xs={24} sm={12} md={6}>
+          <Card
+            className="h-full flex rounded-2xl border-0 shadow-xl hover:shadow-2xl transition-shadow duration-300 
+      bg-gradient-to-br from-purple-500 to-violet-700 text-white"
+          >
+            <Statistic
+              title={
+                <span className="text-white font-medium">
+                  رجال الأمن غير النشطين
+                </span>
+              }
+              value={stats!.general.guards_count.inactive}
+              prefix={<UserOutlined className="text-white text-2xl" />}
               valueStyle={{
                 fontSize: "1.5rem",
                 fontWeight: "bold",

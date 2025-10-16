@@ -292,10 +292,13 @@ def get_supervisor_home_stats(request):
         violations = Violation.objects.filter(created_by=employee)
         attendance_records = ShiftAttendance.objects.filter(created_by=employee)
 
+    security_guards_count = SecurityGuard.objects.all()
+
     data = {
         "general": {"projects_count": Project.objects.count(),
                     "locations_count": Location.objects.count(),
-                    "guards_count": SecurityGuard.objects.count()},
+                    "guards_count": {"active": security_guards_count.filter(is_active=True).count(),
+                                     "inactive": security_guards_count.filter(is_active=False).count()}, },
         "today": {
             "scheduled": {
                 "morning": filter_visits_by_period(visits.filter(status=Visit.VisitStatus.SCHEDULED), today,

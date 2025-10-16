@@ -14,7 +14,7 @@ export type HomeStats = {
   general: {
     projects_count: number;
     locations_count: number;
-    guards_count: number;
+    guards_count: { active: number; inactive: number };
   };
   today: DayStats;
   yesterday: DayStats;
