@@ -140,18 +140,26 @@ const ModeratorHome: React.FC = () => {
         {/* Navigation Cards */}
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={12} md={6}>
-            <Card className="shadow-sm rounded-2xl border-t-4 border-blue-500">
+            <Card className="shadow-sm rounded-2xl border-t-4 border-blue-500 h-full">
               <Statistic
-                title="عدد المشاريع"
+                title={
+                  <h3 className="text-gray-500 font-semibold text-lg mb-2">
+                    عدد المشاريع
+                  </h3>
+                }
                 value={stats!.general.projects_count}
                 prefix={<ProjectOutlined className="text-blue-500 text-xl" />}
               />
             </Card>
           </Col>
           <Col xs={24} sm={12} md={6}>
-            <Card className="shadow-sm rounded-2xl border-t-4 border-green-500">
+            <Card className="shadow-sm rounded-2xl border-t-4 border-green-500 h-full">
               <Statistic
-                title="عدد المواقع"
+                title={
+                  <h3 className="text-gray-500 font-semibold text-lg mb-2">
+                    عدد المواقع
+                  </h3>
+                }
                 value={stats!.general.locations_count}
                 prefix={
                   <EnvironmentOutlined className="text-green-500 text-xl" />
@@ -161,19 +169,44 @@ const ModeratorHome: React.FC = () => {
           </Col>
           <Col xs={24} sm={12} md={6}>
             <Card className="shadow-sm rounded-2xl border-t-4 border-purple-500">
-              <Statistic
-                title="عدد رجال الأمن"
-                value={stats!.general.security_guards_count}
-                prefix={
-                  <UserSwitchOutlined className="text-purple-500 text-xl" />
-                }
-              />
+              <h3 className="text-gray-500 font-semibold text-lg mb-2">
+                عدد رجال الأمن
+              </h3>
+
+              <div className="grid grid-cols-2 gap-4 text-center">
+                {/* Active Guards */}
+                <div className="p-3 rounded-xl bg-purple-50 flex flex-col items-center justify-center">
+                  <div className="flex">
+                    <UserSwitchOutlined className="text-purple-500 text-lg me-1" />
+                    <p className="text-sm text-gray-500">النشطين</p>
+                  </div>
+                  <p className="text-xl font-semibold text-purple-600">
+                    {stats!.general.security_guards_count.active}
+                  </p>
+                </div>
+
+                {/* Inactive Guards */}
+                <div className="p-3 rounded-xl bg-gray-50 flex flex-col items-center justify-center">
+                  <div className="flex">
+                    <UserOutlined className="text-gray-400 text-lg me-1" />
+                    <p className="text-sm text-gray-500">غير النشطين</p>
+                  </div>
+                  <p className="text-xl font-semibold text-gray-600">
+                    {stats!.general.security_guards_count.inactive}
+                  </p>
+                </div>
+              </div>
             </Card>
           </Col>
+
           <Col xs={24} sm={12} md={6}>
-            <Card className="shadow-sm rounded-2xl border-t-4 border-orange-500">
+            <Card className="shadow-sm rounded-2xl border-t-4 border-orange-500 h-full">
               <Statistic
-                title="عدد المشرفين"
+                title={
+                  <h3 className="text-gray-500 font-semibold text-lg mb-2">
+                    عدد المشرفين
+                  </h3>
+                }
                 value={stats?.general.supervisors_count}
                 prefix={<TeamOutlined className="text-orange-500 text-xl" />}
               />

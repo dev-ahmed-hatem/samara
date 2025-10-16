@@ -201,7 +201,7 @@ def get_moderator_home_stats(request):
 
     projects_count = Project.objects.count()
     locations_count = Location.objects.count()
-    security_guards_count = SecurityGuard.objects.count()
+    security_guards_count = SecurityGuard.objects.all()
     supervisors = Employee.objects.filter(user__role=User.RoleChoices.SUPERVISOR)
     supervisors_count = supervisors.count()
 
@@ -213,7 +213,8 @@ def get_moderator_home_stats(request):
         "general": {
             "projects_count": projects_count,
             "locations_count": locations_count,
-            "security_guards_count": security_guards_count,
+            "security_guards_count": {"active": security_guards_count.filter(is_active=True).count(),
+                                      "inactive": security_guards_count.filter(is_active=False).count()},
             "supervisors_count": supervisors_count,
         },
         "today_visits": {

@@ -1,8 +1,9 @@
 client stats in home
 inactive client aren't shown in attendace record
 active and inactive locations
+edit scheduled visit
 actions in violations
-vists reports view stats and moderator notes
-moderator add notes to non-compledted scheduled vists
-add time in violation form
-add "other" security guards list selection in violation form
+vistis reports view stats and moderator notes
+moderator add notes to non-completed scheduled visits
+add time field for violation form
+add "other" security in guards list selection in violation form

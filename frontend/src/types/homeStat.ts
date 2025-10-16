@@ -39,7 +39,7 @@ export type ModeratorHomeStats = {
   general: {
     projects_count: number;
     locations_count: number;
-    security_guards_count: number;
+    security_guards_count: { active: number; inactive: number };
     supervisors_count: number;
   };
   today_visits: {
