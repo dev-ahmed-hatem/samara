@@ -84,17 +84,20 @@ export const visitsEndpoints = api.injectEndpoints({
       }),
       providesTags: (response, error, id) => [{ type: "Violation", id }],
     }),
-    violation: builder.mutation<void, ViolationForm & { visit: string }>({
-      query: (data) => ({
-        url: `/visits/violations/`,
-        method: "POST",
+    violation: builder.mutation<
+      Violation,
+      { url?: string; method?: string; data: Partial<ViolationForm & { visit: string }> }
+    >({
+      query: ({ url, method, data }) => ({
+        url: url ?? `/visits/violations/`,
+        method: method ?? "POST",
         data,
         headers: {
           "Content-Type": "multipart/form-data",
         },
       }),
       invalidatesTags: (result, error, arg) => [
-        { type: "Violation", id: arg.visit },
+        { type: "Violation", id: result?.id.toString()! },
       ],
     }),
     deleteViolation: builder.mutation<void, string>({

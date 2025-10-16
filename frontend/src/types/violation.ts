@@ -22,9 +22,10 @@ export type Violation = {
   action?: string;
   guidance?: string;
   penalty?: string;
-  confirmed_by_ops: boolean;
   confirmed_by_monitoring: boolean;
   created_by: string;
   created_at: string;
+  updated_at?: string;
   date?: string;
+  time?: string;
 };

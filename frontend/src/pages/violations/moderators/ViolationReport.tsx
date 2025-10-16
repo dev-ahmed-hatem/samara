@@ -8,6 +8,7 @@ import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 import Loading from "@/components/Loading";
 import { useGetViolationQuery } from "@/app/api/endpoints/visits";
 import { textify } from "@/utils";
+import EditableFieldCard from "./EditableCards";
 
 const ViolationReport = ({ report_id }: { report_id: string }) => {
   const {
@@ -66,6 +67,9 @@ const ViolationReport = ({ report_id }: { report_id: string }) => {
           <Descriptions.Item label="التاريخ">
             <span dir="rtl">{violation!.date}</span>
           </Descriptions.Item>
+          <Descriptions.Item label="التاريخ">
+            <span dir="rtl">{violation!.time}</span>
+          </Descriptions.Item>
           <Descriptions.Item label="وقت الإنشاء">
             {violation!.created_at}
           </Descriptions.Item>
@@ -86,18 +90,6 @@ const ViolationReport = ({ report_id }: { report_id: string }) => {
             {textify(violation!.supervisor_explanation) ?? <Tag>لا يوجد</Tag>}
           </Card>
 
-          <Card title="الإجراء" className="text-lg">
-            {textify(violation!.action) ?? <Tag>لا يوجد</Tag>}
-          </Card>
-
-          <Card title="التوجيه" className="text-lg">
-            {textify(violation!.guidance) ?? <Tag>لا يوجد</Tag>}
-          </Card>
-
-          <Card title="الجزاء المطبق" className="text-lg">
-            {textify(violation!.penalty) ?? <Tag>لا يوجد</Tag>}
-          </Card>
-
           <Card title="صورة المخالفة">
             {violation!.violation_image ? (
               <Image
@@ -111,23 +103,41 @@ const ViolationReport = ({ report_id }: { report_id: string }) => {
             )}
           </Card>
 
+          <EditableFieldCard
+            title="الإجراء"
+            field="action"
+            value={violation!.action}
+            id={violation!.id}
+          />
+
+          <EditableFieldCard
+            title="التوجيه"
+            field="guidance"
+            value={violation!.guidance}
+            id={violation!.id}
+          />
+
+          <EditableFieldCard
+            title="الجزاء المطبق"
+            field="penalty"
+            value={violation!.penalty}
+            id={violation!.id}
+          />
+
           <Card title="حالة التأكيد">
             <div className="flex flex-col gap-2 text-base">
-              <div className="flex items-center gap-2">
-                {violation!.confirmed_by_ops ? (
-                  <CheckCircleOutlined className="text-green-500" />
-                ) : (
-                  <ExclamationCircleOutlined className="text-red-500" />
-                )}
-                <span>تأكيد مدير العمليات</span>
-              </div>
               <div className="flex items-center gap-2">
                 {violation!.confirmed_by_monitoring ? (
                   <CheckCircleOutlined className="text-green-500" />
                 ) : (
                   <ExclamationCircleOutlined className="text-red-500" />
                 )}
-                <span>تأكيد قسم المتابعة والحفظ</span>
+                <span>تأكيد المتابعة والحفظ</span>
+              </div>
+              <div>
+                {violation!.confirmed_by_monitoring && (
+                  <>اخر تعديل: {violation?.updated_at}</>
+                )}
               </div>
             </div>
           </Card>

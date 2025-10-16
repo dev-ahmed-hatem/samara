@@ -120,6 +120,8 @@ class ViolationReadSerializer(serializers.ModelSerializer):
     created_at = serializers.SerializerMethodField(read_only=True)
     security_guard = serializers.StringRelatedField(source='security_guard.name', read_only=True)
     created_by = serializers.StringRelatedField(source='created_by.name', read_only=True)
+    updated_at = serializers.SerializerMethodField(read_only=True)
+    time = serializers.TimeField(read_only=True, format='%I:%M %p')
 
     class Meta:
         model = Violation
@@ -128,6 +130,9 @@ class ViolationReadSerializer(serializers.ModelSerializer):
 
     def get_created_at(self, obj):
         return obj.created_at.astimezone(settings.SAUDI_TZ).strftime('%Y-%m-%d %I:%M %p')
+
+    def get_updated_at(self, obj):
+        return obj.updated_at.astimezone(settings.SAUDI_TZ).strftime('%Y-%m-%d %I:%M %p')
 
 
 class ViolationWriteSerializer(serializers.ModelSerializer):

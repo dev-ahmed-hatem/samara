@@ -5,5 +5,5 @@ active and inactive locations
 actions in violations
 vists reports view stats and moderator notes
 moderator add notes to non-compledted scheduled vists
-add time in violation form
+add time field in violation form
 add "other" security guards list selection in violation form

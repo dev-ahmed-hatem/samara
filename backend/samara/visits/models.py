@@ -335,11 +335,6 @@ class Violation(models.Model):
         verbose_name=_("الجزاء المطبق للائحة"),
     )
 
-    confirmed_by_ops = models.BooleanField(
-        default=False,
-        verbose_name=_("التأكيد من مدير العمليات"),
-    )
-
     confirmed_by_monitoring = models.BooleanField(
         default=False,
         verbose_name=_("التأكيد من قسم المتابعة والحفظ"),
@@ -347,7 +342,14 @@ class Violation(models.Model):
 
     date = models.DateField(verbose_name=_("تاريخ المخالفة"), blank=True, null=True)
 
+    time = models.TimeField(
+        verbose_name=_("وقت المخالفة"),
+        blank=True,
+        null=True,
+    )
+
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("تاريخ الإنشاء"))
+    updated_at = models.DateTimeField(auto_now=True, verbose_name=_("اخر تعديل"))
 
     created_by = models.ForeignKey(Employee, on_delete=models.CASCADE)
 

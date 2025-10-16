@@ -2,6 +2,7 @@ from django.utils.timezone import make_aware
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.decorators import action
 
 from .models import Visit, VisitReport, Violation
 from .serializers import VisitReadSerializer, VisitWriteSerializer, \
@@ -11,6 +12,7 @@ from datetime import datetime, time, timedelta
 from django.conf import settings
 from django.db.models import Q
 from django.db.models.functions import TruncDate
+from django.utils.translation import gettext_lazy as _
 from users.models import User
 
 
@@ -123,3 +125,20 @@ class ViolationViewSet(ModelViewSet):
             queryset = queryset.filter(created_by=employee)
 
         return queryset
+
+    @action(detail=True, methods=["patch"])
+    def confirm_by_monitoring(self, request, pk=None):
+        try:
+            violation = Violation.objects.get(pk=pk)
+        except Exception:
+            return Response({'detail': _('مخالفة غير موجودة')}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = self.get_serializer(
+            violation, data=request.data, partial=True
+        )
+        
+        if serializer.is_valid():
+            serializer.save(confirmed_by_monitoring=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

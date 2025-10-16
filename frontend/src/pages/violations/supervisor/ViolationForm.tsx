@@ -2,14 +2,12 @@ import {
   Form,
   Input,
   Select,
-  Checkbox,
   Upload,
   Button,
   Card,
-  Descriptions,
-  Tag,
   Spin,
   DatePicker,
+  TimePicker,
 } from "antd";
 import { LoadingOutlined, UploadOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
@@ -19,7 +17,7 @@ import { useNavigate } from "react-router";
 import Loading from "@/components/Loading";
 import ErrorPage from "@/pages/ErrorPage";
 import { useNotification } from "@/providers/NotificationProvider";
-import { ViolationForm as ViolationFormType, Visit } from "@/types/visit";
+import { ViolationForm as ViolationFormType } from "@/types/visit";
 import { useGetProjectsQuery } from "@/app/api/endpoints/projects";
 import { useLazyGetLocationsQuery } from "@/app/api/endpoints/locations";
 import { useLazyGetSecurityGuardsQuery } from "@/app/api/endpoints/security_guards";
@@ -74,6 +72,7 @@ const ViolationForm: React.FC = () => {
     const data = {
       ...values,
       date: values.date.format("YYYY-MM-DD"),
+      time: values.time.format("HH:mm"),
     };
 
     if (fileList?.length) {
@@ -197,11 +196,18 @@ const ViolationForm: React.FC = () => {
 
           <Form.Item
             label="التاريخ"
-            className="mb-0"
             name={"date"}
             rules={[{ required: true, message: "يرجى اختيار تاريخ المخالفة" }]}
           >
             <DatePicker className="w-full" format="YYYY-MM-DD" />
+          </Form.Item>
+
+          <Form.Item
+            label="الوقت"
+            name="time"
+            rules={[{ required: true, message: "يرجى اختيار وقت المخالفة" }]}
+          >
+            <TimePicker use12Hours className="w-full" format="HH:mm" />
           </Form.Item>
 
           <Form.Item
@@ -300,44 +306,6 @@ const ViolationForm: React.FC = () => {
             >
               <Button icon={<UploadOutlined />}>تحميل صورة</Button>
             </Upload>
-          </Form.Item>
-
-          {/* الإجراء */}
-          <Form.Item
-            name="action"
-            label={<span className="text-base">الإجراء</span>}
-            className="md:col-span-2"
-          >
-            <TextArea rows={2} />
-          </Form.Item>
-
-          {/* التوجيه */}
-          <Form.Item
-            name="guidance"
-            label={<span className="text-base">التوجيه</span>}
-            className="md:col-span-2"
-          >
-            <TextArea rows={2} />
-          </Form.Item>
-
-          {/* الجزاء */}
-          <Form.Item
-            name="penalty"
-            label={<span className="text-base">الجزاء المطبق للائحة</span>}
-            className="md:col-span-2"
-          >
-            <TextArea rows={2} />
-          </Form.Item>
-
-          {/* التأكيدات */}
-          <Form.Item name="confirmed_by_ops" valuePropName="checked">
-            <Checkbox className="text-base">التأكيد من مدير العمليات</Checkbox>
-          </Form.Item>
-
-          <Form.Item name="confirmed_by_monitoring" valuePropName="checked">
-            <Checkbox className="text-base">
-              التأكيد من قسم المتابعة والحفظ
-            </Checkbox>
           </Form.Item>
 
           {/* زر الحفظ */}

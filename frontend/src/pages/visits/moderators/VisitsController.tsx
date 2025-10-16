@@ -440,60 +440,73 @@ const VisitsController: React.FC = () => {
                   />
                 )}
 
-                {daily.violations.map((violation) => (
-                  <Card
-                    styles={{
-                      header: {
-                        padding: 0,
-                      },
-                    }}
-                    key={violation.id}
-                    className="w-full sm:w-[49%] lg:w-[49%] shadow-sm border border-red-500 rounded-md"
-                    title={
-                      <div className={`py-2 px-3 rounded-t-md mx-0 bg-red-100`}>
-                        <div className="flex items-center justify-between mb-1">
-                          <Text
-                            strong
-                            className="truncate text-base line-clamp-1"
-                          >
-                            {violation.project_name} - {violation.location_name}
-                          </Text>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <Text className="text-xs">
-                            {violation.created_at}
-                          </Text>
-                        </div>
-                      </div>
-                    }
-                  >
-                    <Text type="secondary" className="text-sm line-clamp-2">
-                      {violation.violation_type}
-                    </Text>
-                    <div className="flex justify-end items-center mt-5 gap-2">
-                      <ViolationReportModal
-                        report_id={violation.id}
-                        disabled={deletingViolation}
-                      />
+                {daily.violations.map((violation) => {
+                  const isConfirmed = violation.confirmed_by_monitoring;
 
-                      <Popconfirm
-                        title="حذف المخالفة"
-                        description="هل أنت متأكد من أنك تريد حذف هذه المخالفة؟"
-                        okText="نعم"
-                        cancelText="إلغاء"
-                        onConfirm={() => handleViolationDelete(violation.id)}
-                      >
-                        <Button
-                          danger
-                          size="middle"
-                          loading={deletingViolation}
+                  return (
+                    <Card
+                      styles={{
+                        header: {
+                          padding: 0,
+                        },
+                      }}
+                      key={violation.id}
+                      className="w-full sm:w-[49%] lg:w-[49%] shadow-sm border border-red-500 rounded-md"
+                      title={
+                        <div
+                          className={`py-2 px-3 rounded-t-md mx-0 bg-red-100`}
                         >
-                          حذف المخالفة
-                        </Button>
-                      </Popconfirm>
-                    </div>
-                  </Card>
-                ))}
+                          <div className="flex items-center justify-between mb-1">
+                            <Text
+                              strong
+                              className="truncate text-base line-clamp-1"
+                            >
+                              {violation.project_name} -{" "}
+                              {violation.location_name}
+                            </Text>
+
+                            {isConfirmed && (
+                              <Tag color="green" className="ml-2">
+                                مؤكد
+                              </Tag>
+                            )}
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <Text className="text-xs">
+                              {violation.date} = {violation.time}
+                            </Text>
+                          </div>
+                        </div>
+                      }
+                    >
+                      <Text type="secondary" className="text-sm line-clamp-2">
+                        {violation.violation_type}
+                      </Text>
+                      <div className="flex justify-end items-center mt-5 gap-2">
+                        <ViolationReportModal
+                          report_id={violation.id}
+                          disabled={deletingViolation}
+                        />
+
+                        <Popconfirm
+                          title="حذف المخالفة"
+                          description="هل أنت متأكد من أنك تريد حذف هذه المخالفة؟"
+                          okText="نعم"
+                          cancelText="إلغاء"
+                          onConfirm={() => handleViolationDelete(violation.id)}
+                        >
+                          <Button
+                            danger
+                            size="middle"
+                            loading={deletingViolation}
+                          >
+                            حذف المخالفة
+                          </Button>
+                        </Popconfirm>
+                      </div>
+                    </Card>
+                  );
+                })}
               </div>
             </Col>
           </Row>
