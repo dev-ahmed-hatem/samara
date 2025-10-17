@@ -41,6 +41,7 @@ const AttendanceSummary: React.FC = () => {
       });
     }
   }, [attendancesIsError]);
+  
 
   if (fetchingProjects) return <Loading />;
   if (ProjectsError) return <ErrorPage />;

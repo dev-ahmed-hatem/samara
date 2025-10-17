@@ -4,8 +4,8 @@ edit attendance record (✓)
 active and inactive locations
 actions in violations (✓)
 edit schedueld visit (✓)
-vists reports view stats and moderator notes
-moderator add notes to non-completed scheduled vists
+vists reports view stats and moderator notes (✓)
+moderator add notes to non-completed scheduled visits (✓)
 add time field in violation form (✓)
 add "other" security guards list selection in violation form (✓)
-view recorded shifts attendances
+view recorded shifts attendances (✓)

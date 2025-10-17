@@ -9,11 +9,16 @@ import { useLazyGetLocationsQuery } from "@/app/api/endpoints/locations";
 import Loading from "../../Loading";
 import ErrorPage from "@/pages/ErrorPage";
 import { useLazyGetSecurityGuardsQuery } from "@/app/api/endpoints/security_guards";
-import { useShiftAttendanceMutation } from "@/app/api/endpoints/attendance";
+import {
+  useLazyGetProjectAttendancesQuery,
+  useShiftAttendanceMutation,
+} from "@/app/api/endpoints/attendance";
 import { useNotification } from "@/providers/NotificationProvider";
 import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 import { SecurityGuard } from "@/types/scurityGuard";
 import { Project } from "@/types/project";
+import AttendanceStatusGrid from "./AttendanceStatusGrid";
+import AttendanceAccordion from "./AttendanceAccordion";
 
 const today = dayjs().format("YYYY-MM-DD");
 const yesterday = dayjs().subtract(1, "day").format("YYYY-MM-DD");
@@ -140,6 +145,15 @@ const AttendanceRecords: React.FC = () => {
     recordAttendance(data);
   };
 
+  const [
+    getAttendances,
+    {
+      data: attendances,
+      isFetching: fetchingAttendances,
+      isError: attendancesIsError,
+    },
+  ] = useLazyGetProjectAttendancesQuery();
+
   useEffect(() => {
     if (securityGuards) {
       setGuards(securityGuards as SecurityGuard[]);
@@ -165,6 +179,15 @@ const AttendanceRecords: React.FC = () => {
   useEffect(() => {
     setAttendance({});
   }, [currentDate, projectId, shift, location]);
+
+  useEffect(() => {
+    if (projectId && currentDate) {
+      getAttendances({
+        date: currentDate,
+        project: projectId!.toString(),
+      });
+    }
+  }, [projectId, currentDate]);
 
   useEffect(() => {
     if (attendanceSaved) {
@@ -300,7 +323,42 @@ const AttendanceRecords: React.FC = () => {
         </div>
       </Card>
 
-      {/* Section 2 */}
+      {/* Section2 */}
+      <div className="flex flex-col items-center justify-center">
+        {/* Loading state */}
+        {fetchingAttendances && (
+          <div className="flex flex-col items-center justify-center py-10">
+            <Loading className="h-36" />
+          </div>
+        )}
+
+        {/* Error state */}
+        {attendancesIsError && !fetchingAttendances && (
+          <div className="text-center text-red-500 py-10">
+            <p>حدث خطأ أثناء تحميل بيانات الحضور. يرجى المحاولة لاحقًا.</p>
+          </div>
+        )}
+
+        {/* Empty state */}
+        {!fetchingAttendances &&
+          !attendancesIsError &&
+          attendances?.attendances?.length === 0 && (
+            <div className="text-center text-gray-500 py-10">
+              <p>لا توجد بيانات حضور متاحة حاليًا.</p>
+            </div>
+          )}
+
+        {/* Data loaded */}
+        {!fetchingAttendances &&
+          !attendancesIsError &&
+          projectId &&
+          attendances &&
+          attendances.attendances.length > 0 && (
+            <AttendanceAccordion attendances={attendances} />
+          )}
+      </div>
+
+      {/* Section 3 */}
       {fetchingSecurityGuards ? (
         <Loading />
       ) : previouslyRecorded ? (

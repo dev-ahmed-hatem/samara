@@ -16,7 +16,7 @@ from .serializers import ShiftAttendanceSerializer, SecurityGuardAttendanceSeria
 
 
 class ShiftAttendanceViewSet(viewsets.ModelViewSet):
-    queryset = SecurityGuardAttendance.objects.all()
+    queryset = ShiftAttendance.objects.all()
     serializer_class = ShiftAttendanceSerializer
 
 
