@@ -50,6 +50,11 @@ class Visit(models.Model):
         verbose_name=_("تاريخ استكمال التقرير"),
         help_text=_("تاريخ ووقت اكتمال تقرير الزيارة")
     )
+    notes = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name=_("ملاحظات"),
+    )
 
     class Meta:
         verbose_name = _("زيارة")

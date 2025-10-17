@@ -1,4 +1,9 @@
-import { ViolationForm, Visit, VisitFormData, VisitReportForm } from "@/types/visit";
+import {
+  ViolationForm,
+  Visit,
+  VisitFormData,
+  VisitReportForm,
+} from "@/types/visit";
 import api from "../apiSlice";
 import qs from "query-string";
 import { Violation } from "@/types/violation";
@@ -48,6 +53,7 @@ export const visitsEndpoints = api.injectEndpoints({
         method: method ?? "POST",
         data,
       }),
+      invalidatesTags: [{ type: "DailyRecord", id: "LIST" }],
     }),
     visitReport: builder.mutation<void, VisitReportForm & { visit: string }>({
       query: (data) => ({
@@ -92,7 +98,11 @@ export const visitsEndpoints = api.injectEndpoints({
     }),
     violation: builder.mutation<
       Violation,
-      { url?: string; method?: string; data: Partial<ViolationForm & { visit: string }> }
+      {
+        url?: string;
+        method?: string;
+        data: Partial<ViolationForm & { visit: string }>;
+      }
     >({
       query: ({ url, method, data }) => ({
         url: url ?? `/visits/violations/`,

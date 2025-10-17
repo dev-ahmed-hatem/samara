@@ -38,6 +38,7 @@ import CreateVisitForm from "@/components/visits/moderators/CreateVisitForm";
 import { Visit } from "@/types/visit";
 import VisitReportModal from "../../../components/visits/moderators/VisitReportModal";
 import ViolationReportModal from "@/components/violations/ViolationReportModal";
+import VisitNotesModal from "@/components/visits/moderators/VisitNotesModal";
 
 const { Option } = Select;
 const { Title, Text } = Typography;
@@ -311,6 +312,11 @@ const VisitsController: React.FC = () => {
                             {visit.location.project_name} -{" "}
                             {visit.location.name}
                           </Text>
+                          <VisitNotesModal
+                            visit_id={visit.id}
+                            value={visit.notes}
+                            disabled={loadingVisit}
+                          />
                         </div>
 
                         {/* Row 2: Date + Time on left, Status on right */}
@@ -379,13 +385,6 @@ const VisitsController: React.FC = () => {
                     title={
                       <div className="relative py-2 px-3 rounded-t-md mx-0 bg-calypso-50">
                         {/* Edit Icon (top-right corner) */}
-                        <Button
-                          type="text"
-                          size="small"
-                          icon={<EditOutlined />}
-                          className="!absolute top-2 left-5 text-gray-600 hover:text-blue-600"
-                          onClick={() => navigate(`edit-visit/${visit.id}`)}
-                        />
 
                         {/* Row 1: Project + Location */}
                         <div className="flex items-center justify-between mb-1">
@@ -396,6 +395,21 @@ const VisitsController: React.FC = () => {
                             {visit.location.project_name} -{" "}
                             {visit.location.name}
                           </Text>
+
+                          <div>
+                            <VisitNotesModal
+                              visit_id={visit.id}
+                              value={visit.notes}
+                              disabled={loadingVisit}
+                            />
+                            <Button
+                              type="text"
+                              size="small"
+                              icon={<EditOutlined />}
+                              className="text-gray-600 hover:text-blue-600"
+                              onClick={() => navigate(`edit-visit/${visit.id}`)}
+                            />
+                          </div>
                         </div>
 
                         {/* Row 2: Date + Time + Status */}

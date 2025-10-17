@@ -23,6 +23,7 @@ export interface Visit {
   report_id: string | null;
 
   opened?: boolean;
+  notes?: string;
   // gps_coordinates?: { lat: number; lng: number }; // if you enable GIS field later
 }
 

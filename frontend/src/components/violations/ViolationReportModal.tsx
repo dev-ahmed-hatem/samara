@@ -25,9 +25,9 @@ const ViolationReportModal = ({
       </Button>
 
       <Modal
-        title={null} // remove title if you want full page feel
+        title={null}
         open={open}
-        footer={null} // no footer buttons
+        footer={null}
         className="w-[95%] top-10"
         onCancel={() => setOpen(false)}
       >
