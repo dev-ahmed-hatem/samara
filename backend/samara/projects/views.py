@@ -58,10 +58,27 @@ class LocationViewSet(ModelViewSet):
 
         project_id = self.request.query_params.get('project_id')
 
+        status_filters = self.request.query_params.get('is_active', None)
+
         if project_id:
             queryset = queryset.filter(project_id=project_id)
 
+        if status_filters == "active":
+            queryset = queryset.filter(is_active=True)
+        elif status_filters == "inactive":
+            queryset = queryset.filter(is_active=False)
+
         return queryset
+
+    @action(detail=True, methods=['post'])
+    def switch_active(self, request, pk=None):
+        try:
+            location = Location.objects.get(pk=pk)
+            location.is_active = not location.is_active
+            location.save()
+            return Response({"is_active": location.is_active})
+        except Exception:
+            return Response({'detail': _('موقع غير موجود')}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(["GET"])

@@ -30,6 +30,8 @@ class Location(models.Model):
         verbose_name=_("المشروع"),
     )
 
+    is_active = models.BooleanField(default=True)
+
     class Meta:
         verbose_name = _("موقع")
         verbose_name_plural = _("المواقع")

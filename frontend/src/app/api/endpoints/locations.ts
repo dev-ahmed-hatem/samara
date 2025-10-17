@@ -51,6 +51,13 @@ export const locationsEndpoints = api.injectEndpoints({
         }
       },
     }),
+    switchLocationActive: builder.mutation<{ is_active: boolean }, string>({
+      query: (id) => ({
+        url: `/projects/locations/${id}/switch_active/`,
+        method: "POST",
+      }),
+      invalidatesTags: (_, __, arg) => [{ type: "Location", id: arg }],
+    }),
   }),
 });
 
@@ -58,4 +65,5 @@ export const {
   useGetLocationsQuery,
   useLazyGetLocationsQuery,
   useLocationMutation,
+  useSwitchLocationActiveMutation,
 } = locationsEndpoints;

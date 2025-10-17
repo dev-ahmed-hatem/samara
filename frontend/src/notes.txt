@@ -1,7 +1,7 @@
 client stats in home (✓)
 inactive client aren't shown in attendace record (✓)
 edit attendance record (✓)
-active and inactive locations
+active and inactive locations (✓)
 actions in violations (✓)
 edit schedueld visit (✓)
 vists reports view stats and moderator notes (✓)

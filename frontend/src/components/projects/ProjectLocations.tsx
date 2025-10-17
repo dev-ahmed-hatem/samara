@@ -1,10 +1,6 @@
 import { useState } from "react";
 import { Table, Button, Modal, Space, Popconfirm, Card } from "antd";
-import {
-  PlusOutlined,
-  EditOutlined,
-  DeleteOutlined,
-} from "@ant-design/icons";
+import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useNotification } from "@/providers/NotificationProvider";
 import { useParams } from "react-router";
 import {
@@ -17,6 +13,7 @@ import ErrorPage from "@/pages/ErrorPage";
 import LocationForm, { LocationFormValues } from "./LocationForm";
 import { useAppDispatch } from "@/app/redux/hooks";
 import { projectsEndpoints } from "@/app/api/endpoints/projects";
+import SwitchLocationStatus from "./SwitchLocationStatus";
 
 const ProjectLocationsList = () => {
   const { project_id } = useParams();
@@ -24,7 +21,7 @@ const ProjectLocationsList = () => {
   const dispatch = useAppDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingLocation, setEditingLocation] = useState<Location | null>(null);
-  
+
   const {
     data: locations,
     isFetching,
@@ -107,6 +104,15 @@ const ProjectLocationsList = () => {
       title: "اسم الموقع",
       dataIndex: "name",
       key: "name",
+    },
+    {
+      title: "الحالة",
+      dataIndex: "is_active",
+      key: "is_active",
+      width: "15%",
+      render: (_: boolean, record: Location) => (
+        <SwitchLocationStatus location={record} />
+      ),
     },
     {
       title: "إجراءات",

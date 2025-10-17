@@ -296,7 +296,7 @@ def get_supervisor_home_stats(request):
 
     data = {
         "general": {"projects_count": Project.objects.count(),
-                    "locations_count": Location.objects.count(),
+                    "locations_count": Location.objects.filter(is_active=True).count(),
                     "guards_count": {"active": security_guards_count.filter(is_active=True).count(),
                                      "inactive": security_guards_count.filter(is_active=False).count()}, },
         "today": {
