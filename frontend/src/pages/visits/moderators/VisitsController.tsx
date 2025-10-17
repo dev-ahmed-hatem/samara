@@ -482,7 +482,7 @@ const VisitsController: React.FC = () => {
                           </div>
                           <div className="flex items-center justify-between">
                             <Text className="text-xs">
-                              {violation.date} = {violation.time}
+                              {violation.created_at}
                             </Text>
                           </div>
                         </div>
