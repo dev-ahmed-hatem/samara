@@ -50,7 +50,7 @@ const AttendanceSummary: React.FC = () => {
 
   useEffect(() => {
     if (projectId) {
-      getLocations({ project_id: projectId });
+      getLocations({ is_active: "active", project_id: projectId });
     }
   }, [projectId]);
 

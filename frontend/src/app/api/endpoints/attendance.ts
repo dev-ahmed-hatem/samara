@@ -5,13 +5,14 @@ import { LocationAttendance } from "@/types/attendance";
 export const attendanceEndpoints = api.injectEndpoints({
   endpoints: (builder) => ({
     getProjectAttendances: builder.query<
-    { project: string; date: string; attendances: LocationAttendance[] },
-    { project: string; date: string }
+      { project: string; date: string; attendances: LocationAttendance[] },
+      { project: string; date: string }
     >({
       query: (params) => ({
-        url: `/attendance/get-project-attendances/?${qs.stringify(
-          params || {}
-        )}`,
+        url: `/attendance/get-project-attendances/?${qs.stringify({
+          is_active: "active",
+          ...params,
+        })}`,
         method: "GET",
       }),
       providesTags: [{ type: "ProjectAttendances", id: "LIST" }],
@@ -24,22 +25,22 @@ export const attendanceEndpoints = api.injectEndpoints({
       }),
     }),
     securityGuardAttendance: builder.mutation<
-    void,
-    { id: string; status: string }
+      void,
+      { id: string; status: string }
     >({
       query: ({ id, status }) => ({
         url: `/attendance/security-guard-attendances/${id}/`,
         method: "PATCH",
         data: { status },
       }),
-      invalidatesTags: [{type: "ShiftAttendance", id: "LIST"}]
+      invalidatesTags: [{ type: "ShiftAttendance", id: "LIST" }],
     }),
     getShiftAttendance: builder.query({
       query: (params) => ({
         url: `/attendance/get-shift-attendance/?${qs.stringify(params || {})}`,
         method: "GET",
       }),
-      providesTags: [{type: "ShiftAttendance", id: "LIST"}]
+      providesTags: [{ type: "ShiftAttendance", id: "LIST" }],
     }),
     deleteShiftAttendance: builder.mutation<void, number>({
       query: (shift_id) => ({

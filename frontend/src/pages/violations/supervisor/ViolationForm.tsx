@@ -79,7 +79,7 @@ const ViolationForm: React.FC = () => {
       data["violation_image"] = fileList[0];
     }
 
-    submitForm({data});
+    submitForm({ data });
   };
 
   const handleUploadChange = ({ fileList }: any) => {
@@ -109,7 +109,7 @@ const ViolationForm: React.FC = () => {
 
   useEffect(() => {
     if (projectId) {
-      getLocations({ project_id: projectId });
+      getLocations({ is_active: "active", project_id: projectId });
     }
   }, [projectId]);
 
@@ -222,7 +222,11 @@ const ViolationForm: React.FC = () => {
             name="security_guard"
             className="col-span-1"
           >
-            <Select placeholder="اختر الموظف المخالف" disabled={!location} allowClear>
+            <Select
+              placeholder="اختر الموظف المخالف"
+              disabled={!location}
+              allowClear
+            >
               {location &&
                 (securityGuards as SecurityGuard[])?.map((sec) => (
                   <Select.Option key={sec.id} value={sec.id}>

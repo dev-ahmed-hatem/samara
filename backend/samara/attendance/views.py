@@ -32,10 +32,15 @@ def get_project_attendances(request):
     date = request.query_params.get('date')
 
     project = get_object_or_404(Project, pk=project)
+    is_active = request.query_params.get('is_active', None)
+
+    locations = project.locations.all()
+    if is_active == 'active':
+        locations = locations.filter(is_active=True)
 
     project_attendances = []
     all_shifts = [*Shift.ShiftChoices]
-    for location in project.locations.all():
+    for location in locations:
         location_data = {"location": location.name, "shifts": {}}
         for shift_name in all_shifts:
             shift_attendance = ShiftAttendance.objects.filter(location=location, date=date,

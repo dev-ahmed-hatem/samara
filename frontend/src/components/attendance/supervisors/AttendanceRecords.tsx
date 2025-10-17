@@ -17,7 +17,6 @@ import { useNotification } from "@/providers/NotificationProvider";
 import { axiosBaseQueryError } from "@/app/api/axiosBaseQuery";
 import { SecurityGuard } from "@/types/scurityGuard";
 import { Project } from "@/types/project";
-import AttendanceStatusGrid from "./AttendanceStatusGrid";
 import AttendanceAccordion from "./AttendanceAccordion";
 
 const today = dayjs().format("YYYY-MM-DD");
@@ -161,7 +160,7 @@ const AttendanceRecords: React.FC = () => {
   }, [securityGuards]);
 
   useEffect(() => {
-    if (projectId) getLocations({ project_id: projectId });
+    if (projectId) getLocations({ project_id: projectId, is_active: "active" });
   }, [projectId]);
 
   useEffect(() => {
