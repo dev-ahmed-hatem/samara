@@ -69,7 +69,7 @@ const ViolationReport = ({ report_id }: { report_id: string }) => {
           <Descriptions.Item label="التاريخ">
             <span dir="rtl">{violation!.date}</span>
           </Descriptions.Item>
-          <Descriptions.Item label="التاريخ">
+          <Descriptions.Item label="الوقت">
             <span dir="rtl">{violation!.time}</span>
           </Descriptions.Item>
           <Descriptions.Item label="وقت الإنشاء">
