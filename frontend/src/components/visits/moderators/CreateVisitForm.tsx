@@ -26,25 +26,38 @@ import { useGetEmployeesQuery } from "@/app/api/endpoints/employees";
 import ErrorPage from "@/pages/ErrorPage";
 import { Employee } from "@/types/employee";
 import { dayjs } from "@/utils/locale";
+import { Dayjs } from "dayjs";
 import { Project } from "@/types/project";
+import { VisitFormData } from "@/types/visit";
+import { useNavigate } from "react-router";
 
 const { Option } = Select;
 const { TextArea } = Input;
 const { Title } = Typography;
 
-const CreateVisitForm = ({}: // selectedSupervisor,
-// selectedDate,
-{
-  // selectedSupervisor: string;
-  // selectedDate: string;
-}) => {
-  const [projectId, setProjectId] = useState<number | null>(null);
+const checkTimeRange = (time: Dayjs): "morning" | "evening" => {
+  const start = dayjs("09:00", "HH:mm");
+  const end = dayjs("20:59", "HH:mm");
+
+  return time.isAfter(start) && time.isBefore(end) ? "morning" : "evening";
+};
+
+const CreateVisitForm = ({ visitData }: { visitData?: VisitFormData }) => {
+  const [initialValues, setInitialValues] = useState<VisitFormData | undefined>(
+    visitData
+  );
+  const [projectId, setProjectId] = useState<number | null>(
+    initialValues ? initialValues.project : null
+  );
   const notification = useNotification();
   const dispatch = useAppDispatch();
 
-  const [period, setPeriod] = useState<"morning" | "evening" | null>();
+  const [period, setPeriod] = useState<"morning" | "evening" | null>(
+    initialValues ? checkTimeRange(dayjs(initialValues.time, "HH:mm")) : null
+  );
 
   const [form] = Form.useForm();
+  const navigate = useNavigate();
 
   const {
     data: supervisors,
@@ -79,7 +92,13 @@ const CreateVisitForm = ({}: // selectedSupervisor,
       status: "مجدولة",
     };
 
-    createVisit({ data });
+    createVisit({
+      data,
+      method: initialValues ? "PATCH" : "POST",
+      url: initialValues
+        ? `/visits/visits/${initialValues.id}/`
+        : "/visits/visits/",
+    });
   };
 
   useEffect(() => {
@@ -100,7 +119,11 @@ const CreateVisitForm = ({}: // selectedSupervisor,
           { type: "MonthlyRecord", id: "LIST" },
         ])
       );
-      notification.success({ message: "تم إضافة الزيارة" });
+      notification.success({
+        message: `تم 
+            ${initialValues ? "تعديل" : "إضافة"} الزيارة`,
+      });
+      setInitialValues(undefined);
     }
   }, [visitDone]);
 
@@ -119,9 +142,20 @@ const CreateVisitForm = ({}: // selectedSupervisor,
           },
         ]);
       }
-      notification.error({ message: "حدث خطأ أثناء إضافة الزيارة" });
+      notification.error({
+        message: `حدث خطأ أثناء ${initialValues ? "تعديل" : "إضافة"} الزيارة`,
+      });
     }
   }, [visitIsError]);
+
+  // manually set time in edit mode
+  useEffect(() => {
+    if (initialValues) {
+      form.setFieldValue("time", dayjs(initialValues.time, "HH:mm"));
+    } else {
+      form.resetFields();
+    }
+  }, [initialValues]);
 
   if (fetchingSupervisors || fetchingProjects) return <Loading />;
   if (supervisorsError || ProjectsError || locationsError) return <ErrorPage />;
@@ -129,14 +163,21 @@ const CreateVisitForm = ({}: // selectedSupervisor,
   return (
     <div>
       <Title level={4} className="mb-4">
-        إضافة زيارة
+        {initialValues ? "تعديل" : "إضافة"} زيارة
       </Title>
 
       <Form
         layout="vertical"
         form={form}
         onFinish={handleFinish}
-        initialValues={{ time: dayjs().hour(9).minute(0) }}
+        initialValues={{
+          ...initialValues,
+          period,
+          date: initialValues ? dayjs(initialValues.date) : undefined,
+          time: initialValues?.time
+            ? dayjs(initialValues.time, "hh:mm A")
+            : undefined,
+        }}
       >
         <Row gutter={[16, 16]}>
           {/* Supervisor */}
@@ -302,7 +343,7 @@ const CreateVisitForm = ({}: // selectedSupervisor,
                 size="large"
                 loading={loadingVisit}
               >
-                إنشاء الزيارة
+                {initialValues ? "تعديل" : "إضافة"}
               </Button>
             </Form.Item>
           </Col>

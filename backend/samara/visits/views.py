@@ -2,7 +2,7 @@ from django.utils.timezone import make_aware
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 
 from .models import Visit, VisitReport, Violation
 from .serializers import VisitReadSerializer, VisitWriteSerializer, \
@@ -75,7 +75,7 @@ class VisitViewSet(ModelViewSet):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        if instance.date not in (today, yesterday):
+        if employee.user.role == User.RoleChoices.SUPERVISOR and instance.date not in (today, yesterday):
             return Response(
                 {"detail": "لا يمكن عرض الزيارة، هذا ليس يوم تنفيذ الزيارة."},
                 status=status.HTTP_403_FORBIDDEN
@@ -142,3 +142,27 @@ class ViolationViewSet(ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET"])
+def get_visit_form_data(request):
+    visit_id = request.query_params.get("id", None)
+    if visit_id:
+        try:
+            visit: Visit = Visit.objects.get(id=visit_id)
+        except Visit.DoesNotExist:
+            return Response({'detail': _('زيارة غير موجودة')}, status=status.HTTP_404_NOT_FOUND)
+
+        data = {
+            "id": visit.id,
+            "employee": visit.employee.id,
+            "project": visit.location.project.id,
+            "location": visit.location.id,
+            "date": visit.date,
+            "time": visit.time,
+            "purpose": visit.purpose,
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
+
+    return Response({"detail": "يجب إدخال كود الزيارة"}, status=status.HTTP_400_BAD_REQUEST)

@@ -10,6 +10,7 @@ import SecurityGuardProfile from "@/pages/security-guards/SecurityGuardProfile";
 import ProjectForm from "@/pages/projects/ProjectForm";
 import ProjectEdit from "@/pages/projects/ProjectEdit";
 import ProjectProfile from "@/pages/projects/ProjectProfile";
+import EditVisit from "@/components/visits/moderators/EditVisit";
 
 const alterRoute = function (
   appRoutes: AppRoute[],
@@ -76,6 +77,7 @@ let routes: RouteObject[] = addSubRoutes(appRoutes, {
   "/moderator/visits": [
     { path: "view-report/:report_id", element: <VisitReportPage /> },
     { path: "add-visit/", element: <CreateVisitForm /> },
+    { path: "edit-visit/:visit_id", element: <EditVisit /> },
   ],
   "/moderator/security-guards": [
     { path: "add/", element: <SecurityGuardForm /> },

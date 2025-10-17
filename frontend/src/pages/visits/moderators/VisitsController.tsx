@@ -14,7 +14,7 @@ import {
   Divider,
   Radio,
 } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { EditOutlined, PlusOutlined } from "@ant-design/icons";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import {
@@ -377,7 +377,16 @@ const VisitsController: React.FC = () => {
                     key={visit.id}
                     className={`w-full sm:w-[49%] lg:w-[49%] h-52 flex flex-col justify-between shadow-sm border rounded-md border-calypso-500`}
                     title={
-                      <div className="py-2 px-3 rounded-t-md mx-0 bg-calypso-50">
+                      <div className="relative py-2 px-3 rounded-t-md mx-0 bg-calypso-50">
+                        {/* Edit Icon (top-right corner) */}
+                        <Button
+                          type="text"
+                          size="small"
+                          icon={<EditOutlined />}
+                          className="!absolute top-2 left-5 text-gray-600 hover:text-blue-600"
+                          onClick={() => navigate(`edit-visit/${visit.id}`)}
+                        />
+
                         {/* Row 1: Project + Location */}
                         <div className="flex items-center justify-between mb-1">
                           <Text
@@ -389,7 +398,7 @@ const VisitsController: React.FC = () => {
                           </Text>
                         </div>
 
-                        {/* Row 2: Date + Time on left, Status on right */}
+                        {/* Row 2: Date + Time + Status */}
                         <div className="flex items-center justify-between flex-wrap gap-1">
                           <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2 text-xs text-gray-700">
                             <span dir="rtl">{visit.date}</span>

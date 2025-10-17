@@ -26,6 +26,16 @@ export interface Visit {
   // gps_coordinates?: { lat: number; lng: number }; // if you enable GIS field later
 }
 
+export type VisitFormData = {
+  id: string;
+  employee: number;
+  project: number;
+  location: number;
+  date: string;
+  time: string;
+  purpose: string;
+};
+
 export const visitReportFieldLabels: Record<string, string> = {
   guard_presence: "تواجد الحارس في موقعه",
   uniform_cleanliness: "نظافة الزي الرسمي",

@@ -1,10 +1,11 @@
-client stats in home
-inactive client aren't shown in attendace record
-edit attendance record
+client stats in home (✓)
+inactive client aren't shown in attendace record (✓)
+edit attendance record (✓)
 active and inactive locations
-actions in violations
+actions in violations (✓)
 edit schedueld visit
 vists reports view stats and moderator notes
 moderator add notes to non-completed scheduled vists
-add time field in violation form
-add "other" security guards list selection in violation form
+add time field in violation form (✓)
+add "other" security guards list selection in violation form (✓)
+view recorded shifts attendances
